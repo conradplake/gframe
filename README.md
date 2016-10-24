@@ -6,4 +6,5 @@ Offers some nice features already including:
  - sub-pixel & sub-texel accuracy
  - phong shading
  - normal mapping
+ - shadow mapping
  - physics support and particles
