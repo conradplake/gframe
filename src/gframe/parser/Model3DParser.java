@@ -21,7 +21,8 @@ public class Model3DParser {
 
 		// fw.write("[Faces]\n");
 		// it = model.getFaces().iterator();
-
+		
+		fw.close();
 	}
 
 	public static Model3D parse(String filename) {
