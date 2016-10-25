@@ -1,0 +1,12 @@
+# define sequence of key positions in world space
+#timestamp_in_millis	x	y	z	xx	xy	xz	yx	yy	yz	zx	zy	zz
+10000	-70	0	550	0	0	-1	0	1	0	1	0	0
+15500	-30	0	800
+22900	0	0	950
+23000	0	0	1100
+
+#3000	-0	0	300
+#3500	-30	30	330
+#4000	0	30	350
+#4500	30	-30	370
+#10000	-0	0	800

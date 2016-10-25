@@ -1,0 +1,5 @@
+# define sequence of key positions in world space
+#timestamp_in_millis	x	y	z	xx	xy	xz	yx	yy	yz	zx	zy	zz
+#9500	0	0	465
+19000	0	0	930
+23000	0	0	950
