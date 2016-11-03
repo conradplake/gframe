@@ -7,4 +7,4 @@ Features include:
  - flat & phong shading
  - normal mapping
  - shadow mapping (only one spotlight though)
- - physics support and particles
+ - physics support & particles
