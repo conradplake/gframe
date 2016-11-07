@@ -112,6 +112,14 @@ public class Vector3D {
 		this.y+=move_dy;
 		this.z+=move_dz;
 	}
+	
+	
+	public Vector3D crossProduct(Vector3D v) {
+		float r_x = (v.y*z) - (v.z*y);
+		float r_y = (v.z*x) - (v.x*z);
+		float r_z = (v.x*y) - (v.y*x);
+		return new Vector3D(r_x, r_y, r_z);
+	}
 
 	public Vector3D copy() {
 		return new Vector3D(x, y, z);
@@ -130,5 +138,5 @@ public class Vector3D {
 
 	public float x;
 	public float y;
-	public float z;
+	public float z;	
 }
