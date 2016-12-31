@@ -25,7 +25,7 @@ public class Model3DGenerator {
 	
 	
 	public static Model3D buildSkydome(float radius, Color color){
-		Model3D result = WavefrontObjParser.parse(new File("models/structures/Sphere.obj"), color);							
+		Model3D result = WavefrontObjParser.parse(new File("models/structures/sphere.obj"), color);							
 		invertFaces(result);
 		float scalefactor = radius / result.getBoundingSphereRadius();
 		result.scale(scalefactor, scalefactor, scalefactor);
