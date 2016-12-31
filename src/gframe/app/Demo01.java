@@ -2,7 +2,10 @@ package gframe.app;
 
 import java.awt.AWTEvent;
 import java.awt.Color;
+import java.awt.DisplayMode;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -45,6 +48,7 @@ import gframe.parser.WavefrontObjParser;
 import imaging.ImageRaster;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
 
@@ -58,12 +62,6 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 	}	
 
 	public void start() {
-		
-		setSize(SCREENX, SCREENY);
-		setLocation(20, 0);
-		setLayout(null);
-		enableEvents(AWTEvent.KEY_EVENT_MASK);
-		addMouseMotionListener(this);
 				
 		initEngine();
 				
@@ -73,6 +71,16 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 			@Override
 			public void timePassedInMillis(long millis) {
 				// here we load everything at once and ignore the millis
+				
+				// audio
+				try{
+				  cassius_i_love_you_so = new Media((new File("audio/Cassius-ILoveYouSoHq.mp3")).toURI().toString());
+				  silent_shout = new Media((new File("audio/Silent_shout.mp3")).toURI().toString());
+				}
+				catch(MediaException me){
+					System.out.println("Audio files missing?");
+					System.exit(1);
+				}
 				
 				//preload menger sponge into segment 1		
 				masterMengerCube = Model3DGenerator.buildMengerSponge(3, 6561, Color.blue);
@@ -85,11 +93,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				berlinRaster = TextureShader.getRGBRaster(new File("./textures/diffuse/berlin.jpg"), 160, 160);
 				berlinRaster.inverse();
 				graffitiRaster = TextureShader.getRGBRaster(new File("./textures/diffuse/politics_160x160.png"), 160, 160);
-				graffitiRaster.inverse();
-				
-				// audio
-				cassius_i_love_you_so = new Media((new File("audio/Cassius-ILoveYouSoHq.mp3")).toURI().toString());
-				silent_shout = new Media((new File("audio/Silent_shout.mp3")).toURI().toString());
+				graffitiRaster.inverse();							
 				
 				isLoading = false; // done
 			}
@@ -101,6 +105,29 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		};
 		Timer.getInstance().registerTimedObject(loader);
 				
+		
+		// -- DISPLAY MODE SETTINGS
+		
+		GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		if(device.isFullScreenSupported()){
+			DisplayMode newMode = new DisplayMode(SCREENX, SCREENY, 32, 60);
+			this.setUndecorated(true);
+			this.setResizable(false);
+			//this.setIgnoreRepaint(true);
+			device.setFullScreenWindow(this);			
+			device.setDisplayMode(newMode);			
+		}else{
+			setSize(SCREENX, SCREENY);
+			setLocation(20, 0);
+			setLayout(null);
+		}	
+		
+		enableEvents(AWTEvent.KEY_EVENT_MASK);
+		addMouseMotionListener(this);
+		
+		
+		
+		// ----
 		
 		showLoadingScreen();
 		
@@ -229,9 +256,13 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 			Model3D wallSegment = Model3DGenerator.buildPlane(100, new Point3D(), Color.black);
 			wallSegment.move(0, 50, i * (100));
 			wallSegment.rotate(90, 0, 180);
-			engine.register(wallSegment);
-			engine.setModelShader(wallSegment, wallShader);
+			engine.register(wallSegment,wallShader);			
 		}
+		
+		Model3D ceilingSegment = Model3DGenerator.buildPlane(100, new Point3D(), Color.black);
+		ceilingSegment.move(-100, 50, 9 * (100));
+		ceilingSegment.rotate(90, 0, 180);
+		engine.register(ceilingSegment, wallShader);		
 
 		// end wall
 		Model3D wallSegment = Model3DGenerator.buildPlane(100, new Point3D(), Color.black);
@@ -325,6 +356,8 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		events.add(new SparkTimedEvent(System.currentTimeMillis()+43900, new FadeOutFadeIn(lightsource, 500, 500)));
 		
 		events.add(new SparkTimedEvent(System.currentTimeMillis()+52000, new FadeOutFadeIn(lightsource, 500, 1000)));
+		
+		events.add(new SparkTimedEvent(System.currentTimeMillis()+59200, new FadeOut(lightsource, 400)));
 				
 	}
 	
@@ -653,14 +686,11 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		setForeground(Color.black);
 		setVisible(true);
 				
-		while(isLoading){
-			repaint();			
+		while(isLoading){				
 			try {
-				Thread.sleep(500);				
-				
+				Thread.sleep(500);								
 				Color  c = Color.getHSBColor((float)Math.random(), 1, 0.5f);
 				setBackground(c);
-				
 			} catch (InterruptedException ie_ignore) {
 			}	
 		}	
@@ -712,14 +742,21 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		
 		long lastTime = System.currentTimeMillis();
 
+		//Graphics graphics = this.getGraphics();
 		while (true) {
-			repaint();			
+			repaint();
+			//update(this.getGraphics());
+			//update(graphics);
+
+			//Thread.yield();
 			try {
 				Thread.sleep(2);
 			} catch (InterruptedException ie_ignore) {
-			}	
+			}
 
 			long currentTime = System.currentTimeMillis();
+			
+			
 
 			boolean allKeyPositionsReached = true;
 			if (!lightKeyPositions.isEmpty()) {
@@ -753,7 +790,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				break;
 			}
 
-			lastTime = currentTime;
+			lastTime = currentTime;		
 		}				
 	}
 
@@ -804,11 +841,13 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 			}
 			
 			if (allKeyPositionsReached) {
-				lightsource.setIntensity(Math.max(0f, lightsource.getIntensity()-0.01f));
-				if(lightsource.getIntensity()<=0.001){
-					lightsource.setIntensity(0);
-					break;
-				}
+//				lightsource.setIntensity(Math.max(0f, lightsource.getIntensity()-0.01f));
+//				if(lightsource.getIntensity()<=0.001){
+//					lightsource.setIntensity(0);
+//					break;
+//				}
+				lightsource.setIntensity(0);						
+				break;
 			}
 			
 			lastTime = currentTime;
@@ -822,15 +861,10 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		initPart3_metro_scene();
 
 		setBackground(Color.black);
-		setForeground(Color.black);					
-		
+		setForeground(Color.black);						
 		setVisible(true);
-
 						
 		long lastTime = System.currentTimeMillis();
-		
-		float lightsourceMoveOutAcc = 0.0005f;
-		float speed = 0;
 		
 		while (true) {
 			repaint();			
@@ -876,13 +910,15 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 			}
 			
 			if (allKeyPositionsReached) {
-				speed += lightsourceMoveOutAcc;
-				lightsource.move(0, 0, speed);
-				engine.recomputeShadowMaps();
-				if(lightsource.z>2000){
-					lightsource.setIntensity(0);
-					break;
-				}
+//				speed += lightsourceMoveOutAcc;
+//				lightsource.move(0, 0, speed);
+//				engine.recomputeShadowMaps();
+//				if(lightsource.z>2000){
+//					lightsource.setIntensity(0);
+//					break;
+//				}
+				lightsource.setIntensity(0);
+				break;
 			}
 			
 			lastTime = currentTime;			
@@ -1219,10 +1255,10 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 			}
 		}
 
-		fpsCounter++;
-		if (fpsCounter % 20 == 0) {
-			System.out.println("FPS: " + (1000 / updateTime));
-		}
+//		fpsCounter++;
+//		if (fpsCounter % 20 == 0) {
+//			System.out.println("FPS: " + (1000 / updateTime));
+//		}
 
 	}
 
