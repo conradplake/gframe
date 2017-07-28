@@ -26,6 +26,8 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 	
 	float[] edgeDeltas;
 	
+	int shadowColorRGB = Color.black.getRGB();
+	
 
 	public DefaultConvexPolygonRasterizer(int frameX, int frameY) {
 		this(frameX / 2, frameY / 2, frameX, frameY);		
@@ -372,10 +374,10 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		if(draw_x < edgeTableEntry.min_draw_x || !edgeTableEntry.visited){
 			
 			edgeTableEntry.min_draw_x = draw_x;
-			edgeTableEntry.min_draw_z = renderFace.cam_Z[startVertex] + height*deltas[1] + subPix*deltas[1];
+//			edgeTableEntry.min_draw_z = renderFace.cam_Z[startVertex] + height*deltas[1] + subPix*deltas[1];
 			
-			if(!onlyZPass){
-				edgeTableEntry.min_zFactor = renderFace.zFactors[startVertex] + height*deltas[2] + subPix*deltas[2];
+			edgeTableEntry.min_zFactor = renderFace.zFactors[startVertex] + height*deltas[2] + subPix*deltas[2];
+			if(!onlyZPass){				
 				
 				edgeTableEntry.min_texel_u = renderFace.texel_U[startVertex] + height*deltas[3] + subPix*deltas[3];
 				edgeTableEntry.min_texel_v = renderFace.texel_V[startVertex] + height*deltas[4] + subPix*deltas[4];
@@ -396,10 +398,10 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		if(draw_x > edgeTableEntry.max_draw_x || !edgeTableEntry.visited){
 			
 			edgeTableEntry.max_draw_x = draw_x;
-			edgeTableEntry.max_draw_z = renderFace.cam_Z[startVertex] + height*deltas[1] + subPix*deltas[1];
+//			edgeTableEntry.max_draw_z = renderFace.cam_Z[startVertex] + height*deltas[1] + subPix*deltas[1];
 			
-			if(!onlyZPass){
-				edgeTableEntry.max_zFactor = renderFace.zFactors[startVertex] + height*deltas[2] + subPix*deltas[2];
+			edgeTableEntry.max_zFactor = renderFace.zFactors[startVertex] + height*deltas[2] + subPix*deltas[2];
+			if(!onlyZPass){				
 				
 				edgeTableEntry.max_texel_u = renderFace.texel_U[startVertex] + height*deltas[3] + subPix*deltas[3];
 				edgeTableEntry.max_texel_v = renderFace.texel_V[startVertex] + height*deltas[4] + subPix*deltas[4];		
@@ -427,8 +429,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 	public void interpolateScanlines(RenderFace renderFace, ImageRaster colorBuffer, ZBuffer zBuffer,
 			Shader shader, int minY, int maxY, boolean doOnlyZPass) {	
 		
-		int rgb = shader == null ? renderFace.col.getRGB() : shader.shade(renderFace);
-		int shadowColorRGB = Color.black.getRGB();
+		int rgb = shader == null ? renderFace.col.getRGB() : shader.shade(renderFace);		
 		
 		DirectionalLight directionalLight = shader!=null? shader.getDirectionalLight() : null;		
 		Matrix3D inverseLightMatrix = directionalLight!=null? directionalLight.getInverseMatrix() : null;
@@ -450,7 +451,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 			final float iScanlineLength = 1f / (edgeTableEntry.max_draw_x - edgeTableEntry.min_draw_x + 1);
 			
-			final float draw_dz_stepfactor = (edgeTableEntry.max_draw_z - edgeTableEntry.min_draw_z) * iScanlineLength;
+//			final float draw_dz_stepfactor = (edgeTableEntry.max_draw_z - edgeTableEntry.min_draw_z) * iScanlineLength;
 			
 			final float world_dx_stepfactor = (edgeTableEntry.max_world_x - edgeTableEntry.min_world_x) * iScanlineLength;					
 			final float world_dy_stepfactor = (edgeTableEntry.max_world_y - edgeTableEntry.min_world_y) * iScanlineLength;			
@@ -472,7 +473,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			if (edgeTableEntry.min_draw_x < 0) {
 				// das abgeschnittene ende auf alle min-werte drauf
 				// interpolieren
-				edgeTableEntry.min_draw_z += -edgeTableEntry.min_draw_x * draw_dz_stepfactor;
+//				edgeTableEntry.min_draw_z += -edgeTableEntry.min_draw_x * draw_dz_stepfactor;
 
 				edgeTableEntry.min_world_x += -edgeTableEntry.min_draw_x * world_dx_stepfactor;
 				edgeTableEntry.min_world_y += -edgeTableEntry.min_draw_x * world_dy_stepfactor;
@@ -507,15 +508,21 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 //			subTex = 0;
 //			System.out.println("subTex="+subTex);
 			
+			float dx=-1;
 			for (int draw_x = startX; draw_x <= endX; draw_x++) {
 
-				final float dx = draw_x - startX;
+				//final float dx = draw_x - startX;
+				dx++;
 				
-				float draw_z = edgeTableEntry.min_draw_z + (dx * draw_dz_stepfactor); // lerp
+//				float draw_z = edgeTableEntry.min_draw_z + (dx * draw_dz_stepfactor); // lerp
+				float zfa = edgeTableEntry.min_zFactor + (dx * zfactor_stepfactor);
+				
 				if(dx>0){
-					draw_z += draw_dz_stepfactor * subTex;
+//					draw_z += draw_dz_stepfactor * subTex;
+					zfa += zfactor_stepfactor * subTex;
 				}
-
+				float draw_z = Engine3D.inverseZFactor(zfa);
+				
 				if (zBuffer.update(draw_x, draw_y, draw_z)) {
 					
 					if(doOnlyZPass)
@@ -563,7 +570,9 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 						
 						
 						// perspektiven korrektur
-						float inverseZfactor = 1f / (edgeTableEntry.min_zFactor + dx * zfactor_stepfactor);
+						//float inverseZfactor = 1f / (edgeTableEntry.min_zFactor + dx * zfactor_stepfactor);
+						float inverseZfactor = 1f / zfa;
+						//float inverseZfactor = draw_z;
 						texel_u *= inverseZfactor;
 						texel_v *= inverseZfactor;
 																																					
@@ -912,8 +921,8 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		float min_draw_x;
 		float max_draw_x;
 
-		float min_draw_z;
-		float max_draw_z;
+//		float min_draw_z;
+//		float max_draw_z;
 
 		float min_texel_u;
 		float min_texel_v;
@@ -948,8 +957,8 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			min_draw_x = 0;
 			max_draw_x = 0;
 
-			min_draw_z = 0;
-			max_draw_z = 0;
+//			min_draw_z = 0;
+//			max_draw_z = 0;
 
 			min_texel_u = 0;
 			min_texel_v = 0;
