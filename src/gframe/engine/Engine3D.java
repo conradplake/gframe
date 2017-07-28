@@ -297,7 +297,7 @@ public class Engine3D {
 		
 		Point3D camOrigin = camera.getOrigin().copy();
 		Matrix3D icammat = camera.getMatrix().getInverse();
-		Vector3D cam_z = camera.getZVector();
+		Vector3D cam_z = camera.getZVector().copy();
 							
 		for (Model3D model : segments[activeSegment]) {
 			
@@ -368,7 +368,7 @@ public class Engine3D {
 			
 //			renderFace = rasterizer.nearPlaneClipping(renderFace);
 			
-			renderFace.transformToCamSpace(camOrigin, icammat);
+			renderFace.transformToCamSpace(camOrigin, icammat, true);
 			
 			
 			if(!rasterizer.isOutsideScreen(renderFace)){
@@ -417,12 +417,22 @@ public class Engine3D {
 	 * returns a factor depending on the z-value so that bigger z-values make
 	 * Objects appear smaller --> factor decreases
 	 */
-	public static float zFactor(float z) {		//								
-						
+	public static float zFactor(float z) {
 		if(z<=1){		
-			return 800;
+			return 800f;
 		} 		
-		return 800 / z;
+		return 800f / z;		
+	}
+	
+	/**
+	 * Returns the original z-value
+	 * */
+	public static float inverseZFactor(float zf) {
+		if(zf==800){		
+			return 1f;
+		}else{
+			return 800f/zf;
+		} 					
 	}
 		
 
