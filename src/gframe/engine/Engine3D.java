@@ -353,23 +353,24 @@ public class Engine3D {
 		modelOrigin.add(parentOrigin);
 		Matrix3D modelMatrix = parentMatrix.getTransformed(model.getMatrix());		
 		Shader modelShader = modelShaders.get(model);
-		
+
 		for (Iterator<Face> it = model.getFaces().iterator(); it.hasNext();) {
 			
 			Face face = (Face)it.next();
 			RenderFace renderFace = face.createRenderFace();						
-							
+
 			renderFace.preTransform(modelMatrix, modelOrigin);						
 			if(backfaceCull(renderFace, camOrigin, icammat)){
 				continue;
 			}
 			renderFace.postTransform(modelMatrix, modelOrigin);
 			
-			
-//			renderFace = rasterizer.nearPlaneClipping(renderFace);
-			
+									
 			renderFace.transformToCamSpace(camOrigin, icammat, true);
 			
+			
+//			renderFace = rasterizer.nearPlaneClipping(renderFace, camOrigin, icammat, true);			
+			// wenn renderface ein neues obj dann muss transformToCamspace wiederholt werden!!
 			
 			if(!rasterizer.isOutsideScreen(renderFace)){
 				
@@ -397,7 +398,13 @@ public class Engine3D {
 	
 	public boolean backfaceCull(Face face, Point3D camOrigin, Matrix3D iCamMat){		
 
-		// vector pointing from camera (view point) to center of face - hopefully its faster than initiating a vector3d object ;) 
+		// vector pointing from camera (view point) to center of face - hopefully its faster than initiating a vector3d object ;)
+		
+//		Point3D maxZ = face.getMaxZVertex();
+//		float vCamToFace_x = maxZ.x - camOrigin.x;
+//		float vCamToFace_y = maxZ.y - camOrigin.y;
+//		float vCamToFace_z = maxZ.z - camOrigin.z;
+		
 		float vCamToFace_x = face.centroid.x - camOrigin.x;
 		float vCamToFace_y = face.centroid.y - camOrigin.y;
 		float vCamToFace_z = face.centroid.z - camOrigin.z;
@@ -424,14 +431,17 @@ public class Engine3D {
 		return 800f / z;		
 	}
 	
+
 	/**
+	 * invZf = 1/zf
+	 * 
 	 * Returns the original z-value
 	 * */
-	public static float inverseZFactor(float zf) {
+	public static float inverseZFactor(float zf, float invZf) {
 		if(zf==800){		
 			return 1f;
 		}else{
-			return 800f/zf;
+			return 800f * invZf; // invZf = 1/zf;
 		} 					
 	}
 		

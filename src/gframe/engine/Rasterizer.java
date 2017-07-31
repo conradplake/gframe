@@ -15,7 +15,7 @@ public interface Rasterizer {
 	
 	public void setScreenSize(int xoffset, int yoffset, int frameX, int frameY);
 		
-	public RenderFace nearPlaneClipping(RenderFace renderFace);
+	public RenderFace nearPlaneClipping(RenderFace renderFace, Point3D camOrigin, Matrix3D icammat, boolean b);
 		
 
 }

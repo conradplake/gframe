@@ -183,7 +183,9 @@ public class Face {
 	}
 
 	
-	
+	/**
+	 * Recompute centroid and normal vector
+	 * */
 	public void recompute(){
 		this.centroid = computeCentroid();
 		

@@ -24,7 +24,7 @@ public class Particle extends Model3D implements OIS3D{
 		this.velocity = velocity;		
 		this.rgb = Color.HSBtoRGB((float)Math.random(), 1, 1f);
 	}
-			
+	
 
 	@Override
 	public Vector3D getVelocityVector() {

@@ -5,6 +5,8 @@ import java.awt.Color;
 /**
  * The representative of a face with all information at hand needed for rendering. 
  * An instance of this class is created from a face object via method Face.createRenderFace 
+ * 
+ * TODO inheritance from face is necessary here?
  * */
 public class RenderFace extends Face implements Comparable<RenderFace> {
 
@@ -101,16 +103,18 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 		for (int i = 0; i < vertices.length; i++) {
 			float[] camCoords = icammat.transform(vertices[i].x - camOrigin.x, vertices[i].y - camOrigin.y,
 					vertices[i].z - camOrigin.z);
+			
 			cam_Z[i] = camCoords[2];		
 			
-			float zf = 1;
+			float zf = 1f;
 			if(perspectiveCorrect){
-				zf = Engine3D.zFactor(cam_Z[i]);		
+				zf = Engine3D.zFactor(cam_Z[i]);
+//				zf = (float)Toolbox.map(zf, 0, 10000, 0, 800);
 			}
 					
-			zFactors[i] = zf;					
+			zFactors[i] = zf;
 			cam_X[i] = camCoords[0] * zf;
-			cam_Y[i] = camCoords[1] * zf;		
+			cam_Y[i] = camCoords[1] * zf;
 			
 			pcorrectedWorld_X[i] = vertices[i].x * zf;
 			pcorrectedWorld_Y[i] = vertices[i].y * zf;
@@ -156,6 +160,8 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 			}
 		}
 	}
+	
+	
 
 	@Override
 	public float minZ() {
@@ -310,6 +316,7 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 	
 	/**
 	 * reset coordinates as in original face 
+	 * reset render state
 	 * */
 	protected void reset(Face face) {		
 		for(int i=0;i<face.vertices.length;i++){

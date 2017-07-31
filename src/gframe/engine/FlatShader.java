@@ -14,7 +14,7 @@ public class FlatShader extends AbstractShader {
 
 
 	@Override
-	public int shade(RenderFace renderFace, float w_x, float w_y, float w_z, float pcorr_world_x, float pcorr_world_y, float pcorr_world_z, float normal_x, float normal_y, float normal_z, float texel_u, float texel_v, int screen_x, int screen_y) {
+	public int shade(RenderFace renderFace, float w_x, float w_y, float w_z, float normal_x, float normal_y, float normal_z, float texel_u, float texel_v, int screen_x, int screen_y) {
 		return this.shade(renderFace);
 	}
 

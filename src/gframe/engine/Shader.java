@@ -24,7 +24,7 @@ public interface Shader {
 	/**
 	 * Returns a color as argb code for the specified face and position within the face;
 	 * */
-	public int shade(RenderFace renderFace, float world_x, float world_y, float world_z, float pcorr_world_x, float pcorr_world_y, float pcorr_world_z, float normal_x, float normal_y, float normal_z, float texel_u, float texel_v, int screen_x, int screen_y);
+	public int shade(RenderFace renderFace, float world_x, float world_y, float world_z, float normal_x, float normal_y, float normal_z, float texel_u, float texel_v, int screen_x, int screen_y);
 
 
 	public void setLightsource(Lightsource ls);

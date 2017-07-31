@@ -1,10 +1,9 @@
 package gframe.engine;
 
-
 /**
  * A point in 3d space.
  * 
- * A point has also normal vector attached which itself can point in any direction.
+ * A point also has a normal vector attached which itself can point in any direction.
  * This is used for computing light over a polygon.
  *  
  * */
@@ -82,6 +81,7 @@ public class Point3D {
 	public Point3D copy() {
 		return (new Point3D(x, y, z, normal_x, normal_y, normal_z));
 	}
+		
 
 	@Override
 	public String toString() {
@@ -97,6 +97,5 @@ public class Point3D {
 	public float x, y, z;
 
 	public float normal_x, normal_y, normal_z;
-	
 
 }
