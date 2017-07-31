@@ -47,11 +47,11 @@ public class MarbleShader extends AbstractShader {
 	
 
 	@Override
-	public int shade(RenderFace renderFace, float world_x, float world_y, float world_z, float pcorr_world_x, float pcorr_world_y, float pcorr_world_z, float normal_x, float normal_y, float normal_z, float texel_u, float texel_v, int screen_x, int screen_y) {
+	public int shade(RenderFace renderFace, float world_x, float world_y, float world_z, float normal_x, float normal_y, float normal_z, float texel_u, float texel_v, int screen_x, int screen_y) {
 					
-		float x = pcorr_world_x;
-		float y = pcorr_world_y;
-		float z = pcorr_world_z;
+		float x = world_x;
+		float y = world_y;
+		float z = world_z;
 			
 		float noise = (float)NoiseGenerator.improvedPerlinNoise(x*1, y*0.5, z*0.5); 
 		

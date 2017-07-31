@@ -5,8 +5,6 @@ import java.awt.Color;
 import gframe.engine.AbstractShader;
 import gframe.engine.Lightsource;
 import gframe.engine.RenderFace;
-import gframe.engine.Toolbox;
-import gframe.engine.generator.NoiseGenerator;
 import imaging.ImageRaster;
 
 /**
@@ -131,8 +129,7 @@ public class SuperEllipseShader extends AbstractShader {
 	
 
 	@Override
-	public int shade(RenderFace renderFace, float world_x, float world_y, float world_z, float pcorr_world_x,
-			float pcorr_world_y, float pcorr_world_z, float normal_x, float normal_y, float normal_z, float texel_u,
+	public int shade(RenderFace renderFace, float world_x, float world_y, float world_z, float normal_x, float normal_y, float normal_z, float texel_u,
 			float texel_v, int screen_x, int screen_y) {
 
 		float x = Math.min(textureWidth - 1, texel_u * (textureWidth));

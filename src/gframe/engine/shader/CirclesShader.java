@@ -110,7 +110,7 @@ public class CirclesShader extends AbstractShader {
 	
 
 	@Override
-	public int shade(RenderFace renderFace, float world_x, float world_y, float world_z, float pcorr_world_x, float pcorr_world_y, float pcorr_world_z, float normal_x, float normal_y, float normal_z, float texel_u, float texel_v, int screen_x, int screen_y) {
+	public int shade(RenderFace renderFace, float world_x, float world_y, float world_z, float normal_x, float normal_y, float normal_z, float texel_u, float texel_v, int screen_x, int screen_y) {
 				
 				
 		float x = Math.min(textureWidth-1, texel_u*(textureWidth));
@@ -122,7 +122,7 @@ public class CirclesShader extends AbstractShader {
 		int green = (texel >> 8) & 0xff;
 		int blue = (texel) & 0xff;
 		
-		return super.shade(255, red, green, blue, pcorr_world_x, pcorr_world_y, pcorr_world_z, normal_x, normal_y, normal_z);
+		return super.shade(255, red, green, blue, world_x, world_y, world_z, normal_x, normal_y, normal_z);
 		
 //		return  ((renderFace.getColor().getAlpha() & 0xFF) << 24) |
 //                ((red & 0xFF) << 16) |
