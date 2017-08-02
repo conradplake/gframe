@@ -34,8 +34,18 @@ public class WavefrontObjParser {
 					String[] fields = line.split("\\s+");
 					int[] vertices = new int[fields.length-1];								
 					for(int i=1;i<fields.length;i++){						
-						String[] subFields = fields[i].split("/");						
-						vertices[i-1] = Integer.parseInt(subFields[0]) - 1;
+						String[] subFields = fields[i].split("/");			
+						
+						int vertexIndexInFile = Integer.parseInt(subFields[0]);
+						
+						if(vertexIndexInFile<0){ // see wavefront obj format description: negative values refer to the end of vertex list
+							vertexIndexInFile = model.numberOfVertices() + vertexIndexInFile;
+						}else{
+							vertexIndexInFile--;  // index count starts from 1
+						}
+						vertices[i-1] = vertexIndexInFile;
+						
+						// other subfields..!
 					}
 					model.stretchFace(vertices, col);
 				}
