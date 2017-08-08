@@ -2,7 +2,10 @@ package gframe.app;
 
 import java.awt.AWTEvent;
 import java.awt.Color;
+import java.awt.DisplayMode;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -24,7 +27,6 @@ import gframe.engine.shader.FlowFieldShader;
 import gframe.engine.shader.MandelbrotShader;
 import gframe.engine.shader.MetaballShader;
 import gframe.engine.shader.PhyllotaxisShader;
-import gframe.engine.shader.FireworkShader;
 import gframe.engine.shader.ReactionDiffusionShader;
 import gframe.engine.shader.RocketEvolutionShader;
 import gframe.engine.shader.SuperEllipseShader;
@@ -34,15 +36,9 @@ import imaging.ImageRaster;
 public class ShaderTester extends DoubleBufferedFrame implements MouseMotionListener {
 
 	public ShaderTester() {
-		super();
+		super();   
 		setBackground(Color.lightGray);
-		frame = new ImageRaster(SCREENX, SCREENY);
-	}
-
-	public void start() {
-		initEngine();
-		initWorld();
-		start(10);
+		frame = new ImageRaster(SCREENX, SCREENY);		
 	}
 	
 	
@@ -51,7 +47,8 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 	}
 
 	
-	private void initEngine() {
+	private void initEngine() {		
+
 		engine = new Engine3D(SCREENX, SCREENY);			
 					
 		// LIGHT SETTINGS
@@ -68,6 +65,21 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 		//Shader shader = new LSystemTurtleShader(lightsource);
 		Shader shader = new FlowFieldShader(lightsource, 1000);
 		engine.setDefaultShader(shader);		
+		
+		
+		GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+//		if(device.isFullScreenSupported()){
+//			DisplayMode newMode = new DisplayMode(SCREENX, SCREENY, 32, 60);
+//			this.setUndecorated(true);
+//			this.setResizable(false);			
+//			device.setFullScreenWindow(this);
+//			device.setDisplayMode(newMode);
+//			this.setIgnoreRepaint(true);
+//		}else{
+			setSize(SCREENX, SCREENY);
+			setLocation(20, 0);
+//		}
+			
 	}
 	
 
@@ -95,25 +107,25 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 	}
 
 	
-	private void start(long millidelay) {
-		setSize(SCREENX, SCREENY);
-		setLocation(20, 0);
+	private void start() {
+		
+		initEngine();
+		initWorld();
+		
 		setBackground(Color.black);
 		setForeground(Color.black);
-		setLayout(null);
+//		setLayout(null);
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
 		addMouseMotionListener(this);
 		setVisible(true);
 
 		/** MAIN LOOP */
-		while (true) {
-			repaint();
-			if (millidelay > 0) {
-				try {
-					Thread.sleep(millidelay);
-				} catch (InterruptedException ie_ignore) {
-				}
-			}
+		Graphics graphics = this.getGraphics();
+		while (true) {			
+//			repaint();			
+			update(graphics);						
+			
+			Thread.yield();
 			
 //			List<Model3D> modelList = engine.getActiveModels();
 //			for (Model3D model3d : modelList) {
@@ -198,11 +210,16 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 					engine.setDefaultShader(shader);
 				}
 				else if (keycode == KeyEvent.VK_6) {
-					//Shader shader = new TextureShader(lightsource, TextureGenerator.generateTileTextureNormalMap(512, 512, 40));
+//					Shader shader = new TextureShader(lightsource, TextureGenerator.generateTileTextureNormalMap(512, 512, 40));
 					//Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 2187, 2187), TextureGenerator.generateMengerSpongeNormalMap(2187));
-					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 243, 243), TextureGenerator.generateMengerSpongeNormalMap(243));
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 243, 243), TextureGenerator.generateMengerSpongeNormalMap(243), TextureGenerator.generateRandomSpecularMap(243, 243));
 //					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 108, 108), TextureGenerator.generateMengerSpongeNormalMap(108));
 //					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 324, 324), TextureGenerator.generateMengerSpongeNormalMap(324));
+					
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 324, 324), TextureGenerator.generateDefaultNormalMap(324, 324), TextureGenerator.generateRandomSpecularMap(324, 324));
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 324, 324), TextureGenerator.generateMengerSpongeNormalMap(324), TextureGenerator.generateSpecularMap(324, 324, 255));
+					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateTileTextureNormalMap(324, 324, 30), true);					
+					
 					engine.setDefaultShader(shader);
 				}
 				else if (keycode == KeyEvent.VK_7) {
@@ -309,7 +326,12 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 		super.processKeyEvent(event);
 	}
 
-	public void paint(Graphics g) {				
+//	public void paint(Graphics g) {
+//		render(g);
+//	}
+	
+	public void paint(Graphics g) {
+		
 		long updateTime = System.currentTimeMillis();
 		
 		frame.clear();

@@ -17,7 +17,6 @@ import java.util.List;
 
 import gframe.DoubleBufferedFrame;
 import gframe.Space3D;
-import gframe.engine.DirectionalLight;
 import gframe.engine.Engine3D;
 import gframe.engine.KeyPosition;
 import gframe.engine.Lightsource;
@@ -120,7 +119,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 			setSize(SCREENX, SCREENY);
 			setLocation(20, 0);
 			setLayout(null);
-		}	
+		}
 		
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
 		addMouseMotionListener(this);
@@ -209,7 +208,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 //		Color floorTileColor = Color.BLUE;
 		TextureShader wallShader = new NormalMappedTextureShader(lightsource,
 				TextureGenerator.generateTileTexture(textureWidth, textureHeight, tilesize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
-				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize));
+				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize), true);
 
 		wallShader.setIsBilinearFiltering(false);
 		
@@ -217,12 +216,12 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		
 		TextureShader wallBerlinShader = new NormalMappedTextureShader(lightsource,
 				TextureGenerator.generateTileTexture(textureWidth, textureHeight, tilesize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
-				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize));		
+				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize), true);		
 		wallBerlinShader.addEffect(berlinRaster, 100, graffitiColor);
 		
 		TextureShader wallGraffittiShader = new NormalMappedTextureShader(lightsource,
 				TextureGenerator.generateTileTexture(textureWidth, textureHeight, tilesize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
-				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize));		
+				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize), true);		
 		//wallGraffittiShader.addEffect(graffitiRaster, 100, new Color(220, 220, 220));
 		wallGraffittiShader.addEffect(graffitiRaster, 100, graffitiColor);
 
@@ -484,8 +483,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		lightsource.z = -100;
 		lightsource.setIntensity(Lightsource.MAX_INTENSITY);
 		
-		DirectionalLight directionalLight = new DirectionalLight(lightsource);
-		engine.setDirectionalLight(directionalLight);
+		lightsource.setShadowsEnabled(true);
 		
 		cameraKeyPositions = AnimationsParser.parse(new File("animations/demo01/part3_camera.ani"),
 				System.currentTimeMillis(), 1f);
@@ -882,9 +880,9 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				KeyPosition nextPosition = lightKeyPositions.get(0);
 				
 				nextPosition.updatePosition(lastTime, currentTime, lightsource);
-				nextPosition.updatePosition(lastTime, currentTime, engine.getDirectionalLight().getMatrix());
+				nextPosition.updatePosition(lastTime, currentTime, lightsource.getMatrix());
 				
-				engine.getDirectionalLight().recomputeInverse(); // TODO: alle änderungen über eine generelle schnittstelle bekannt machen								
+				lightsource.recomputeInverse(); // TODO: alle änderungen über eine generelle schnittstelle bekannt machen								
 				engine.recomputeShadowMaps();
 				
 				if (currentTime >= nextPosition.getTimestamp()) {
@@ -918,6 +916,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 //					break;
 //				}
 				lightsource.setIntensity(0);
+				lightsource.setShadowsEnabled(false);
 				break;
 			}
 			
@@ -953,9 +952,9 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				KeyPosition nextPosition = lightKeyPositions.get(0);
 				
 				nextPosition.updatePosition(lastTime, currentTime, lightsource);
-				nextPosition.updatePosition(lastTime, currentTime, engine.getDirectionalLight().getMatrix());
+				nextPosition.updatePosition(lastTime, currentTime, lightsource.getMatrix());
 				
-				engine.getDirectionalLight().recomputeInverse(); // TODO: alle änderungen über eine generelle schnittstelle bekannt machen								
+				lightsource.recomputeInverse(); // TODO: alle änderungen über eine generelle schnittstelle bekannt machen								
 				engine.recomputeShadowMaps();
 				
 				if (currentTime >= nextPosition.getTimestamp()) {
@@ -1107,7 +1106,9 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		} else {
 			int distX = e.getX() - mouseX;
 			int distY = e.getY() - mouseY;
-			camera.rotate(distY / 3, -distX / 3, 0);
+			
+			if(camera!=null)
+			  camera.rotate(distY / 3, -distX / 3, 0);
 			// camera.rotate(0, distX/3, 0);
 			
 //			if(engine.getDirectionalLight()!=null)

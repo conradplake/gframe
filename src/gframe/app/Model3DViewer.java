@@ -16,11 +16,12 @@ import java.util.LinkedList;
 import java.util.Properties;
 
 import gframe.DoubleBufferedFrame;
-import gframe.Space3D;
 import gframe.engine.Engine3D;
+import gframe.engine.FlatShader;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
 import gframe.engine.Point3D;
+import gframe.engine.Shader;
 import gframe.engine.camera.Camera;
 import gframe.engine.camera.TripodCamera;
 import gframe.engine.camera.ViewCone;
@@ -39,6 +40,7 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 		super("model viewer");
 		setSize(SCREENX, SCREENY);
 		setLocation(20, 0);
+		setIgnoreRepaint(true);
 
 		setLayout(null);
 		selectList = new Choice();		
@@ -198,8 +200,27 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 	private void start(long millidelay) {
 		setVisible(true);	
 		
+		Graphics g = this.getGraphics();
 		while (true) {
-			repaint();
+			update(g);
+					
+			// next iterate through next house part and print out indexs
+//			if(counter%20==0 && partCounter<model.getChildren().size()){
+//				
+//				if(partCounter>0){
+//					// reset current part color
+//					Model3D part = (Model3D)model.getChildren().get(partCounter-1);
+//					part.setColor(Color.BLACK);
+//				}
+//				Model3D part = (Model3D)model.getChildren().get(partCounter);
+//				part.setColor(Color.YELLOW);
+//				
+//				System.out.println("Current part index: "+partCounter);
+//				
+//				partCounter++;
+//			}
+//			counter++;
+			
 			if(model!=null)
 				   model.rotate(0, 0.05f, 0);					
 
@@ -236,10 +257,22 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 			
 			Model3DGenerator.normalizeOrigin(mod);
 			
-			mod = Model3DGenerator.split(mod);
-			for(Object part : mod.getChildren()){
-				((Model3D)part).setColor(new Color( (int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255) ));
-			}
+//			mod = Model3DGenerator.split(mod);
+//			for(Object part : mod.getChildren()){
+//				
+//				int r = (int)(Math.random()*255);
+//				int g = (int)(Math.random()*255);
+//				int b = (int)(Math.random()*255);				
+//				int	t = r+g+b;				
+//				while (t<300){
+//					r = (int)(Math.random()*255);
+//					g = (int)(Math.random()*255);
+//					b = (int)(Math.random()*255);				
+//					t = r+g+b;
+//				}
+//																			
+//				((Model3D)part).setColor(new Color(r, g, b));
+//			}
 			
 			mod.setOrigin(origin);
 			mod.move(0, 0, 10000);			
@@ -247,6 +280,8 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 			if(filename.endsWith(".obj")){
 				mod.scale(5, 5, 5);	
 			}
+			
+			counter = 0;
 			
 		} catch (java.io.IOException ioe) {
 			System.out.println("could not load model from file: " + filename);
@@ -289,6 +324,7 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 	private Properties props;
 	private Engine3D engine;
 	private Model3D model;
+	int partCounter = 0;
 	private Choice selectList;
 	private Lightsource lightsource;
 }

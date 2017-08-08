@@ -107,10 +107,11 @@ public class Xmas2016 extends DoubleBufferedFrame implements MouseMotionListener
 
 		// SETUP SCENE
 		Color lightskyblue = new Color(135, 206, 250);
-		Color zenithColor = new Color(60, 100, 140);
+		//Color zenithColor = new Color(60, 100, 140);
+		Color zenithColor = new Color(30, 50, 70);
 		Color horizonColor = new Color(0, 0, 100);
 		Model3D skydome = Model3DGenerator.buildSkydome(1000, lightskyblue);
-		SkyShader skydomeShader = new SkyShader(engine.getLightsource(), skydome, horizonColor, zenithColor);				
+		SkyShader skydomeShader = new SkyShader(engine.getLightsource(), skydome, horizonColor, zenithColor);							
 		engine.register(skydome, skydomeShader);				
 					
 		engine.setDefaultShader(null);

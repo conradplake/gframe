@@ -12,7 +12,6 @@ import gframe.engine.Engine3D;
 import gframe.engine.FlatShader;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
-import gframe.engine.PhongShader;
 import gframe.engine.Point3D;
 import gframe.engine.camera.TripodCamera;
 import gframe.engine.generator.Model3DGenerator;
@@ -60,16 +59,17 @@ public class SkydomeTester extends DoubleBufferedFrame implements MouseMotionLis
 		SkyShader skydomeShader = new SkyShader(engine.getLightsource(), skydome, Color.orange, darkblue);				
 		engine.register(skydome, skydomeShader);
 	
-		int meshX=20;
-		int meshY=20;
+		int meshX=4;
+		int meshY=4;
 		int tilesize=4000;
 		
-		Model3D terrain = Model3DGenerator.buildFlatMesh(meshX, meshY, tilesize, Color.GREEN);
+		Model3D terrain = Model3DGenerator.buildFlatMesh(meshX, meshY, tilesize, Color.GREEN);		
+		
 //		Model3D terrain = Model3DGenerator.buildRandomVoronoiTerrainMesh(meshX, meshY, tilesize, 100, Color.GREEN);
 //		terrain.scale(1, 20, 1);
 		
-		Model3DGenerator.laplacianSmooth(meshX, meshY, terrain);		
-		Model3DGenerator.laplacianSmooth(meshX, meshY, terrain);
+//		Model3DGenerator.laplacianSmooth(meshX, meshY, terrain);		
+//		Model3DGenerator.laplacianSmooth(meshX, meshY, terrain);
 		terrain.move(-meshX*tilesize/2, 0, -meshY*tilesize/2);
 		engine.register(terrain, new FlatShader(engine.getLightsource()));
 		
@@ -77,7 +77,8 @@ public class SkydomeTester extends DoubleBufferedFrame implements MouseMotionLis
 //		Model3D water = Model3DGenerator.buildFlatMesh(4, 4, 4000, Color.BLUE);
 //		Model3DGenerator.normalizeOrigin(water);
 		
-		water.move(0, 500, 7500);
+		water.move(0, 10, 7500);
+//		water.rotate(5, 0, 0);
 		engine.register(water, new FlatShader(engine.getLightsource()));
 		
 		Rotate rotate = new Rotate(water, 100000000L, 0.05f, Rotate.AXIS_Y);
@@ -189,6 +190,13 @@ public class SkydomeTester extends DoubleBufferedFrame implements MouseMotionLis
 				}
 				else if (keycode == KeyEvent.VK_V) {
 					water.scale(0.8f, 0.8f, 0.8f);
+				}
+				
+				else if (keycode == KeyEvent.VK_LEFT) {
+					water.move(-100, 0, 0);
+				}
+				else if (keycode == KeyEvent.VK_RIGHT) {
+					water.move(100, 0, 0);
 				}
 				
 

@@ -9,7 +9,6 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 
 import gframe.DoubleBufferedFrame;
-import gframe.engine.DirectionalLight;
 import gframe.engine.Engine3D;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
@@ -51,7 +50,10 @@ public class ShadowMapTester extends DoubleBufferedFrame implements MouseMotionL
 		engine = new Engine3D(SCREENX, SCREENY);			
 					
 		// LIGHT SETTINGS
-		lightsource = new Lightsource(0, 0, 0, Color.white, Lightsource.MAX_INTENSITY);				
+		lightsource = new Lightsource(0, 0, 0, Color.white, Lightsource.MAX_INTENSITY);
+		
+		lightsource.setShadowsEnabled(true);
+		
 		engine.setLightsource(lightsource);
 				
 					
@@ -62,8 +64,6 @@ public class ShadowMapTester extends DoubleBufferedFrame implements MouseMotionL
 		engine.setDefaultShader(shader);
 		
 		
-		directionalLight = new DirectionalLight(lightsource);
-		engine.setDirectionalLight(directionalLight);
 	}
 	
 
@@ -139,7 +139,7 @@ public class ShadowMapTester extends DoubleBufferedFrame implements MouseMotionL
 		
 		// LIGHT SETTNGS
 		lightsource.move(0, 100, -300);
-		directionalLight.rotate(-20, 0, 0);
+		lightsource.rotate(-20, 0, 0);
 	}
 
 	
@@ -218,54 +218,54 @@ public class ShadowMapTester extends DoubleBufferedFrame implements MouseMotionL
 					engine.shadingEnabled = !engine.shadingEnabled;
 				}
 				// CAM CONTROL
-				else if (keycode == KeyEvent.VK_1) {					
-					//Shader shader = new TextureShader(lightsource);
-					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.MAGENTA, 4096, 4096), TextureShader.getRGBRaster(new File("textures/Normal_map_example.png"), 4096, 4096));
-					//Shader shader = new TextureShader(lightsource, TextureShader.getRGBRaster(Color.MAGENTA, 4096, 4096));
-					shader.setDirectionalLight(engine.getDirectionalLight());
-					engine.setDefaultShader(shader);
-				} 
-				else if (keycode == KeyEvent.VK_2) {				
-					Shader shader = new TextureShader(lightsource, TextureGenerator.generateWoodTexture(512, 512, 255));
-					shader.setDirectionalLight(engine.getDirectionalLight());
-					engine.setDefaultShader(shader);
-				} 
-				else if (keycode == KeyEvent.VK_3) {	
-					Shader shader = new TextureShader(lightsource, TextureGenerator.generateTileTexture(512, 512, 40, Color.blue.getRGB(), Color.BLUE.getRGB()));
-					shader.setDirectionalLight(engine.getDirectionalLight());
-					engine.setDefaultShader(shader);
-				}
-				else if (keycode == KeyEvent.VK_4) {
-					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.BLUE, 512, 512), TextureShader.getRGBRaster(new File("textures/9677-normal.jpg"), 512, 512));
-					shader.setDirectionalLight(engine.getDirectionalLight());
-					engine.setDefaultShader(shader);
-				}
-				else if (keycode == KeyEvent.VK_5) {				
-					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.GRAY, 800, 600), TextureShader.getRGBRaster(new File("textures/stonerock_ps_01b.jpg"), 800, 600));
-					shader.setDirectionalLight(engine.getDirectionalLight());
-					engine.setDefaultShader(shader);
-				}
-				else if (keycode == KeyEvent.VK_6) {
-					//Shader shader = new TextureShader(lightsource, TextureGenerator.generateTileTextureNormalMap(512, 512, 40));
-					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 2187, 2187), TextureGenerator.generateMengerSpongeNormalMap(2187));
-					shader.setDirectionalLight(engine.getDirectionalLight());
-					engine.setDefaultShader(shader);
-				}
-				else if (keycode == KeyEvent.VK_7) {
-					Shader shader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateTileTexture(160, 160, 20, Color.BLUE.getRGB(), Color.BLUE.getRGB()),  TextureGenerator.generateTileTextureNormalMap(160, 160, 20));
-					shader.setDirectionalLight(engine.getDirectionalLight());
-					engine.setDefaultShader(shader);
-				}
-				else if (keycode == KeyEvent.VK_8) {
-					Shader shader = new TestShader(lightsource);
-					shader.setDirectionalLight(engine.getDirectionalLight());
-					engine.setDefaultShader(shader);
-				}
-				else if (keycode == KeyEvent.VK_9) {
-					Shader shader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateDiscoTileTexture(320, 320, 20), TextureGenerator.generateTileTextureNormalMap(320, 320, 20));
-					shader.setDirectionalLight(engine.getDirectionalLight());
-					engine.setDefaultShader(shader);
-				}
+//				else if (keycode == KeyEvent.VK_1) {					
+//					//Shader shader = new TextureShader(lightsource);
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.MAGENTA, 4096, 4096), TextureShader.getRGBRaster(new File("textures/Normal_map_example.png"), 4096, 4096));
+//					//Shader shader = new TextureShader(lightsource, TextureShader.getRGBRaster(Color.MAGENTA, 4096, 4096));
+//					shader.setDirectionalLight(engine.getDirectionalLight());
+//					engine.setDefaultShader(shader);
+//				} 
+//				else if (keycode == KeyEvent.VK_2) {				
+//					Shader shader = new TextureShader(lightsource, TextureGenerator.generateWoodTexture(512, 512, 255));
+//					shader.setDirectionalLight(engine.getDirectionalLight());
+//					engine.setDefaultShader(shader);
+//				} 
+//				else if (keycode == KeyEvent.VK_3) {	
+//					Shader shader = new TextureShader(lightsource, TextureGenerator.generateTileTexture(512, 512, 40, Color.blue.getRGB(), Color.BLUE.getRGB()));
+//					shader.setDirectionalLight(engine.getDirectionalLight());
+//					engine.setDefaultShader(shader);
+//				}
+//				else if (keycode == KeyEvent.VK_4) {
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.BLUE, 512, 512), TextureShader.getRGBRaster(new File("textures/9677-normal.jpg"), 512, 512));
+//					shader.setDirectionalLight(engine.getDirectionalLight());
+//					engine.setDefaultShader(shader);
+//				}
+//				else if (keycode == KeyEvent.VK_5) {				
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.GRAY, 800, 600), TextureShader.getRGBRaster(new File("textures/stonerock_ps_01b.jpg"), 800, 600));
+//					shader.setDirectionalLight(engine.getDirectionalLight());
+//					engine.setDefaultShader(shader);
+//				}
+//				else if (keycode == KeyEvent.VK_6) {
+//					//Shader shader = new TextureShader(lightsource, TextureGenerator.generateTileTextureNormalMap(512, 512, 40));
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 2187, 2187), TextureGenerator.generateMengerSpongeNormalMap(2187));
+//					shader.setDirectionalLight(engine.getDirectionalLight());
+//					engine.setDefaultShader(shader);
+//				}
+//				else if (keycode == KeyEvent.VK_7) {
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateTileTexture(160, 160, 20, Color.BLUE.getRGB(), Color.BLUE.getRGB()),  TextureGenerator.generateTileTextureNormalMap(160, 160, 20));
+//					shader.setDirectionalLight(engine.getDirectionalLight());
+//					engine.setDefaultShader(shader);
+//				}
+//				else if (keycode == KeyEvent.VK_8) {
+//					Shader shader = new TestShader(lightsource);
+//					shader.setDirectionalLight(engine.getDirectionalLight());
+//					engine.setDefaultShader(shader);
+//				}
+//				else if (keycode == KeyEvent.VK_9) {
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateDiscoTileTexture(320, 320, 20), TextureGenerator.generateTileTextureNormalMap(320, 320, 20));
+//					shader.setDirectionalLight(engine.getDirectionalLight());
+//					engine.setDefaultShader(shader);
+//				}
 
 				else if (keycode == KeyEvent.VK_S) {
 					camera.move(-10);
@@ -287,16 +287,16 @@ public class ShadowMapTester extends DoubleBufferedFrame implements MouseMotionL
 				
 				
 				else if (keycode == KeyEvent.VK_Y) {
-					directionalLight.rotate(0, 5, 0);
+					lightsource.rotate(0, 5, 0);
 				} else if (keycode == KeyEvent.VK_X) {					
-					directionalLight.rotate(0, -5, 0);
+					lightsource.rotate(0, -5, 0);
 				}							
 
 				
 				else if (keycode == KeyEvent.VK_C) {
-					directionalLight.rotate(5, 0, 0);
+					lightsource.rotate(5, 0, 0);
 				} else if (keycode == KeyEvent.VK_V) {					
-					directionalLight.rotate(-5, 0, 0);
+					lightsource.rotate(-5, 0, 0);
 				}
 				
 				
@@ -375,8 +375,7 @@ public class ShadowMapTester extends DoubleBufferedFrame implements MouseMotionL
 
 
 	private TripodCamera camera;
-	private Lightsource lightsource;
-	DirectionalLight directionalLight;
+	private Lightsource lightsource;	
 
 	private int mouseX;
 	private int mouseY;
