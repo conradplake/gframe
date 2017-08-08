@@ -12,8 +12,6 @@ public abstract class AbstractShader implements Shader {
 
 	Lightsource lightsource;
 	
-	DirectionalLight directionalLight;
-	
 	float[] diffuseRGBComponents;
 	
 	static final float iColorNorm = 1/255f;	
@@ -32,19 +30,10 @@ public abstract class AbstractShader implements Shader {
 	}
 	
 	
-	public void setDirectionalLight(DirectionalLight dl){
-		this.directionalLight = dl;
-	}
-	
-	public DirectionalLight getDirectionalLight(){
-		return this.directionalLight;
-	}
-	
-	
 	/**
 	 * Does nothing by default.
 	 * */
-	public void preShade(RenderFace renderFace) {		
+	public void preShade(RenderFace renderFace) {
 	}
 	
 	
@@ -79,7 +68,7 @@ public abstract class AbstractShader implements Shader {
 	}	
 	
 	
-	// Intensity = Intensity_lightsource x Kd x cos(theta)  or Intensity = Intensity_lightsource x Kd x (N' * L')
+	// Intensity = Intensity_lightsource x Kd x cos(theta)  or Intensity = Intensity_lightsource x Kd x (N * L)
 	// Kd - diffuse reflection coefficient in [0..1]
 	public int shade(Color diffuseColor, float diffuseReflectionCoefficient, float lightNormalProduct){							
 			

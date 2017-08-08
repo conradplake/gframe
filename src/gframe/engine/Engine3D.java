@@ -140,25 +140,10 @@ public class Engine3D {
 		this.lightsource = ls;
 		this.defaultShader.setLightsource(ls);
 	}
-		
-	
-	public void setDirectionalLight(DirectionalLight directionalLight){
-		this.directionalLight = directionalLight;
-		this.defaultShader.setDirectionalLight(directionalLight);
-		
-		for(Shader shader : modelShaders.values()){
-			shader.setDirectionalLight(null); // will be overwritten during next draw call with the new directional light
-		}
-	}
-	
-	public DirectionalLight getDirectionalLight(){
-		return directionalLight;			
-	}
 	
 	
-	public void recomputeShadowMaps(){
-		if(directionalLight!=null)
-			directionalLight.recomputeDepthMap();
+	public void recomputeShadowMaps(){		
+		lightsource.recomputeDepthMap();
 	}
 
 	public Lightsource getLightsource() {
@@ -196,18 +181,18 @@ public class Engine3D {
 	}
 	
 	public void drawShadowedScene(ImageRaster colorBuffer){			
-		
-		if(directionalLight==null){
-			drawScene(colorBuffer);
+
+		if(lightsource.isShadowsEnabled()==false){
+			this.drawScene(colorBuffer);
 			return;
-		}		
+		}
 		
-		
-		if(directionalLight.isRecomputeDepthMap()){
+		// umwelt geändert? dann neuen snapshot der tiefenkarte erzeugen  
+		if(lightsource.isRecomputeDepthMap()){
 			
-			Point3D lightOrigin = directionalLight.getOrigin();
-			Matrix3D iLightMat = directionalLight.getInverseMatrix();
-			Vector3D light_z = directionalLight.getZVector();
+			Point3D lightOrigin = lightsource;
+			Matrix3D iLightMat = lightsource.getInverseMatrix();
+			Vector3D light_z = lightsource.getZVector();
 								
 			// we can cull with depthBuffer as well
 			depthTestCuller.setZBuffer(depthBuffer);
@@ -233,7 +218,7 @@ public class Engine3D {
 			  depthBuffer.filter(ImageHelper.TPFILTER33); // 3x3 box filter
 			}
 			
-			directionalLight.setDepthMap(depthBuffer);
+			lightsource.setDepthMap(depthBuffer);
 			
 			// put back the original zBuffer 
 			depthTestCuller.setZBuffer(zBuffer);
@@ -261,8 +246,7 @@ public class Engine3D {
 				shader = renderFace.shader; // override with model specific shader
 			}			
 			
-			if(shader!=null){
-				shader.setDirectionalLight(directionalLight);
+			if(shader!=null){				
 				shader.preShade(renderFace);
 			}
 			
@@ -280,8 +264,7 @@ public class Engine3D {
 													// shader
 				}
 				
-				if(shader!=null){
-					shader.setDirectionalLight(directionalLight);
+				if(shader!=null){					
 					shader.preShade(renderFace);
 				}
 				
@@ -317,11 +300,9 @@ public class Engine3D {
 				shader = renderFace.shader; // override with model specific shader
 			}			
 			
-			if(shader!=null){
-				shader.setDirectionalLight(null); // Suppress execution of shadow mapping code during rasterization
+			if(shader!=null){				
 				shader.preShade(renderFace);
-			}
-			
+			}			
 			rasterizer.rasterize(renderFace, colorBuffer, zBuffer, shader); 
 		}
 		
@@ -334,8 +315,7 @@ public class Engine3D {
 					shader = renderFace.shader; // override with model specific shader
 				}	
 				
-				if(shader!=null){
-					shader.setDirectionalLight(null); // Suppress execution of shadow mapping code during rasterization
+				if(shader!=null){					
 					shader.preShade(renderFace);
 				}
 				
@@ -357,7 +337,7 @@ public class Engine3D {
 		for (Iterator<Face> it = model.getFaces().iterator(); it.hasNext();) {
 			
 			Face face = (Face)it.next();
-			RenderFace renderFace = face.createRenderFace();						
+			RenderFace renderFace = face.createRenderFace(model.abientCoefficient, model.diffuseCoefficient, model.shineness);			
 
 			renderFace.preTransform(modelMatrix, modelOrigin);						
 			if(backfaceCull(renderFace, camOrigin, icammat)){
@@ -459,8 +439,7 @@ public class Engine3D {
 
 	protected List<Model3D>[] segments;
 	protected Camera camera;
-	
-	protected DirectionalLight directionalLight;
+		
 	protected Lightsource lightsource;
 	
 	//protected List<RenderFace> polyHeap;

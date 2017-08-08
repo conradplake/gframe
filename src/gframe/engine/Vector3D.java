@@ -125,6 +125,12 @@ public class Vector3D {
 		return new Vector3D(x, y, z);
 	}
 	
+	
+	@Override
+	public String toString() {
+		return "[" + x + "," + y + "," + z + "]";
+	}
+	
 	public static float[] normalize(float x, float y, float z){		
 		float len = (float) (Math.sqrt(x * x + y * y + z * z));
 		if(len>0){

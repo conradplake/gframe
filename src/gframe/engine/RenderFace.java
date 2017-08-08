@@ -38,12 +38,21 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 	float[] texel_U;
 	float[] texel_V;	
 	
+	// light & reflection properties
+	float abientCoefficient;
+	float diffuseCoefficient;
+	float shineness;
+	
 	Matrix3D inverseTangentSpace;
 	Matrix3D tangentSpace;
 
 	Shader shader;
 	
+	Point3D cameraPosition;
 	
+	// the original model this face comes from	
+	Model3D model3d; 
+
 	protected RenderFace(Point3D[] vertices, int length, Point3D centroid, Color col, float normal_x, float normal_y,
 			float normal_z) {
 		super(vertices, length, centroid, col, normal_x, normal_y, normal_z);
@@ -100,6 +109,8 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 		screen_bbox_miny = -1;
 		screen_bbox_maxy = -1;
 		
+		this.cameraPosition = camOrigin;
+		
 		for (int i = 0; i < vertices.length; i++) {
 			float[] camCoords = icammat.transform(vertices[i].x - camOrigin.x, vertices[i].y - camOrigin.y,
 					vertices[i].z - camOrigin.z);
@@ -119,6 +130,10 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 			pcorrectedWorld_X[i] = vertices[i].x * zf;
 			pcorrectedWorld_Y[i] = vertices[i].y * zf;
 			pcorrectedWorld_Z[i] = vertices[i].z * zf;
+			
+//			vertices[i].normal_x *= zf;
+//			vertices[i].normal_y *= zf;
+//			vertices[i].normal_z *= zf;
 			
 
 			// assign vertices to texture corners		
@@ -335,6 +350,19 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 		
 		tangentSpace = null;
 		inverseTangentSpace = null;
-	}	
+	}
+	
+	
+	public Point3D getCameraPosition(){
+		return this.cameraPosition;
+	}
 
+	
+	public Model3D getModel3d() {
+		return model3d;
+	}
+
+	public void setModel3d(Model3D model3d) {
+		this.model3d = model3d;
+	}
 }

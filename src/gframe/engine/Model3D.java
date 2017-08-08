@@ -355,13 +355,39 @@ public class Model3D extends Object3D {
 	}
 	
 	
-	public void clear() {
+	public void clearGeometry() {
 		faces.clear();
 		vertices.clear();
 		vertex2faces.clear();
 		bsRad = -1;
 	}
 
+	
+	
+	public float getAbientCoefficient() {
+		return abientCoefficient;
+	}
+
+	public void setAbientCoefficient(float abientCoefficient) {
+		this.abientCoefficient = abientCoefficient;
+	}
+
+	public float getDiffuseCoefficient() {
+		return diffuseCoefficient;
+	}
+
+	public void setDiffuseCoefficient(float diffuseCoefficient) {
+		this.diffuseCoefficient = diffuseCoefficient;
+	}
+
+	public float getShineness() {
+		return shineness;
+	}
+
+	public void setShineness(float shineness) {
+		this.shineness = shineness;
+	}
+	
 	
 	private float bsRad = -1;
 
@@ -372,4 +398,9 @@ public class Model3D extends Object3D {
 
 	public boolean isVisible = true;
 	
+	
+	// light & reflection properties
+	float abientCoefficient = 0.5f;	
+	float diffuseCoefficient = 1f;
+	float shineness = 16;
 }

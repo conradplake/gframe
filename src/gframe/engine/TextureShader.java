@@ -76,16 +76,14 @@ public class TextureShader extends AbstractShader{
 	
 	
 	public void addEffect(ImageRaster heightmap, int threshold, Color c){
-		
-		int rgb = c.getRGB();
+				
+		int rgb = c.getRGB();		
 		
 		int hw = heightmap.getWidth()-1;
 		
 		for(int x=0;x<heightmap.getWidth();x++){
 			for(int y=0;y<heightmap.getHeight();y++){
 				int pixel = heightmap.getPixel(x, y);
-				
-				//int alpha = (pixel >> 24) & 0xff;
 				int red = (pixel >> 16) & 0xff;
 				int green = (pixel >> 8) & 0xff;
 				int blue = (pixel) & 0xff;
@@ -95,6 +93,12 @@ public class TextureShader extends AbstractShader{
 				}							
 			}	
 		}
+		
+		// recompute LOD textures
+		this.textureLOD0 = texture;
+		this.textureLOD1 = TextureGenerator.mipmap(texture);
+		this.textureLOD2 = TextureGenerator.mipmap(textureLOD1);
+		this.textureLOD3 = TextureGenerator.mipmap(textureLOD2);
 	}
 	
 	

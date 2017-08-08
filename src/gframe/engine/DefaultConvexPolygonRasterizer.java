@@ -369,10 +369,11 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			
 			int rgb = shader == null ? renderFace.col.getRGB() : shader.shade(renderFace);		
 			
-			DirectionalLight directionalLight = shader!=null? shader.getDirectionalLight() : null;		
-			Matrix3D inverseLightMatrix = directionalLight!=null? directionalLight.getInverseMatrix() : null;
-			Point3D lightOrigin = directionalLight!=null? directionalLight.getOrigin() : null;
-			ZBuffer shadowMap = directionalLight!=null? directionalLight.getDepthMap() : null;
+			
+			Lightsource lightsource = shader!=null? shader.getLightsource() : null;
+			boolean shadowsEnabled = lightsource!=null? lightsource.isShadowsEnabled() : false;				
+			Matrix3D inverseLightMatrix = shadowsEnabled? lightsource.getInverseMatrix() : null;			
+			ZBuffer shadowMap = shadowsEnabled? lightsource.getDepthMap() : null;
 			
 			for (int draw_y = minY; draw_y <= maxY; draw_y++) {
 	
@@ -496,10 +497,14 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 							pcorr_world_x *= inverseZfactor;
 							pcorr_world_y *= inverseZfactor;
 							pcorr_world_z *= inverseZfactor;
+							
+//							vn_x *= inverseZfactor;
+//							vn_y *= inverseZfactor;
+//							vn_z *= inverseZfactor;
 												
 							// Shadow mapping: anhand der world space coordinaten noch den punkt im light space bestimmen
 							if(shadowMap!=null){
-								float[] lightCoords = inverseLightMatrix.transform(pcorr_world_x - lightOrigin.x, pcorr_world_y - lightOrigin.y, pcorr_world_z - lightOrigin.z);
+								float[] lightCoords = inverseLightMatrix.transform(pcorr_world_x - lightsource.x, pcorr_world_y - lightsource.y, pcorr_world_z - lightsource.z);
 																						
 								// perspektiven korrektur innerhalb des light space
 								float zf = Engine3D.zFactor(lightCoords[2]);
@@ -512,7 +517,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 								
 								if(light_x<0 || light_x>=shadowMap.w || light_y<0 || light_y>=shadowMap.h){ // alles ausserhalb des lichtkegels ist im schatten								
 									
-									if(directionalLight.isSpotLight()){
+									if(lightsource.isSpotLight()){
 										colorBuffer.setPixel(draw_x, draw_y, shadowColorRGB);
 										continue; // TODO: schatten-info an den shader weiter geben und ihn machen lassen
 									}
@@ -661,7 +666,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		
 		if(newVertexCount > renderFace.vertices.length){
 			Face face = new Face(newVertices, newVertexCount, renderFace.getColor());
-			RenderFace newRenderFace = face.createRenderFace();
+			RenderFace newRenderFace = face.createRenderFace(renderFace.abientCoefficient, renderFace.diffuseCoefficient, renderFace.shineness);
 //			newRenderFace.transformToCamSpace(camOrigin, icammat, perspectiveCorrect);
 			return newRenderFace;
 			//return face.createRenderFace();

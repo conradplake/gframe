@@ -1,6 +1,5 @@
 package gframe.engine;
 
-
 /**
  * 	Gives a color result for every position in 3d space (see Methods shade).
  *  
@@ -29,11 +28,7 @@ public interface Shader {
 
 	public void setLightsource(Lightsource ls);
 	public Lightsource getLightsource();
-	
-	public void setDirectionalLight(DirectionalLight dl);
-	public DirectionalLight getDirectionalLight();
-	
-	
+
 	public boolean isPerPixelShader();
 	
 }
