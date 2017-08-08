@@ -3,7 +3,7 @@ package gframe.engine.timing;
 import gframe.engine.Model3D;
 
 /**
- * Effekt: reinzoomen, wieder rauszoomen durch bewegung des cam origin's in blickrichtung
+ *
  * */
 public class Rotate implements Timed{
 	
