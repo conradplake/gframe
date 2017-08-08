@@ -5,6 +5,6 @@ Features include:
  - pixel-perfect perspective correct texture mapping
  - sub-pixel & sub-texel accuracy
  - flat & phong shading
- - normal mapping
+ - normal & specular mapping
  - shadow mapping (only one spotlight though)
  - physics support & particles
