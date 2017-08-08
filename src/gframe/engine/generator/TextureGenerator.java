@@ -12,7 +12,6 @@ import graph.Graph;
 import graph.Node;
 import imaging.ImageHelper;
 import imaging.ImageRaster;
-import imaging.draw.Tool;
 
 public class TextureGenerator {
 
@@ -33,6 +32,12 @@ public class TextureGenerator {
 				int pixel_c = texture.getPixel(x*2, y*2+1);
 				int pixel_d = texture.getPixel(x*2+1, y*2+1);
 								
+				int a_alpha = (pixel_a >> 24) & 0xff;
+				int b_alpha = (pixel_b >> 24) & 0xff;
+				int c_alpha = (pixel_c >> 24) & 0xff;
+				int d_alpha = (pixel_d >> 24) & 0xff;				
+				int new_alpha = (a_alpha+b_alpha+c_alpha+d_alpha) / 4;
+				
 				int a_red = (pixel_a >> 16) & 0xff;
 				int b_red = (pixel_b >> 16) & 0xff;
 				int c_red = (pixel_c >> 16) & 0xff;
@@ -51,7 +56,7 @@ public class TextureGenerator {
 				int d_blue = (pixel_d >> 0) & 0xff;
 				int new_blue = (a_blue+b_blue+c_blue+d_blue) / 4;
 														
-				int pixel =	((255 & 0xFF) << 24) |    
+				int pixel =	((new_alpha & 0xFF) << 24) |    
 						((new_red & 0xFF) << 16) |
 		                ((new_green & 0xFF) << 8)  |
 		                ((new_blue & 0xFF) << 0);					
@@ -151,34 +156,40 @@ public class TextureGenerator {
 						for(int y=0;y<blocksize;y++){
 														
 							Vector3D normal = new Vector3D(0, 0, 1); // default normal points to z direction
+							int alpha = 255;
 							
 							if(blocksize<5){
 //								normal = Toolbox.getXrotMatrix(180).transform(normal);
 								normal = new Vector3D();
+								alpha = 0;
 							}
 							else{
 								if(left.contains(x,y)){
 									normal = Toolbox.getYrotMatrix(-90).transform(normal);
 									if(blocksize<10){
 										normal = Toolbox.getYrotMatrix(-60).transform(normal); // vector "überdrehen" um die helligkeit zu dimmen
+										alpha = 0;
 									}
 								}
 								else if(right.contains(x,y)){
 									normal = Toolbox.getYrotMatrix(90).transform(normal);
 									if(blocksize<10){
 										normal = Toolbox.getYrotMatrix(60).transform(normal);
+										alpha = 0;
 									}
 								}
 								else if(up.contains(x,y)){
 									normal = Toolbox.getXrotMatrix(-90).transform(normal);
 									if(blocksize<10){
 										normal = Toolbox.getXrotMatrix(-60).transform(normal);
+										alpha = 0;
 									}
 								}
 								else if(down.contains(x,y)){
 									normal = Toolbox.getXrotMatrix(90).transform(normal);
 									if(blocksize<10){
 										normal = Toolbox.getXrotMatrix(60).transform(normal);
+										alpha = 0;
 									}
 								}else{
 //									normal = Toolbox.getXrotMatrix(180).transform(normal);
@@ -187,7 +198,7 @@ public class TextureGenerator {
 							}
 														
 														
-							int col = toColor(normal);							
+							int col = toColor(normal, alpha);							
 							raster.setPixel(pos_x + (s*blocksize + x), pos_y + (t*blocksize + y), col);
 						}
 					}	
@@ -516,23 +527,30 @@ public class TextureGenerator {
 					for(int x=0;x<tile_size;x++){					
 						
 						Vector3D normal = new Vector3D(0, 0, 1); // default normal points to z direction
-																						
-						if(x==tile_size-1){ // rechter rand
+						
+						boolean gap = false;
+						
+						if(x==tile_size-1 || x==tile_size-2){ // rechter rand
 							normal = Toolbox.getYrotMatrix(-20).transform(normal);
-						}else if(x==0){ // linker rand
+							gap = true;
+						}else if(x==0 || x==1){ // linker rand
 							normal = Toolbox.getYrotMatrix(20).transform(normal);
+							gap = true;
 						}
 						
-						if(y==tile_size-1){ // unterer rand
-							normal = Toolbox.getXrotMatrix(-20).transform(normal);							
-						}else if(y==0){ // oberer rand
-							normal = Toolbox.getXrotMatrix(20).transform(normal);							
+						if(y==tile_size-1 || y==tile_size-2){ // unterer rand
+							normal = Toolbox.getXrotMatrix(-20).transform(normal);
+							gap = true;
+						}else if(y==0 || y==1){ // oberer rand
+							normal = Toolbox.getXrotMatrix(20).transform(normal);
+							gap = true;
 						}						
 						
 						// add base displacement
-						normal = Toolbox.getRotMatrix(tile_deg_x, tile_deg_y, 0).transform(normal);						
+						if(!gap)
+							normal = Toolbox.getRotMatrix(tile_deg_x, tile_deg_y, 0).transform(normal);						
 																							
-						int col = toColor(normal);						
+						int col = toColor(normal, gap? 0:255);						
 											
 						result.setPixel((t*tile_size)+x, (r*tile_size)+y, col);
 					}	
@@ -606,7 +624,8 @@ public class TextureGenerator {
 		for (int x=0;x<width;x++) {
 			for (int y=0;y<height;y++) {
 				
-				int rgbCode = ((128 & 0xFF) << 16) |
+				int rgbCode = ((0 & 0xFF) << 24) |
+							  ((128 & 0xFF) << 16) |
 		                	  ((128 & 0xFF) << 8)  |
 		                	  ((255 & 0xFF) << 0);
 				
@@ -615,6 +634,44 @@ public class TextureGenerator {
 		}
 		
 		return normalMap;
+	}
+	
+	
+	public static ImageRaster generateRandomSpecularMap(int width, int height){
+		ImageRaster specularMap = new ImageRaster(width, height);
+		
+		for (int x=0;x<width;x++) {
+			for (int y=0;y<height;y++) {
+				
+				float value = (float) Math.random();
+				
+//				if(value>0.5f){
+//					value = 1;
+//				}else{
+//					value = 0.1f;	
+//				}
+				
+				
+				Color c = Color.getHSBColor(value, 1, 1);
+				specularMap.setPixel(x, y, c.getRGB());
+			}	
+		}
+		
+		return specularMap;
+	}
+	
+	
+	public static ImageRaster generateSpecularMap(int width, int height, Color color){
+		ImageRaster specularMap = new ImageRaster(width, height);
+		
+		for (int x=0;x<width;x++) {
+			for (int y=0;y<height;y++) {
+				
+				specularMap.setPixel(x, y, color.getRGB());
+			}	
+		}
+		
+		return specularMap;
 	}
 	
 	
@@ -633,12 +690,12 @@ public class TextureGenerator {
 	}
 	
 	
-	public static int toColor(Vector3D normalVector){
+	public static int toColor(Vector3D normalVector, int alpha){
 		int red = (int)(normalVector.x * 127) + 128;
 		int green = (int)(normalVector.y * 127) + 128;
 		int blue = (int)(normalVector.z * 127) + 128;																	
 		
-		int col =	((255 & 0xFF) << 24) |    
+		int col =	((alpha & 0xFF) << 24) |    
 					((red & 0xFF) << 16) |
 	                ((green & 0xFF) << 8)  |
 	                ((blue & 0xFF) << 0);
