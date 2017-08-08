@@ -33,6 +33,10 @@ public class DoubleBufferedFrame extends java.awt.Frame {
 	public void clearDoubleBuffer(){
 		offscreen = null; 	
 	}
+	
+	public Image getOffscreen(){
+		return offscreen;
+	}
 
 	private Image offscreen;
 }

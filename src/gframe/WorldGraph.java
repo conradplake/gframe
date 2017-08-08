@@ -1,7 +1,11 @@
 package gframe;
 
-import java.util.*;
-import graph.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import graph.Graph;
+import graph.Node;
 
 public class WorldGraph extends Graph{
 
