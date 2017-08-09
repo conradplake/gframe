@@ -219,7 +219,7 @@ public class NormalMappedTextureShader extends TextureShader {
 					/ (currentShineness + (currentShineness * viewReflectionProduct) - viewReflectionProduct);
 
 			float specularIntensity = Math.max(viewReflectionProduct, 0);
-			float specularCoefficient = diffuseAlpha * iColorNorm; // specularity from alpha-channel in [0..1]
+			float specularCoefficient = ((texelNormal >> 24) & 0xff) * iColorNorm; // specularity from normal map's alpha-channel in [0..1]
 
 			float specIntermediate = specularIntensity * specularCoefficient;
 			float specular_red = specIntermediate * lightsource.rgbComponents[0];
@@ -238,7 +238,7 @@ public class NormalMappedTextureShader extends TextureShader {
 			if (blueColor > 255)
 				blueColor = 255;
 
-			return ((255 & 0xFF) << 24) | ((redColor & 0xFF) << 16) | ((greenColor & 0xFF) << 8)
+			return ((diffuseAlpha & 0xFF) << 24) | ((redColor & 0xFF) << 16) | ((greenColor & 0xFF) << 8)
 					| ((blueColor & 0xFF) << 0);
 		}
 	}
