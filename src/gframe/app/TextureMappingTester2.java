@@ -53,8 +53,11 @@ public class TextureMappingTester2 extends DoubleBufferedFrame implements MouseM
 //		Shader shader = new TestShader(lightsource);
 //		Shader shader = new MetaballShader(lightsource, 2);
 		
-		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateTileTextureNormalMap(324, 324, 30), true);
+//		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateTileTextureNormalMap(324, 324, 30), true);
 //		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateMengerSpongeNormalMap(324), true);
+		Shader shader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateDiscoTileTexture(320, 320, 20), TextureGenerator.generateTileTextureNormalMap(320, 320, 20), true);
+		
+//		((TextureShader)shader).setIsBilinearFiltering(true);
 		
 		//Shader shader = new RocketEvolutionShader(lightsource);		
 //		Shader shader = new PhyllotaxisShader(lightsource);

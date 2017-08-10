@@ -2,7 +2,6 @@ package gframe.app;
 
 import java.awt.AWTEvent;
 import java.awt.Color;
-import java.awt.DisplayMode;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -14,6 +13,7 @@ import java.io.File;
 import gframe.DoubleBufferedFrame;
 import gframe.engine.Engine3D;
 import gframe.engine.Lightsource;
+import gframe.engine.Material;
 import gframe.engine.Model3D;
 import gframe.engine.NormalMappedTextureShader;
 import gframe.engine.Point3D;
@@ -36,9 +36,9 @@ import imaging.ImageRaster;
 public class ShaderTester extends DoubleBufferedFrame implements MouseMotionListener {
 
 	public ShaderTester() {
-		super();   
-		setBackground(Color.lightGray);
-		frame = new ImageRaster(SCREENX, SCREENY);		
+		super();
+		frame = new ImageRaster(SCREENX, SCREENY);
+		setBackground(Color.lightGray);			
 	}
 	
 	
@@ -63,7 +63,8 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 		//Shader shader = new SuperEllipseShader(lightsource);
 		//Shader shader = new RocketEvolutionShader(lightsource);
 		//Shader shader = new LSystemTurtleShader(lightsource);
-		Shader shader = new FlowFieldShader(lightsource, 1000);
+		//Shader shader = new FlowFieldShader(lightsource, 1000);
+		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateDefaultNormalMap(324, 324), true);
 		engine.setDefaultShader(shader);		
 		
 		
@@ -91,6 +92,9 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 			model = Model3DGenerator.buildPlane(100, new Point3D(), Color.white);
 			model.rotate(0, 0, 90);
 			model.scale(1, 1, 1);
+			
+			model.material = Material.GOLD;
+			
 			engine.register(model);
 		} catch (Exception e) {
 			e.printStackTrace();			
@@ -217,9 +221,10 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 //					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 324, 324), TextureGenerator.generateMengerSpongeNormalMap(324));
 					
 //					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 324, 324), TextureGenerator.generateDefaultNormalMap(324, 324), TextureGenerator.generateRandomSpecularMap(324, 324));
-//					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 324, 324), TextureGenerator.generateMengerSpongeNormalMap(324), TextureGenerator.generateSpecularMap(324, 324, 255));
-					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateTileTextureNormalMap(324, 324, 30), true);					
-					
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 324, 324), TextureGenerator.generateMengerSpongeNormalMap(324), true);
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateTileTextureNormalMap(324, 324, 30), true);					
+					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateDefaultNormalMap(324, 324), true);
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateDiscoTileTexture(320, 320, 20), TextureGenerator.generateTileTextureNormalMap(320, 320, 20), true);
 					engine.setDefaultShader(shader);
 				}
 				else if (keycode == KeyEvent.VK_7) {

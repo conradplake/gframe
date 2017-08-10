@@ -105,21 +105,20 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		Timer.getInstance().registerTimedObject(loader);
 				
 		
-		// -- DISPLAY MODE SETTINGS
-		
-		GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-		if(device.isFullScreenSupported()){
-			DisplayMode newMode = new DisplayMode(SCREENX, SCREENY, 32, 60);
-			this.setUndecorated(true);
-			this.setResizable(false);
-			//this.setIgnoreRepaint(true);
-			device.setFullScreenWindow(this);			
-			device.setDisplayMode(newMode);			
-		}else{
+//		// -- DISPLAY MODE SETTINGS		
+//		GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+//		if(device.isFullScreenSupported()){
+//			DisplayMode newMode = new DisplayMode(SCREENX, SCREENY, 32, 60);
+//			this.setUndecorated(true);
+//			this.setResizable(false);
+//			//this.setIgnoreRepaint(true);
+//			device.setFullScreenWindow(this);			
+//			device.setDisplayMode(newMode);			
+//		}else{
 			setSize(SCREENX, SCREENY);
 			setLocation(20, 0);
 			setLayout(null);
-		}
+//		}
 		
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
 		addMouseMotionListener(this);
@@ -1256,10 +1255,10 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 			}
 		}
 
-//		fpsCounter++;
-//		if (fpsCounter % 20 == 0) {
-//			System.out.println("FPS: " + (1000 / updateTime));
-//		}
+		fpsCounter++;
+		if (fpsCounter % 20 == 0) {
+			System.out.println("FPS: " + (1000 / updateTime));
+		}
 
 	}
 
