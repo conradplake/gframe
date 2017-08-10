@@ -166,6 +166,7 @@ public class TextureGenerator {
 							else{
 								if(left.contains(x,y)){
 									normal = Toolbox.getYrotMatrix(-90).transform(normal);
+									alpha = 250;
 									if(blocksize<10){
 										normal = Toolbox.getYrotMatrix(-60).transform(normal); // vector "überdrehen" um die helligkeit zu dimmen
 										alpha = 0;
@@ -173,6 +174,7 @@ public class TextureGenerator {
 								}
 								else if(right.contains(x,y)){
 									normal = Toolbox.getYrotMatrix(90).transform(normal);
+									alpha = 250;
 									if(blocksize<10){
 										normal = Toolbox.getYrotMatrix(60).transform(normal);
 										alpha = 0;
@@ -180,6 +182,7 @@ public class TextureGenerator {
 								}
 								else if(up.contains(x,y)){
 									normal = Toolbox.getXrotMatrix(-90).transform(normal);
+									alpha = 250;
 									if(blocksize<10){
 										normal = Toolbox.getXrotMatrix(-60).transform(normal);
 										alpha = 0;
@@ -187,6 +190,7 @@ public class TextureGenerator {
 								}
 								else if(down.contains(x,y)){
 									normal = Toolbox.getXrotMatrix(90).transform(normal);
+									alpha = 250;
 									if(blocksize<10){
 										normal = Toolbox.getXrotMatrix(60).transform(normal);
 										alpha = 0;
@@ -359,15 +363,15 @@ public class TextureGenerator {
 //							col = fugenColor.getRGB();
 //						}
 												
-						if(x==tile_size-1){ // rechter rand
+						if(x==tile_size-1 || x==tile_size-2){ // rechter rand
 							col = fugenColor;
-						}else if(x==0){ // linker rand
+						}else if(x==0 || x==1){ // linker rand
 							col = fugenColor;
 						}
 						
-						if(y==tile_size-1){ // unterer rand
+						if(y==tile_size-1 || y==tile_size-2){ // unterer rand
 							col = fugenColor;							
-						}else if(y==0){ // oberer rand
+						}else if(y==0 || y==1){ // oberer rand
 							col = fugenColor;							
 						}		
 						
@@ -550,7 +554,7 @@ public class TextureGenerator {
 						if(!gap)
 							normal = Toolbox.getRotMatrix(tile_deg_x, tile_deg_y, 0).transform(normal);						
 																							
-						int col = toColor(normal, gap? 0:255);						
+						int col = toColor(normal, gap? 155:255);						
 											
 						result.setPixel((t*tile_size)+x, (r*tile_size)+y, col);
 					}	
@@ -624,7 +628,7 @@ public class TextureGenerator {
 		for (int x=0;x<width;x++) {
 			for (int y=0;y<height;y++) {
 				
-				int rgbCode = ((0 & 0xFF) << 24) |
+				int rgbCode = ((255 & 0xFF) << 24) |
 							  ((128 & 0xFF) << 16) |
 		                	  ((128 & 0xFF) << 8)  |
 		                	  ((255 & 0xFF) << 0);
