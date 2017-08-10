@@ -38,11 +38,9 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 	float[] texel_U;
 	float[] texel_V;	
 	
-	// light & reflection properties
-	float abientCoefficient;
-	float diffuseCoefficient;
-	float shineness;
 	
+	Material material;
+
 	Matrix3D inverseTangentSpace;
 	Matrix3D tangentSpace;
 
@@ -50,8 +48,7 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 	
 	Point3D cameraPosition;
 	
-	// the original model this face comes from	
-	Model3D model3d; 
+
 
 	protected RenderFace(Point3D[] vertices, int length, Point3D centroid, Color col, float normal_x, float normal_y,
 			float normal_z) {
@@ -356,13 +353,13 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 	public Point3D getCameraPosition(){
 		return this.cameraPosition;
 	}
-
 	
-	public Model3D getModel3d() {
-		return model3d;
+	
+	public Material getMaterial() {
+		return material;
 	}
 
-	public void setModel3d(Model3D model3d) {
-		this.model3d = model3d;
+	public void setMaterial(Material material) {
+		this.material = material;
 	}
 }

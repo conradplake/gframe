@@ -666,10 +666,11 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		
 		if(newVertexCount > renderFace.vertices.length){
 			Face face = new Face(newVertices, newVertexCount, renderFace.getColor());
-			RenderFace newRenderFace = face.createRenderFace(renderFace.abientCoefficient, renderFace.diffuseCoefficient, renderFace.shineness);
+//			RenderFace newRenderFace = face.createRenderFace(renderFace.abientCoefficient, renderFace.diffuseCoefficient, renderFace.shininess);
 //			newRenderFace.transformToCamSpace(camOrigin, icammat, perspectiveCorrect);
-			return newRenderFace;
+//			return newRenderFace;
 			//return face.createRenderFace();
+			return null;
 		}
 		else{
 			return renderFace; // no clipping needed

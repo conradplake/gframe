@@ -49,7 +49,7 @@ public abstract class AbstractShader implements Shader {
 	
 	
 	public int shade(Color diffuseColor, float world_x, float world_y, float world_z, float normal_x, float normal_y, float normal_z) {
-		Vector3D ls_face = new Vector3D(world_x - lightsource.x, world_y - lightsource.y, world_z - lightsource.z);		
+		Vector3D ls_face = new Vector3D(lightsource.x - world_x, lightsource.y - world_y, lightsource.z - world_z);		
 		
 		ls_face.normalize();
 		
@@ -59,7 +59,7 @@ public abstract class AbstractShader implements Shader {
 //			ls_face.normalize();
 //		}
 		
-		float dp = -ls_face.dotProduct(normal_x, normal_y, normal_z);
+		float dp = ls_face.dotProduct(normal_x, normal_y, normal_z);
 		if (dp < 0) {
 			dp = 0;
 		}

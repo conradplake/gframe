@@ -2,8 +2,6 @@ package gframe.engine;
 
 import java.awt.Color;
 
-import javafx.scene.AmbientLight;
-
 public class Face {
 	
 	public Face(Point3D p1, Point3D p2, Point3D p3, Color col) {		
@@ -213,25 +211,27 @@ public class Face {
 	}
 
 	
+	
+	public RenderFace createRenderFace(){
+		return createRenderFace(Material.DEFAULT);
+	}
+	
 	/**
 	 * 
 	 * Creates a representative of this face used for rendering (see Engine3D.fillPolyBuffers).
-	 * @param shineness 
+	 * @param shininess 
 	 * @param diffuseCoefficient 
 	 * @param abientCoefficient 
 	 * */
-	public RenderFace createRenderFace(float abientCoefficient, float diffuseCoefficient, float shineness){
+	public RenderFace createRenderFace(Material material){
 		
 		if(renderFace==null){		
 			Point3D[] copyVertices = new Point3D[vertices.length];
 			for(int i=0;i<vertices.length;i++){
 				copyVertices[i]=vertices[i].copy();
 			}		
-			renderFace = new RenderFace(copyVertices, copyVertices.length, centroid.copy(), col, normal_x, normal_y, normal_z);
-			
-			renderFace.abientCoefficient = abientCoefficient;
-			renderFace.diffuseCoefficient = diffuseCoefficient;
-			renderFace.shineness = shineness;
+			renderFace = new RenderFace(copyVertices, copyVertices.length, centroid.copy(), col, normal_x, normal_y, normal_z);			
+			renderFace.material = material;
 		}
 		else{
 			renderFace.reset(this);

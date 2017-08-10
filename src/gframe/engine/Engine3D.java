@@ -337,7 +337,7 @@ public class Engine3D {
 		for (Iterator<Face> it = model.getFaces().iterator(); it.hasNext();) {
 			
 			Face face = (Face)it.next();
-			RenderFace renderFace = face.createRenderFace(model.abientCoefficient, model.diffuseCoefficient, model.shineness);			
+			RenderFace renderFace = face.createRenderFace(model.material);			
 
 			renderFace.preTransform(modelMatrix, modelOrigin);						
 			if(backfaceCull(renderFace, camOrigin, icammat)){

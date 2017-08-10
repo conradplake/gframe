@@ -13,9 +13,6 @@ public interface Rasterizer {
 	
 	public ZBuffer createZBuffer();
 	
-	public void setScreenSize(int xoffset, int yoffset, int frameX, int frameY);
-		
-	public RenderFace nearPlaneClipping(RenderFace renderFace, Point3D camOrigin, Matrix3D icammat, boolean b);
-		
+	public void setScreenSize(int xoffset, int yoffset, int frameX, int frameY);			
 
 }

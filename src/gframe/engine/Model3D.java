@@ -364,31 +364,6 @@ public class Model3D extends Object3D {
 
 	
 	
-	public float getAbientCoefficient() {
-		return abientCoefficient;
-	}
-
-	public void setAbientCoefficient(float abientCoefficient) {
-		this.abientCoefficient = abientCoefficient;
-	}
-
-	public float getDiffuseCoefficient() {
-		return diffuseCoefficient;
-	}
-
-	public void setDiffuseCoefficient(float diffuseCoefficient) {
-		this.diffuseCoefficient = diffuseCoefficient;
-	}
-
-	public float getShineness() {
-		return shineness;
-	}
-
-	public void setShineness(float shineness) {
-		this.shineness = shineness;
-	}
-	
-	
 	private float bsRad = -1;
 
 	private List<Point3D> vertices;
@@ -399,8 +374,6 @@ public class Model3D extends Object3D {
 	public boolean isVisible = true;
 	
 	
-	// light & reflection properties
-	float abientCoefficient = 0.5f;	
-	float diffuseCoefficient = 1f;
-	float shineness = 16;
+	// default light & reflection properties
+	public Material material = Material.DEFAULT;	
 }
