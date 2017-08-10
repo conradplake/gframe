@@ -207,7 +207,7 @@ public class Face {
 		float mx = minX();
 		float my = minY();
 		float mz = minZ();
-		return new Point3D(mx + (maxX() - mx) / 2, my + (maxY() - my) / 2, mz + (maxZ() - mz) / 2);			
+		return new Point3D(mx + (maxX() - mx) / 2f, my + (maxY() - my) / 2f, mz + (maxZ() - mz) / 2f);			
 	}
 
 	
