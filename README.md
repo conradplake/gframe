@@ -6,5 +6,5 @@ Features include:
  - sub-pixel & sub-texel accuracy
  - flat & phong shading
  - normal & specular mapping
- - shadow mapping (only one spotlight though)
+ - shadow mapping
  - physics support & particles
