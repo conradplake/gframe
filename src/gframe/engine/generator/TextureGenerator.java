@@ -552,7 +552,10 @@ public class TextureGenerator {
 						
 						// add base displacement
 						if(!gap)
-							normal = Toolbox.getRotMatrix(tile_deg_x, tile_deg_y, 0).transform(normal);						
+							normal = Toolbox.getRotMatrix(tile_deg_x, tile_deg_y, 0).transform(normal);
+						else{
+//							normal.scale(0.8f); // dimm the light
+						}
 																							
 						int col = toColor(normal, gap? 155:255);						
 											

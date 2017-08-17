@@ -138,12 +138,9 @@ public class Model3DGenerator {
 			for(int x=0;x<w;x++){									
 				int rgb = heightMap.getPixel(x, y);																	
 				int grayValue = ImageHelper.toGray(rgb);															
-		
-				
+					
 			}
-		}
-				
-		
+		}				
 		
 		return result;	
 	}
@@ -225,6 +222,7 @@ public class Model3DGenerator {
 		}
 				
 		mesh.recomputeFaceNormals();
+		mesh.computeVertexNormals();
 		return mesh;
 	}
 	
@@ -395,13 +393,23 @@ public class Model3DGenerator {
 		return result;	
 	}
 	
-
-	public static Model3D buildCube(float size, java.awt.Color col) {
-		return buildBlock(size, size, size, col);
+	
+	public static Model3D buildRoom(float width, float height, float depth, java.awt.Color col) {
+		return buildBlock(width, height, depth, col, true);		
 	}
 	
 
+	public static Model3D buildCube(float size, java.awt.Color col) {
+		return buildBlock(size, size, size, col, false);
+	}
+	
+	
 	public static Model3D buildBlock(float width, float height, float depth, java.awt.Color col) {
+		return buildBlock(width, height, depth, col, false);
+	}
+	
+
+	public static Model3D buildBlock(float width, float height, float depth, java.awt.Color col, boolean reverseFaces) {
 		Model3D result = new Model3D();
 		
 		
@@ -446,19 +454,36 @@ public class Model3DGenerator {
 		result.addVertex(width / 2, height / 2, depth / 2); // 6
 		result.addVertex(width / 2, height / 2, -depth / 2); // 7
 
-		result.stretchFace(4, 5, 6, 7, col); // dach
+		if(reverseFaces)
+			result.stretchFace(7, 6, 5, 4, col); // dach
+		else
+			result.stretchFace(4, 5, 6, 7, col); // dach
 		
-		result.stretchFace(0, 4, 7, 3, col); // rueckwand
-		result.stretchFace(1, 5, 4, 0, col); // linke wand
+		if(reverseFaces)
+			result.stretchFace(3, 7, 4, 0, col); // rueckwand
+		else
+			result.stretchFace(0, 4, 7, 3, col); // rueckwand
 		
-//		result.stretchFace(1, 2, 6, 5, col); // vorderwand
-		result.stretchFace(2, 6, 5, 1, col); // vorderwand
 		
-		//result.stretchFace(7, 6, 2, 3, col); // rechte wand
-//		result.stretchFace(6, 2, 3, 7, col); // rechte wand
-		result.stretchFace(3, 7, 6, 2, col); // rechte wand
+		if(reverseFaces)
+			result.stretchFace(0, 4, 5, 1, col); // linke wand
+		else
+			result.stretchFace(1, 5, 4, 0, col); // linke wand
 		
-		result.stretchFace(3, 2, 1, 0, col); // boden
+		if(reverseFaces)
+			result.stretchFace(1, 5, 6, 2, col); // vorderwand
+		else
+			result.stretchFace(2, 6, 5, 1, col); // vorderwand	
+	
+		if(reverseFaces)
+			result.stretchFace(2, 6, 7, 3, col); // rechte wand
+		else
+			result.stretchFace(3, 7, 6, 2, col); // rechte wand
+		
+		if(reverseFaces)
+			result.stretchFace(0, 1, 2, 3, col); // boden
+		else
+			result.stretchFace(3, 2, 1, 0, col); // boden
 
 		return result;
 	}
@@ -501,8 +526,7 @@ public class Model3DGenerator {
 	public static Model3D buildMengerSponge(int level, int size, Color color){
 		
 		Model3D masterMengerCube = Model3DGenerator.buildCube(size, color);
-		masterMengerCube.move(0, 0, 500);		
-
+		masterMengerCube.move(0, 0, 500);
 		
 		Model3D[] mengerSponge = new Model3D[(int)Math.pow(20, level)]; // level 3: 8000 cubes
 		int cubeCounter = 0;
@@ -527,11 +551,24 @@ public class Model3DGenerator {
 		
 		Model3DGenerator.removeHiddenFaces(mengerSponge);
 		
-		
-		masterMengerCube = new Model3D();		
-					
+
+		masterMengerCube.clearGeometry();		
+		masterMengerCube.setOrigin(new Point3D());
+//		masterMengerCube = new Model3D();					
+		int totalVertexCount = 0;
 		for (Model3D model3d : mengerSponge) {
-			masterMengerCube.addChild(model3d);
+			for(Face face : model3d.getFaces()){
+				for(Point3D vertex : face.getVertices()){
+					masterMengerCube.addVertex(vertex.copy().add(model3d.getOrigin()));
+				}
+				
+				masterMengerCube.stretchFace(totalVertexCount, totalVertexCount+1, totalVertexCount+2, totalVertexCount+3, face.getColor());
+//				masterMengerCube.stretchFace(totalVertexCount+3, totalVertexCount+2, totalVertexCount+1, totalVertexCount, face.getColor());
+				
+				totalVertexCount += 4;
+			}									
+			
+//			masterMengerCube.addChild(model3d);
 		}
 												
 		return masterMengerCube;
@@ -829,7 +866,7 @@ public class Model3DGenerator {
 	
 	
 	/**
-	 * Finds all coherent regions in a given model. 
+	 * Returns all connected regions in a given model. 
 	 * Two regions are connected if they share a vertex.
 	 * **/
 	public static List<Model3D> splitToParts(Model3D model){
