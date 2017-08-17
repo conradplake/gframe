@@ -155,11 +155,11 @@ public class Model3D extends Object3D {
 	
 	
 	private void addToVertexMapping(Face face){
-		for(Point3D verttex : face.getVertices()){
-			Set<Face> facesAtVertex = vertex2faces.get(verttex);
+		for(Point3D vertex : face.getVertices()){
+			Set<Face> facesAtVertex = vertex2faces.get(vertex);
 			if(facesAtVertex==null){
 				facesAtVertex = new HashSet<Face>();
-				vertex2faces.put(verttex, facesAtVertex);
+				vertex2faces.put(vertex, facesAtVertex);
 			}
 			facesAtVertex.add(face);
 		}
@@ -361,6 +361,15 @@ public class Model3D extends Object3D {
 		vertex2faces.clear();
 		bsRad = -1;
 	}
+	
+	
+	public Material getMaterial() {
+		return material;
+	}
+
+	public void setMaterial(Material material) {
+		this.material = material;
+	}	
 
 	
 	
@@ -375,5 +384,6 @@ public class Model3D extends Object3D {
 	
 	
 	// default light & reflection properties
-	public Material material = Material.DEFAULT;	
+	Material material = Material.DEFAULT;
+
 }

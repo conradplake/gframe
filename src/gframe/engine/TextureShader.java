@@ -75,6 +75,10 @@ public class TextureShader extends AbstractShader{
 	}
 	
 	
+	void setEffectPixel(int x, int y, int c){
+		texture.setPixel(x, y, c);
+	}
+	
 	public void addEffect(ImageRaster heightmap, int threshold, Color c){
 				
 		int rgb = c.getRGB();		
@@ -89,12 +93,17 @@ public class TextureShader extends AbstractShader{
 				int blue = (pixel) & 0xff;
 														
 				if(red+green+blue>threshold){
-					texture.setPixel(hw-x, y, rgb);
+					setEffectPixel(hw-x, y, rgb);					
 				}							
 			}	
 		}
 		
 		// recompute LOD textures
+		recomputeMipmaps();
+	}
+	
+	
+	void recomputeMipmaps(){
 		this.textureLOD0 = texture;
 		this.textureLOD1 = TextureGenerator.mipmap(texture);
 		this.textureLOD2 = TextureGenerator.mipmap(textureLOD1);

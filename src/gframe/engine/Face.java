@@ -68,31 +68,6 @@ public class Face {
 		normal_z = newNormal[2];
 	}
 	
-	
-	/**
-	 * This just does the centroid and normal which can be sufficient for quick checks. 
-	 * Call postTransform to complete this transformation!
-	 * */
-	public void preTransform(Matrix3D matrix, Point3D p) {				
-		matrix.transform(centroid);
-		centroid.add(p);
-		
-		float[] newNormal = matrix.transform(normal_x, normal_y, normal_z);
-		normal_x = newNormal[0];
-		normal_y = newNormal[1];
-		normal_z = newNormal[2];
-	}
-		
-	/**
-	 *  Does not assume preTransform was called before but it must be called in order to complete this transformation!
-	 * */
-	public void postTransform(Matrix3D matrix, Point3D p) {		
-		for(int i=0;i<vertices.length;i++){
-			matrix.transform(vertices[i]);
-			vertices[i].add(p);
-		}		
-	}
-	
 
 	public float minX() {		
 		float minx = vertices[0].x;
@@ -134,7 +109,6 @@ public class Face {
 		return maxy;
 	}
 
-
 	public float minZ() {
 		float minz = vertices[0].z;
 		for(int i=1;i<vertices.length;i++){
@@ -167,6 +141,10 @@ public class Face {
 		return result;
 	}
 	
+	
+	/**
+	 * Adds position of p to all vertices and centroid. 
+	 * */
 	public void add(Point3D p) {		
 		for(int i=0;i<vertices.length;i++){
 			vertices[i].add(p);		
@@ -244,6 +222,7 @@ public class Face {
 	public Point3D[] getVertices() {
 		return vertices;
 	}
+	
 	
 	
 	public Point3D getCentroid() {

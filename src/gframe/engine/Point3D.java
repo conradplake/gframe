@@ -20,12 +20,19 @@ public class Point3D {
 	}
 	
 	public Point3D(float x, float y, float z, float normal_x, float normal_y, float normal_z) {
+		this(x, y, z, normal_x, normal_y, normal_z, 0f, 0f);
+	}
+	
+	public Point3D(float x, float y, float z, float normal_x, float normal_y, float normal_z, float u, float v) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.normal_x = normal_x;
 		this.normal_y = normal_y;
 		this.normal_z = normal_z;
+		
+		this.u = u;
+		this.v = v;
 	}
 
 	public float distance(Point3D p) {
@@ -45,11 +52,20 @@ public class Point3D {
 		y += dy;
 		z += dz;
 	}
+	
+	
+	public Point3D subtract(Point3D p) {
+		x -= p.x;
+		y -= p.y;
+		z -= p.z;
+		return this;
+	}
 
-	public void add(Point3D p) {
+	public Point3D add(Point3D p) {
 		x += p.x;
 		y += p.y;
 		z += p.z;
+		return this;
 	}
 
 	public void setCoordinates(float x, float y, float z) {
@@ -72,20 +88,28 @@ public class Point3D {
 
 	
 	public void lerp(Point3D targetPosition, float lerpFactor) {		
-		float move_dx = (targetPosition.x-x)*lerpFactor;
-		float move_dy = (targetPosition.y-y)*lerpFactor;		
-		float move_dz = (targetPosition.z-z)*lerpFactor;		
+		float move_dx = (targetPosition.x-this.x)*lerpFactor;
+		float move_dy = (targetPosition.y-this.y)*lerpFactor;		
+		float move_dz = (targetPosition.z-this.z)*lerpFactor;		
 		this.move(move_dx, move_dy, move_dz);
+		
+		// Also lerp normals and u,v-coordinates
+		this.normal_x += (targetPosition.normal_x-this.normal_x)*lerpFactor;
+		this.normal_y += (targetPosition.normal_y-this.normal_y)*lerpFactor;
+		this.normal_z += (targetPosition.normal_z-this.normal_z)*lerpFactor;
+
+		this.u += (targetPosition.u-this.u)*lerpFactor;
+		this.v += (targetPosition.v-this.v)*lerpFactor;
 	}
 	
 	public Point3D copy() {
-		return (new Point3D(x, y, z, normal_x, normal_y, normal_z));
+		return (new Point3D(x, y, z, normal_x, normal_y, normal_z, u, v));
 	}
 		
 
 	@Override
 	public String toString() {
-		return "[" + x + "," + y + "," + z + "], vn: ["+normal_x+","+normal_y+","+normal_z+"]";
+		return "[" + x + "," + y + "," + z + "], vn: ["+normal_x+","+normal_y+","+normal_z+"], uv: ["+u+","+v+"]";
 	}
 
 	
@@ -97,5 +121,8 @@ public class Point3D {
 	public float x, y, z;
 
 	public float normal_x, normal_y, normal_z;
+	
+	// texture map coordinates in [0..1]
+	float u, v;
 
 }

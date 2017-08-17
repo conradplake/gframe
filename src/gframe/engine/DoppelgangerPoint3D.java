@@ -27,9 +27,18 @@ public class DoppelgangerPoint3D extends Point3D{
   }
   
   @Override
-  public void add(Point3D p){
+  public Point3D add(Point3D p){
     super.add(p);
 	doppelganger.add(p);
+	return this;
+  }
+
+  
+  @Override
+  public Point3D subtract(Point3D p){
+    super.subtract(p);
+	doppelganger.subtract(p);
+	return this;
   }
 
   

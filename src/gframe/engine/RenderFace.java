@@ -132,8 +132,9 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 //			vertices[i].normal_y *= zf;
 //			vertices[i].normal_z *= zf;
 			
-
-			// assign vertices to texture corners		
+//			texel_U[i] = vertices[i].u * zf;
+//			texel_V[i] = vertices[i].v * zf;
+			// assign vertices to texture corners						
 			if (i == 0) {
 				texel_U[i] = 0;
 				texel_V[i] = 0;
@@ -151,6 +152,7 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 				texel_U[i] = zf; // 1 x zF
 				texel_V[i] = 0;
 			}
+			
 
 			if (cam_Z[i] < min_z) {
 				min_z = cam_Z[i];
@@ -333,8 +335,11 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 	protected void reset(Face face) {		
 		for(int i=0;i<face.vertices.length;i++){
 			Point3D faceVertex = face.vertices[i];
-			vertices[i].setCoordinates(faceVertex.x, faceVertex.y, faceVertex.z);
-			vertices[i].setNormalVector(faceVertex.normal_x, faceVertex.normal_y, faceVertex.normal_z);
+			Point3D vertex = this.vertices[i];
+			vertex.setCoordinates(faceVertex.x, faceVertex.y, faceVertex.z);
+			vertex.setNormalVector(faceVertex.normal_x, faceVertex.normal_y, faceVertex.normal_z);
+			vertex.u = faceVertex.u; 
+			vertex.v = faceVertex.v;
 		}
 		centroid.setCoordinates(face.centroid.x, face.centroid.y, face.centroid.z);
 		centroid.setNormalVector(face.centroid.normal_x, face.centroid.normal_y, face.centroid.normal_z);

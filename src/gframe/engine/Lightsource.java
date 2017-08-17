@@ -45,11 +45,6 @@ public class Lightsource extends Point3D {
 		col.getRGBComponents(rgbComponents);
 	}
 	
-//	public Lightsource copy(){
-//		return new Lightsource(super.copy(), col, intensity);
-//	}
-	
-	
 	public Matrix3D getInverseMatrix(){
 		return inverseMatrix;
 	}
@@ -103,6 +98,10 @@ public class Lightsource extends Point3D {
 	public void recomputeDepthMap() {
 		recomputeDepthMap = true;
 	}
+	
+	public void recomputeLightZ(){
+		this.light_z= matrix.getZVector();
+	}	
 	
 	public boolean isSpotLight(){
 		return isSpotLight;

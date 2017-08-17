@@ -15,20 +15,19 @@ import gframe.engine.camera.Camera;
 import imaging.ImageHelper;
 import imaging.ImageRaster;
 
-
 /**
  * 
- * This class ties together the main ingredients needed for 3D software rendering:
- *  
- * - a list of 3d models / objects that exist
- * - a polygon heap that contains all triangles/quads/etc. to be rendered to the screen
- * - a z-Buffer for pixel accurate depth tests
- * - a rasterizer that "writes" polygons onto a color buffer
- * - a lightsource for shading and shadowing
- * - a camera through which the scenery is observed 
- *  
- *  @author conrad plake
- * */
+ * This class ties together the main ingredients needed for 3D software
+ * rendering:
+ * 
+ * - a list of 3d models / objects that exist - a polygon heap that contains all
+ * triangles/quads/etc. to be rendered to the screen - a z-Buffer for pixel
+ * accurate depth tests - a rasterizer that "writes" polygons onto a color
+ * buffer - a lightsource for shading and shadowing - a camera through which the
+ * scenery is observed
+ * 
+ * @author conrad plake
+ */
 public class Engine3D {
 
 	public Engine3D(int screenx, int screeny) {
@@ -37,12 +36,12 @@ public class Engine3D {
 
 	public Engine3D(int segments, int screenx, int screeny) {
 
-		this.polyHeap = new PriorityQueue<RenderFace>();		
-		this.unsortedPolyHeap = new ArrayList<RenderFace>();		
-		this.rasterizer = new DefaultConvexPolygonRasterizer(screenx / 2, screeny / 2, screenx, screeny);		
-		this.zBuffer = rasterizer.createZBuffer();		
+		this.polyHeap = new PriorityQueue<RenderFace>();
+		this.unsortedPolyHeap = new ArrayList<RenderFace>();
+		this.rasterizer = new DefaultConvexPolygonRasterizer(screenx / 2, screeny / 2, screenx, screeny);
+		this.zBuffer = rasterizer.createZBuffer();
 		this.depthBuffer = rasterizer.createZBuffer();
-		this.depthTestCuller = new DepthTestCuller(zBuffer);				
+		this.depthTestCuller = new DepthTestCuller(zBuffer);
 		this.camera = new Camera();
 		this.lightsource = DEFAULTLIGHTSOURCE;
 		this.defaultShader = new PhongShader(lightsource);
@@ -50,9 +49,8 @@ public class Engine3D {
 		this.segments = new List[segments];
 		this.initSegments();
 	}
-	
-	
-	public void setRasterizer(Rasterizer rasterizer){
+
+	public void setRasterizer(Rasterizer rasterizer) {
 		this.rasterizer = rasterizer;
 	}
 
@@ -69,7 +67,7 @@ public class Engine3D {
 	public Shader getDefaultShader() {
 		return defaultShader;
 	}
-	
+
 	public void setDefaultShader(Shader shader) {
 		this.defaultShader = shader;
 	}
@@ -78,9 +76,9 @@ public class Engine3D {
 		this.register(model);
 		this.setModelShader(model, shader);
 	}
-	
+
 	public void register(Model3D model) {
-		this.register(model, activeSegment);	
+		this.register(model, activeSegment);
 	}
 
 	public void register(Model3D model, int seg) {
@@ -90,23 +88,22 @@ public class Engine3D {
 		} else {
 			segments[activeSegment].add(model);
 		}
-	}	
-	
-	
-	public void setModelShader(Model3D model, Shader shader){		
+	}
+
+	public void setModelShader(Model3D model, Shader shader) {
 		modelShaders.put(model, shader);
 		for (Object object : model.getChildren()) {
-			setModelShader((Model3D)object, shader);
+			setModelShader((Model3D) object, shader);
 		}
 	}
-	
-	public void removeModelShader(Model3D model){
+
+	public void removeModelShader(Model3D model) {
 		modelShaders.remove(model);
 		for (Object object : model.getChildren()) {
-			removeModelShader((Model3D)object);
+			removeModelShader((Model3D) object);
 		}
 	}
-	
+
 	public void deregister(Model3D model) {
 		for (int i = 0; i < segments.length; i++) {
 			if (segments[i].remove(model)) {
@@ -122,7 +119,6 @@ public class Engine3D {
 		}
 		modelShaders.clear();
 	}
-
 
 	public void resetCamera() {
 		camera.reset();
@@ -140,9 +136,8 @@ public class Engine3D {
 		this.lightsource = ls;
 		this.defaultShader.setLightsource(ls);
 	}
-	
-	
-	public void recomputeShadowMaps(){		
+
+	public void recomputeShadowMaps() {
 		lightsource.recomputeDepthMap();
 	}
 
@@ -153,7 +148,7 @@ public class Engine3D {
 	public List<Model3D> getActiveModels() {
 		return segments[activeSegment];
 	}
-	
+
 	public void drawScenes(Graphics g) {
 		ImageRaster frameBuffer = rasterizer.createEmptyImageRaster();
 		int oldsegidx = activeSegment;
@@ -179,257 +174,268 @@ public class Engine3D {
 		}
 		activeSegment = oldsegidx;
 	}
-	
-	public void drawShadowedScene(ImageRaster colorBuffer){			
 
-		if(lightsource.isShadowsEnabled()==false){
+	public void drawShadowedScene(ImageRaster colorBuffer) {
+
+		if (lightsource.isShadowsEnabled() == false) {
 			this.drawScene(colorBuffer);
 			return;
 		}
-		
-		// umwelt geändert? dann neuen snapshot der tiefenkarte erzeugen  
-		if(lightsource.isRecomputeDepthMap()){
-			
+
+		// umwelt geändert? dann neuen snapshot der tiefenkarte erzeugen
+		if (lightsource.isRecomputeDepthMap()) {
+
 			Point3D lightOrigin = lightsource;
 			Matrix3D iLightMat = lightsource.getInverseMatrix();
 			Vector3D light_z = lightsource.getZVector();
-								
+
 			// we can cull with depthBuffer as well
 			depthTestCuller.setZBuffer(depthBuffer);
-			for(Model3D model : segments[activeSegment]){
-				if(model.isVisible)
-				  fillPolyBuffers(model, new Point3D(), new Matrix3D(), lightOrigin, light_z, iLightMat, false);
+			for (Model3D model : segments[activeSegment]) {
+				if (model.isVisible)
+					fillPolyBuffers(model, new Point3D(), new Matrix3D(), lightOrigin, light_z, iLightMat, false);
 			}
-			
-			depthBuffer.clear();	
-			for(RenderFace renderFace : unsortedPolyHeap){
-				rasterizer.rasterize(renderFace, null, depthBuffer, null); // z-path only
+
+			depthBuffer.clear();
+			for (RenderFace renderFace : unsortedPolyHeap) {
+				rasterizer.rasterize(renderFace, null, depthBuffer, null); // z-path
+																			// only
 			}
 			unsortedPolyHeap.clear();
-			
-			for(RenderFace renderFace : depthTestCuller.getOccluded()){							
-				if (!depthTestCuller.isOccluded(renderFace)) { // re-check for occlusion with updated zBuffer (otherwise shadow flickering will occur during animations)
+
+			for (RenderFace renderFace : depthTestCuller.getOccluded()) {
+				if (!depthTestCuller.isOccluded(renderFace)) { // re-check for
+																// occlusion
+																// with updated
+																// zBuffer
+																// (otherwise
+																// shadow
+																// flickering
+																// will occur
+																// during
+																// animations)
 					rasterizer.rasterize(renderFace, null, depthBuffer, null);
 				}
 			}
 
-			
-			if(filterDepthBuffer){
-			  depthBuffer.filter(ImageHelper.TPFILTER33); // 3x3 box filter
+			if (filterDepthBuffer) {
+				depthBuffer.filter(ImageHelper.TPFILTER33); // 3x3 box filter
 			}
-			
+
 			lightsource.setDepthMap(depthBuffer);
-			
-			// put back the original zBuffer 
+
+			// put back the original zBuffer
 			depthTestCuller.setZBuffer(zBuffer);
 			depthTestCuller.clearOccluded();
-		}		
-		
-		
+		}
+
 		// depthBuffer ist gefüllt, jetzt ganz normal drawScene ausführen:
 		Point3D camOrigin = camera.getOrigin();
 		Matrix3D icammat = camera.getMatrix().getInverse();
-		Vector3D cam_z = camera.getZVector();							
-		
+		Vector3D cam_z = camera.getZVector();
+
 		for (Model3D model : segments[activeSegment]) {
-			if(model.isVisible){
+			if (model.isVisible) {
 				model.preDraw();
 				fillPolyBuffers(model, new Point3D(), new Matrix3D(), camOrigin, cam_z, icammat, true);
 			}
 		}
-						
+
 		zBuffer.clear();
-		while(!polyHeap.isEmpty()){
+		while (!polyHeap.isEmpty()) {
 			RenderFace renderFace = polyHeap.remove();
 			Shader shader = shadingEnabled ? defaultShader : null;
-			if(shadingEnabled && renderFace.shader!=null){
-				shader = renderFace.shader; // override with model specific shader
-			}			
-			
-			if(shader!=null){				
+			if (shadingEnabled && renderFace.shader != null) {
+				shader = renderFace.shader; // override with model specific
+											// shader
+			}
+
+			if (shader != null) {
 				shader.preShade(renderFace);
 			}
-			
+
 			rasterizer.rasterize(renderFace, colorBuffer, zBuffer, shader);
 		}
-		
+
 		// re-check with updated zBuffer all polys previously marked as
-		// occluded (this prevents visual glitches when camera moves fast)		
-		for(RenderFace renderFace : depthTestCuller.getOccluded()){			
+		// occluded (this prevents visual glitches when camera moves fast)
+		for (RenderFace renderFace : depthTestCuller.getOccluded()) {
 			// re-check for occlusion with updated zBuffer
 			if (!depthTestCuller.isOccluded(renderFace)) {
 				Shader shader = shadingEnabled ? defaultShader : null;
 				if (shadingEnabled && renderFace.shader != null) {
 					shader = renderFace.shader; // override with model specific
-													// shader
+												// shader
 				}
-				
-				if(shader!=null){					
+
+				if (shader != null) {
 					shader.preShade(renderFace);
 				}
-				
-				rasterizer.rasterize(renderFace, colorBuffer, zBuffer, shader);
-			}
-		}
-		depthTestCuller.clearOccluded();		
-		
-	}
-	
-	
-	public void drawScene(ImageRaster colorBuffer) {	
-		
-		Point3D camOrigin = camera.getOrigin().copy();
-		Matrix3D icammat = camera.getMatrix().getInverse();
-		Vector3D cam_z = camera.getZVector().copy();
-							
-		for (Model3D model : segments[activeSegment]) {
-			
-			if(model.isVisible){			
-				model.preDraw();
-				fillPolyBuffers(model, new Point3D(), new Matrix3D(), camOrigin, cam_z, icammat, true);
-			}
-		}
-				
-		// clear zBuffer AFTER everything is put into scene so the information can be used during this stage for doing OC
-		zBuffer.clear();			
-			
-		while(!polyHeap.isEmpty()){
-			RenderFace renderFace = polyHeap.remove();
-			Shader shader = shadingEnabled ? defaultShader : null;
-			if(shadingEnabled && renderFace.shader!=null){
-				shader = renderFace.shader; // override with model specific shader
-			}			
-			
-			if(shader!=null){				
-				shader.preShade(renderFace);
-			}			
-			rasterizer.rasterize(renderFace, colorBuffer, zBuffer, shader); 
-		}
-		
-		// re-check all polys previously marked as occluded (this prevents visual glitches when camera moves fast)		
-		for(RenderFace renderFace : depthTestCuller.getOccluded()){			
-			// re-check for occlusion with updated zBuffer
-			if(!depthTestCuller.isOccluded(renderFace)){
-				Shader shader = shadingEnabled ? defaultShader : null;
-				if(shadingEnabled && renderFace.shader!=null){
-					shader = renderFace.shader; // override with model specific shader
-				}	
-				
-				if(shader!=null){					
-					shader.preShade(renderFace);
-				}
-				
+
 				rasterizer.rasterize(renderFace, colorBuffer, zBuffer, shader);
 			}
 		}
 		depthTestCuller.clearOccluded();
-			
+
 	}
+
+	public void drawScene(ImageRaster colorBuffer) {
+
+		Point3D camOrigin = camera.getOrigin().copy();
+		Matrix3D icammat = camera.getMatrix().getInverse();
+		Vector3D cam_z = camera.getZVector().copy();
+
+		for (Model3D model : segments[activeSegment]) {
+
+			if (model.isVisible) {
+				model.preDraw();
+				fillPolyBuffers(model, new Point3D(), new Matrix3D(), camOrigin, cam_z, icammat, true);
+			}
+		}
+
+		// now clear zBuffer AFTER everything is put into scene so the
+		// information can be used during this stage for occlusion culling
+		zBuffer.clear();
+
+		while (!polyHeap.isEmpty()) {
+			RenderFace renderFace = polyHeap.remove();
+			Shader shader = shadingEnabled ? defaultShader : null;
+			if (shadingEnabled && renderFace.shader != null) {
+				shader = renderFace.shader; // override with model specific
+											// shader
+			}
+
+			if (shader != null) {
+				shader.preShade(renderFace);
+			}
+			rasterizer.rasterize(renderFace, colorBuffer, zBuffer, shader);
+		}
+
+		// re-check all polys previously marked as occluded (this prevents
+		// visual glitches when camera moves fast)
+		for (RenderFace renderFace : depthTestCuller.getOccluded()) {
+			// re-check for occlusion with updated zBuffer (here is the trick:
+			// since zBuffer is filled with current scene, less pixels need to
+			// be shaded if any
+			if (!depthTestCuller.isOccluded(renderFace)) {
+				Shader shader = shadingEnabled ? defaultShader : null;
+				if (shadingEnabled && renderFace.shader != null) {
+					shader = renderFace.shader; // override with model specific
+												// shader
+				}
+
+				if (shader != null) {
+					shader.preShade(renderFace);
+				}
+
+				rasterizer.rasterize(renderFace, colorBuffer, zBuffer, shader);
+			}
+		}
+		depthTestCuller.clearOccluded();
+
+	}
+
 	
-	
+	/**
+	 * 
+	 * Here is where all the transformation takes place.
+	 * Results in polygons of specified model added to a poly heap. 
+	 * This method is invoked recursively for all sub models.   
+	 * 
+	 * * /
+	 * @param model
+	 * @param parentOrigin
+	 * @param parentMatrix
+	 * @param camOrigin
+	 * @param cam_z
+	 * @param icammat
+	 * @param zSortPolyHeap
+	 */
 	protected void fillPolyBuffers(Model3D model, Point3D parentOrigin, Matrix3D parentMatrix, Point3D camOrigin,
 			Vector3D cam_z, Matrix3D icammat, boolean zSortPolyHeap) {
 		Point3D modelOrigin = parentMatrix.transform(model.getOrigin().copy());
 		modelOrigin.add(parentOrigin);
-		Matrix3D modelMatrix = parentMatrix.getTransformed(model.getMatrix());		
+		Matrix3D modelMatrix = parentMatrix.getTransformed(model.getMatrix());
 		Shader modelShader = modelShaders.get(model);
 
+		Point3D camPosInObjectSpace = null;
+		Vector3D camZInObjectSapce = null;
+		Matrix3D modelInverse = modelMatrix.getInverse();
+		camPosInObjectSpace = modelInverse.transform(camOrigin.copy().subtract(modelOrigin));
+		camZInObjectSapce = modelInverse.transform(cam_z.copy());
+		
 		for (Iterator<Face> it = model.getFaces().iterator(); it.hasNext();) {
-			
-			Face face = (Face)it.next();
-			RenderFace renderFace = face.createRenderFace(model.material);			
 
-			renderFace.preTransform(modelMatrix, modelOrigin);						
-			if(backfaceCull(renderFace, camOrigin, icammat)){
-				continue;
+			Face face = (Face) it.next();
+
+			// 3d clipping should take place in object space!
+			// if new face is temporarily created due to clipping then nothing
+			// needs to change along the pipeline (createRenderFace etc)							
+			face = Clipper3D.clip(face, camPosInObjectSpace, camZInObjectSapce);
+			if(face==null){
+				continue; // face is out of view
 			}
-			renderFace.postTransform(modelMatrix, modelOrigin);
-			
-									
+
+			RenderFace renderFace = face.createRenderFace(model.getMaterial());
+
+			renderFace.transform(modelMatrix, modelOrigin);
 			renderFace.transformToCamSpace(camOrigin, icammat, true);
-			
-			
-//			renderFace = rasterizer.nearPlaneClipping(renderFace, camOrigin, icammat, true);			
-			// wenn renderface ein neues obj dann muss transformToCamspace wiederholt werden!!
-			
-			if(!rasterizer.isOutsideScreen(renderFace)){
-				
+
+			if (!rasterizer.isOutsideScreen(renderFace)) {
+
 				renderFace.setShader(modelShader);
-				
-				if(!depthTestCuller.test(renderFace)){
-					if(zSortPolyHeap){
-					  polyHeap.add(renderFace);
-					}
-					else{
-					  unsortedPolyHeap.add(renderFace);
+
+				if (!depthTestCuller.test(renderFace)) {
+					if (zSortPolyHeap) {
+						polyHeap.add(renderFace);
+					} else {
+						unsortedPolyHeap.add(renderFace);
 					}
 				}
-			}			
+			}
 		}
-		
-		
+
 		for (Iterator it = model.getChildren().iterator(); it.hasNext();) {
 			Model3D subModel = (Model3D) it.next();
-			if(subModel.isVisible)				
+			if (subModel.isVisible)
 				fillPolyBuffers(subModel, modelOrigin, modelMatrix, camOrigin, cam_z, icammat, zSortPolyHeap);
 		}
 	}
-	
-	
-	public boolean backfaceCull(Face face, Point3D camOrigin, Matrix3D iCamMat){		
 
-		// vector pointing from camera (view point) to center of face - hopefully its faster than initiating a vector3d object ;)
-		
-//		Point3D maxZ = face.getMaxZVertex();
-//		float vCamToFace_x = maxZ.x - camOrigin.x;
-//		float vCamToFace_y = maxZ.y - camOrigin.y;
-//		float vCamToFace_z = maxZ.z - camOrigin.z;
-		
-		float vCamToFace_x = face.centroid.x - camOrigin.x;
-		float vCamToFace_y = face.centroid.y - camOrigin.y;
-		float vCamToFace_z = face.centroid.z - camOrigin.z;
 
-		// compute dot product and compare sign
-		boolean isBackfaced = (vCamToFace_x*face.normal_x + vCamToFace_y*face.normal_y + vCamToFace_z*face.normal_z) > 0;
-		
-		// TODO: here we do a second test! this should be reflected in the method's name!		
-		// face lies in front of camera?
-		boolean isInFront = iCamMat.transformZ(vCamToFace_x, vCamToFace_y, vCamToFace_z) > 0;		
-		
-		return isBackfaced || !isInFront;		
-	}
-	
-
-	/*
-	 * returns a factor depending on the z-value so that bigger z-values make
+	/**
+	 * A perspective division factor to apply for perspective correction. 
+	 * 
+	 * Returns a factor depending on the z-value so that bigger z-values make
 	 * Objects appear smaller --> factor decreases
+	 * 
+	 * Works best with a scaling value set to screen width.
 	 */
-	public static float zFactor(float z) {
-		if(z<=1){		
+	public static final float zFactor(final float z) {
+		if (z <= 1) {
 			return 800f;
-		} 		
-		return 800f / z;		
+		}
+		return 800f / z;
 	}
-	
 
 	/**
 	 * invZf = 1/zf
 	 * 
 	 * Returns the original z-value
-	 * */
-	public static float inverseZFactor(float zf, float invZf) {
-		if(zf==800){		
+	 */
+	public static final float inverseZFactor(final float zf, final float invZf) {
+		if (zf == 800) {
 			return 1f;
-		}else{
+		} else {
 			return 800f * invZf; // invZf = 1/zf;
-		} 					
+		}
 	}
-		
 
 	private void initSegments() {
 		for (int i = 0; i < segments.length; i++) {
 			segments[i] = new LinkedList<Model3D>();
-//			segments[i] = Collections.synchronizedList(new ArrayList<Model3D>());
+			// segments[i] = Collections.synchronizedList(new
+			// ArrayList<Model3D>());
 		}
 	}
 
@@ -439,26 +445,25 @@ public class Engine3D {
 
 	protected List<Model3D>[] segments;
 	protected Camera camera;
-		
+
 	protected Lightsource lightsource;
-	
-	//protected List<RenderFace> polyHeap;
+
+	// protected List<RenderFace> polyHeap;
 	protected PriorityQueue<RenderFace> polyHeap;
-	protected Collection<RenderFace> unsortedPolyHeap;	
-	
+	protected Collection<RenderFace> unsortedPolyHeap;
+
 	Rasterizer rasterizer;
 
-	ZBuffer zBuffer;	
+	ZBuffer zBuffer;
 	ZBuffer depthBuffer;
-	
+
 	// takes advantage of frame coherence for occlusion culling
 	public DepthTestCuller depthTestCuller;
 
-	public boolean filterDepthBuffer = false;	
-	public boolean shadingEnabled = true;	
+	public boolean filterDepthBuffer = false;
+	public boolean shadingEnabled = true;
 
-	
-	protected Shader defaultShader;	
-	
-	Map<Model3D, Shader> modelShaders;	
+	protected Shader defaultShader;
+
+	Map<Model3D, Shader> modelShaders;
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Marks faces as occluded if they fail the depth test against a specified z-Buffer
+ * Marks faces as occluded if they fail the depth test against a specified z-Buffer.
  * 
  * */
 public class DepthTestCuller {

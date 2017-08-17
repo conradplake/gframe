@@ -145,6 +145,24 @@ public class NormalMappedTextureShader extends TextureShader {
 		this.normalMap = lodNormal;
 	}
 
+	
+	@Override
+	void setEffectPixel(int x, int y, int c) {
+		super.setEffectPixel(x, y, c);
+		normalMap.setAlpha(x, y, 0);		
+	};
+	
+	
+	@Override
+	void recomputeMipmaps() {
+		super.recomputeMipmaps();
+		this.normalMapLOD0 = normalMap;
+		this.normalMapLOD1 = TextureGenerator.mipmap(normalMap);
+		this.normalMapLOD2 = TextureGenerator.mipmap(normalMapLOD1);
+		this.normalMapLOD3 = TextureGenerator.mipmap(normalMapLOD2);
+	};
+	
+	
 	@Override
 	public void preShade(RenderFace renderFace) {
 		
@@ -288,6 +306,7 @@ public class NormalMappedTextureShader extends TextureShader {
 					| ((blueColor & 0xFF) << 0);
 		}
 	}
+	
 
 	private int getNormal(float x, float y) {
 
@@ -296,9 +315,7 @@ public class NormalMappedTextureShader extends TextureShader {
 		if (!super.isBilinearFilteringEnabled) {
 			// int x_int = (int)Math.floor(x + 0.5f);
 			// int y_int = (int)Math.floor(y + 0.5f);
-			int x_int = (int) x;
-			int y_int = (int) y;
-			normal = normalMap.getPixel(x_int, y_int);
+			normal = normalMap.getPixel((int) x, (int) y);
 		} else {
 			int x_int = (int) x;
 			int y_int = (int) y;
