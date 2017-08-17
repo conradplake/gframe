@@ -14,10 +14,14 @@ public class FadeOutFadeIn implements Timed{
 	boolean fadeOut;			
 	boolean done; 
 
-	
 	public FadeOutFadeIn(Lightsource lightsource, long fadeOutTimeInMillis, long fadeInTimeInMillis) {
+		this(lightsource, lightsource.getIntensity(), fadeOutTimeInMillis, fadeInTimeInMillis);
+	}
+	
+	
+	public FadeOutFadeIn(Lightsource lightsource, float intensity, long fadeOutTimeInMillis, long fadeInTimeInMillis) {
 		this.lightsource = lightsource;
-		this.originalIntensity = lightsource.getIntensity();
+		this.originalIntensity = intensity;
 		
 		this.fadeOutDelta = originalIntensity / fadeOutTimeInMillis;
 		this.fadeInDelta = originalIntensity / fadeInTimeInMillis;	
