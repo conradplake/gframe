@@ -77,9 +77,7 @@ public class Clipper3D {
 					// in -> out
 					Point3D newVertex = vertices[prev].copy();
 					float lerpFactor = Math.abs(cosine_prevVertex / (cosine_prevVertex - cosine_vertex));
-					newVertex.lerp(vertices[i], lerpFactor); // normals not
-																// getting
-																// lerped yet!
+					newVertex.lerp(vertices[i], lerpFactor);
 					newVertices[newVertexCount++] = newVertex;
 				}
 
