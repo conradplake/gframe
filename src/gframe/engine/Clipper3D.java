@@ -104,6 +104,7 @@ public class Clipper3D {
 		}
 
 		// return new clipped face
-		return new Face(newVertices, newVertexCount, face.col);
+//		return new Face(newVertices, newVertexCount, face.col);
+		return new Face(newVertices, newVertexCount, face.centroid, face.normal_x, face.normal_y, face.normal_z, face.col);
 	}
 }

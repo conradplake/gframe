@@ -134,6 +134,20 @@ public class Model3D extends Object3D {
 		Point3D pi3 = (Point3D) vertices.get(p3);
 		Point3D pi4 = (Point3D) vertices.get(p4);
 		
+				
+		pi1.u=0;
+		pi1.v=0;
+		
+		pi2.u=0;
+		pi2.v=1;
+		
+		pi3.u=1;
+		pi3.v=1;
+		
+		pi4.u=1;
+		pi4.v=0;
+		
+		
 		Face face = new Face(pi1, pi2, pi3, pi4, col);
 		addFace(face);		
 		return face;
@@ -245,26 +259,6 @@ public class Model3D extends Object3D {
 			}
 		}
 		return bsRad;
-	}
-
-	public boolean collided(Model3D model) {
-		boolean ret = false;
-		float val = getBoundingSphereRadius() + model.getBoundingSphereRadius();
-		float distSquared = getOrigin().distanceSquared(model.getOrigin());
-		if (distSquared < val * val) {
-			ret = true;
-		}
-		return ret;
-	}
-
-	public boolean collided(Point3D point) {
-		boolean ret = false;
-		float rad = getBoundingSphereRadius();
-		float distSquared = getOrigin().distanceSquared(point);
-		if (distSquared < rad * rad) {
-			ret = true;
-		}
-		return ret;
 	}
 
 	 

@@ -27,6 +27,22 @@ public class Face {
 		this.col = col;
 	}
 	
+	
+	public Face(Point3D[] vertices, int length, Point3D centroid, float normal_x, float normal_y, float normal_z, Color col) {
+		this.vertices = new Point3D[length];						
+		for (int i=0;i<length;i++) {
+			this.vertices[i] = vertices[i]; 			
+		}
+	
+		this.centroid = centroid;
+		
+		this.normal_x = normal_x;
+		this.normal_y = normal_y;
+		this.normal_z = normal_z;
+		
+		this.col = col;
+	}
+	
 	protected Face(Point3D[] vertices, int length, Point3D centroid, Color col, float normal_x, float normal_y, float normal_z) {
 		this.vertices = new Point3D[length];					
 		for (int i=0;i<length;i++) {

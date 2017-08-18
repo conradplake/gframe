@@ -123,6 +123,6 @@ public class Point3D {
 	public float normal_x, normal_y, normal_z;
 	
 	// texture map coordinates in [0..1]
-	float u, v;
+	public float u, v;
 
 }

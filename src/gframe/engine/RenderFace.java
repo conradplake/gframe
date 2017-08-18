@@ -132,26 +132,26 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 //			vertices[i].normal_y *= zf;
 //			vertices[i].normal_z *= zf;
 			
-//			texel_U[i] = vertices[i].u * zf;
-//			texel_V[i] = vertices[i].v * zf;
+			texel_U[i] = vertices[i].u * zf;
+			texel_V[i] = vertices[i].v * zf;
 			// assign vertices to texture corners						
-			if (i == 0) {
-				texel_U[i] = 0;
-				texel_V[i] = 0;
-			} else if (i == 1) {
-				texel_U[i] = 0;
-				texel_V[i] = zf; // 1 x zF = zF (später wird mit dem
-									// interpolierten(!) zF wieder dividiert
-									// zwecks perspektivenkorrektur; der zFaktor
-									// (perspektiven-korrekturfaktor) wird
-									// einfach mit interpoliert)
-			} else if (i == 2) {
-				texel_U[i] = zf; // 1 x zF
-				texel_V[i] = zf; // 1 x zF
-			} else { // erstmal alle restpunkte auf die 4. ecke abbilden
-				texel_U[i] = zf; // 1 x zF
-				texel_V[i] = 0;
-			}
+//			if (i == 0) {
+//				texel_U[i] = 0;
+//				texel_V[i] = 0;
+//			} else if (i == 1) {
+//				texel_U[i] = 0;
+//				texel_V[i] = zf; // 1 x zF = zF (später wird mit dem
+//									// interpolierten(!) zF wieder dividiert
+//									// zwecks perspektivenkorrektur; der zFaktor
+//									// (perspektiven-korrekturfaktor) wird
+//									// einfach mit interpoliert)
+//			} else if (i == 2) {
+//				texel_U[i] = zf; // 1 x zF
+//				texel_V[i] = zf; // 1 x zF
+//			} else { // erstmal alle restpunkte auf die 4. ecke abbilden
+//				texel_U[i] = zf; // 1 x zF
+//				texel_V[i] = 0;
+//			}
 			
 
 			if (cam_Z[i] < min_z) {
