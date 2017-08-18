@@ -68,7 +68,7 @@ public class TextureMappingTester extends DoubleBufferedFrame implements MouseMo
 		engine.register(road, roadShader);
 		
 		
-		Model3D skydome = Model3DGenerator.buildSkydome(10000, Color.BLUE);
+		Model3D skydome = Model3DGenerator.buildSkydome(100000, Color.BLUE);
 		Shader skydomeShader = new SkyShader(lightsource, skydome);
 		engine.register(skydome, skydomeShader);
 		

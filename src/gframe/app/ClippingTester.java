@@ -9,21 +9,19 @@ import java.awt.event.MouseMotionListener;
 
 import gframe.DoubleBufferedFrame;
 import gframe.engine.Engine3D;
-import gframe.engine.FlatShader;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
-import gframe.engine.PhongShader;
 import gframe.engine.Point3D;
+import gframe.engine.TextureShader;
 import gframe.engine.camera.TripodCamera;
 import gframe.engine.generator.Model3DGenerator;
-import gframe.engine.shader.SkyShader;
 import gframe.engine.timing.Rotate;
 import gframe.engine.timing.Timer;
 import imaging.ImageRaster;
 
-public class SkydomeTester extends DoubleBufferedFrame implements MouseMotionListener {
+public class ClippingTester extends DoubleBufferedFrame implements MouseMotionListener {
 
-	public SkydomeTester() {
+	public ClippingTester() {
 		super();
 		setBackground(Color.lightGray);
 		frame = new ImageRaster(SCREENX, SCREENY);
@@ -56,31 +54,19 @@ public class SkydomeTester extends DoubleBufferedFrame implements MouseMotionLis
 		Color lightskyblue = new Color(135, 206, 250);
 		Color darkblue = new Color(0, 0, 140);
 						
-		Model3D skydome = Model3DGenerator.buildSkydome(40000, lightskyblue);
-		SkyShader skydomeShader = new SkyShader(engine.getLightsource(), skydome, Color.orange, darkblue);				
-		engine.register(skydome, skydomeShader);
-	
-		int meshX=10;
-		int meshY=10;
-		int tilesize=4000;
+//		Model3D skydome = Model3DGenerator.buildSkydome(40000, lightskyblue);
+//		SkyShader skydomeShader = new SkyShader(engine.getLightsource(), skydome, Color.orange, darkblue);				
+//		engine.register(skydome, skydomeShader);
 		
-		Model3D terrain = Model3DGenerator.buildFlatMesh(meshX, meshY, tilesize, Color.GREEN);		
 		
-//		Model3D terrain = Model3DGenerator.buildRandomVoronoiTerrainMesh(meshX, meshY, tilesize, 100, Color.GREEN);
-//		terrain.scale(1, 20, 1);
-		
-//		Model3DGenerator.laplacianSmooth(meshX, meshY, terrain);		
-//		Model3DGenerator.laplacianSmooth(meshX, meshY, terrain);
-		terrain.move(-meshX*tilesize/2, 0, -meshY*tilesize/2);
-		engine.register(terrain, new FlatShader(engine.getLightsource()));
-		
-		water = Model3DGenerator.buildTile(15000, new Point3D(), Color.BLUE);
+		water = Model3DGenerator.buildTile(1000, new Point3D(), Color.BLUE);
 //		Model3D water = Model3DGenerator.buildFlatMesh(4, 4, 4000, Color.BLUE);
 //		Model3DGenerator.normalizeOrigin(water);
 		
-		water.move(0, 10, 7500);
+//		water.move(0, 10, 7500);
 //		water.rotate(5, 0, 0);
-		engine.register(water, new FlatShader(engine.getLightsource()));
+		//engine.register(water, new FlatShader(engine.getLightsource()));
+		engine.register(water, new TextureShader(engine.getLightsource()));
 		
 		Rotate rotate = new Rotate(water, 100000000L, 0.05f, Rotate.AXIS_Y);
 		Timer.getInstance().registerTimedObject(rotate);
@@ -88,8 +74,8 @@ public class SkydomeTester extends DoubleBufferedFrame implements MouseMotionLis
 		// CAMERA SETTINGS
 		if (camera == null) {
 			camera = new TripodCamera();
-			camera.move(0, 4000, -5000);
-			camera.rotate(-20, 0);
+//			camera.move(0, 4000, -5000);
+//			camera.rotate(-20, 0);
 			engine.setCamera(camera);							
 		}
 	}
@@ -235,7 +221,7 @@ public class SkydomeTester extends DoubleBufferedFrame implements MouseMotionLis
 	}
 
 	public static void main(String[] args) {
-		SkydomeTester main = new SkydomeTester();
+		ClippingTester main = new ClippingTester();
 		main.start();
 	}
 

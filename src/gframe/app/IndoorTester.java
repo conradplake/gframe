@@ -8,11 +8,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
 import gframe.DoubleBufferedFrame;
+import gframe.Space3D;
 import gframe.engine.Engine3D;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
+import gframe.engine.MaterialShader;
 import gframe.engine.Model3D;
-import gframe.engine.NormalMappedTextureShader;
 import gframe.engine.Shader;
 import gframe.engine.TextureShader;
 import gframe.engine.camera.TripodCamera;
@@ -20,9 +21,9 @@ import gframe.engine.generator.Model3DGenerator;
 import gframe.engine.generator.TextureGenerator;
 import imaging.ImageRaster;
 
-public class TextureMappingTester2 extends DoubleBufferedFrame implements MouseMotionListener {
+public class IndoorTester extends DoubleBufferedFrame implements MouseMotionListener {
 
-	public TextureMappingTester2() {
+	public IndoorTester() {
 		super();
 		setBackground(Color.lightGray);
 		frame = new ImageRaster(SCREENX, SCREENY);
@@ -44,55 +45,78 @@ public class TextureMappingTester2 extends DoubleBufferedFrame implements MouseM
 		engine = new Engine3D(SCREENX, SCREENY);			
 					
 		// LIGHT SETTINGS
-		lightsource = new Lightsource(0, 0, 0, Color.white, Lightsource.MAX_INTENSITY);				
+		lightsource = new Lightsource(0, 0, 0, Color.white, Lightsource.MAX_INTENSITY);
+//		lightsource.setShadowsEnabled(true);
 		engine.setLightsource(lightsource);
-					
-//		TextureShader shader = new TextureShader(lightsource, TextureShader.getRGBRaster(new File("textures/chessboard.jpg"), 256, 256));
-//		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.MAGENTA, 4096, 4096), TextureShader.getRGBRaster(new File("textures/normal/Normal_map_example.png"), 4096, 4096));
+									
+//		TextureShader shader = new TextureShader(lightsource);
+//		shader.setIsBilinearFiltering(true);
 		
-//		Shader shader = new TestShader(lightsource);
-//		Shader shader = new MetaballShader(lightsource, 2);
-		
-//		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateTileTextureNormalMap(324, 324, 30), true);
-//		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateMengerSpongeNormalMap(324), true);
-		Shader shader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateDiscoTileTexture(320, 320, 20), TextureGenerator.generateTileTextureNormalMap(320, 320, 20), true);
-//		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateDefaultNormalMap(324, 324), true);
-		
-//		((TextureShader)shader).setIsBilinearFiltering(true);
-		
-		//Shader shader = new RocketEvolutionShader(lightsource);		
-//		Shader shader = new PhyllotaxisShader(lightsource);
-		
-//		shader.setIsDithering(false);
-		
+//		Shader shader = new TextureShader(lightsource, TextureShader.getRGBRaster(Color.CYAN, 256, 256));
+//		Shader shader = new PhongShader(lightsource);
 //		Shader shader = new FlatShader(lightsource);
+		Shader shader = new MaterialShader(lightsource, TextureGenerator.generateTileTextureNormalMap(320, 320, 20));	
 		
-		engine.setDefaultShader(shader);
-		
+		engine.setDefaultShader(shader);		
 	}
 	
+
 	
-	public void initWorld() {	
+	
+	private void initWorld() {	
 		
 		engine.clear();
+											
+		Model3D room = Model3DGenerator.buildRoom(Space3D.ONE_METER, Space3D.ONE_METER, Space3D.ONE_METER, Color.WHITE);
+		room.scale(10, 10, 10);		
+		room = Model3DGenerator.facify(room);
+				
+		room.setMaterial(Material.RED_PLASTIC);
+		engine.register(room);
 		
 		
-		model = Model3DGenerator.buildCube(10, Color.blue);
-		model = Model3DGenerator.facify(model);
+//		int tileSize = 40;		
+//		
+//		Model3D floor = Model3DGenerator.buildPlane(100, new Point3D(), Color.BLUE);
+//		floor.rotate(-180, 0, 0);
+//		floor.setMaterial(Material.RED_PLASTIC);
+//		engine.register(floor);			
+//		
+//		Model3D ceiling = Model3DGenerator.buildTiledFloor(4, 4, tileSize, Color.BLUE);			
+//		ceiling.move(0, 2*tileSize, 4*tileSize);
+//		ceiling.rotate(180, 0, 0);	
+//		ceiling.setMaterial(Material.RED_PLASTIC);
+//		engine.register(ceiling);
+//		
+//		Model3D backwall = Model3DGenerator.buildTiledFloor(4, 2, tileSize, Color.BLUE);
+//		backwall.move(0, 0, 4*tileSize);
+//		backwall.rotate(90, 0, 0);
+//		backwall.setMaterial(Material.RED_PLASTIC);
+//		engine.register(backwall);
+//		
+//		Model3D rightwall = Model3DGenerator.buildTiledFloor(4, 2, tileSize, Color.BLUE);		
+//		rightwall.move(4*tileSize, 0, 4*tileSize);
+//		rightwall.rotate(90, 0, 90);
+//		rightwall.setMaterial(Material.RED_PLASTIC);
+//		engine.register(rightwall);
+//		
+//		Model3D leftwall = Model3DGenerator.buildTiledFloor(4, 2, tileSize, Color.BLUE);		
+//		leftwall.move(0, 0, 0);
+//		leftwall.rotate(90, 0, -90);
+//		leftwall.setMaterial(Material.RED_PLASTIC);
+//		engine.register(leftwall);
 		
-//		model.setMaterial( Material.GOLD );
-//		model = WavefrontObjParser.parse(new File("./models/structures/Torus.obj"), Color.BLUE);
-//		model.scale(10, 10, 10);
-		engine.register(model);
 		
-		lightsource.x=0;
-		lightsource.y=0;
-		lightsource.z=-30;
-
+		
 		// CAMERA SETTINGS	
 		camera = new TripodCamera();
-		camera.move(0, 0, -30);
-		engine.setCamera(camera);
+//		camera.move(0, 200, -1200);
+		engine.setCamera(camera);				
+		
+		
+		// LIGHT SETTNGS
+//		lightsource.move(0, 400, -1000);
+//		lightsource.rotate(-20, 0, 0);
 	}
 
 	
@@ -109,9 +133,6 @@ public class TextureMappingTester2 extends DoubleBufferedFrame implements MouseM
 		/** MAIN LOOP */
 		while (true) {
 			repaint();
-			
-			model.rotate(0, 0.1f, 0);
-			
 			if (millidelay > 0) {
 				try {
 					Thread.sleep(millidelay);
@@ -173,8 +194,7 @@ public class TextureMappingTester2 extends DoubleBufferedFrame implements MouseM
 				else if (keycode == KeyEvent.VK_F3) {
 					engine.shadingEnabled = !engine.shadingEnabled;
 				}
-				
-				// CAM CONTROL
+				// CAM CONTROL	
 				else if (keycode == KeyEvent.VK_S) {
 					camera.move(-10);
 				} else if (keycode == KeyEvent.VK_A) {
@@ -189,50 +209,44 @@ public class TextureMappingTester2 extends DoubleBufferedFrame implements MouseM
 					camera.rotate(0, 7, 0);
 				} 
 				
-				
 				else if (keycode == KeyEvent.VK_R) {					
-					initWorld();
-				}
-			
+					initWorld();				
+				} else if (keycode == KeyEvent.VK_F) {					
+					engine.filterDepthBuffer = !engine.filterDepthBuffer;
+				}				
 				
-				else if (keycode == KeyEvent.VK_Y) {					
-					model.rotate(0, 1, 0);
+				else if (keycode == KeyEvent.VK_Y) {
+					lightsource.rotate(0, 5, 0);
+				} else if (keycode == KeyEvent.VK_X) {					
+					lightsource.rotate(0, -5, 0);
 				}
-				else if (keycode == KeyEvent.VK_X) {					
-					model.rotate(0, -1, 0);
+
+				
+				else if (keycode == KeyEvent.VK_C) {
+					lightsource.rotate(5, 0, 0);
+				} else if (keycode == KeyEvent.VK_V) {					
+					lightsource.rotate(-5, 0, 0);
 				}
 				
-				else if (keycode == KeyEvent.VK_C) {					
-					model.rotate(0, 0, 1);
-				}
-				else if (keycode == KeyEvent.VK_V) {					
-					model.rotate(0, 0, -1);
-				}
 				
-				else if (keycode == KeyEvent.VK_O) {					
-					model.rotate(1, 0, 0);
-				}
-				else if (keycode == KeyEvent.VK_P) {					
-					model.rotate(-1, 0, 0);
-				}
 				
 				else if (keycode == KeyEvent.VK_LEFT) {
-					lightsource.move(-5, 0, 0);
+					lightsource.move(-10, 0, 0);
 				}
 				else if (keycode == KeyEvent.VK_RIGHT) {
-					lightsource.move(5, 0, 0);
+					lightsource.move(10, 0, 0);
 				}
 				else if (keycode == KeyEvent.VK_UP) {
-					lightsource.move(0, 5, 0);
+					lightsource.move(0, 0, 10);
 				}
 				else if (keycode == KeyEvent.VK_DOWN) {
-					lightsource.move(0, -5, 0);
+					lightsource.move(0, 0, -10);
 				}
 				else if (keycode == KeyEvent.VK_PAGE_UP) {
-					lightsource.move(0, 0, 1);
+					lightsource.move(0, 1, 0);
 				}
 				else if (keycode == KeyEvent.VK_PAGE_DOWN) {
-					lightsource.move(0, 0, -1);
+					lightsource.move(0, -1, 0);
 				}
 				else if (keycode == KeyEvent.VK_B) {
 					Shader shader = engine.getDefaultShader();
@@ -242,6 +256,9 @@ public class TextureMappingTester2 extends DoubleBufferedFrame implements MouseM
 						textureShader.setIsBilinearFiltering(!isBiliinearFiltering);
 					}
 				}
+				
+				
+				engine.recomputeShadowMaps();
 			}
 		}
 		super.processKeyEvent(event);
@@ -251,7 +268,8 @@ public class TextureMappingTester2 extends DoubleBufferedFrame implements MouseM
 		long updateTime = System.currentTimeMillis();
 		
 		frame.clear();
-		engine.drawScenes(frame);			
+		engine.drawShadowedScene(frame);
+//		engine.drawScene(frame);
 		g.drawImage(frame.createImage(), 0, 0, frame.getWidth(), frame.getHeight(), null);		
 		
 		updateTime = System.currentTimeMillis() - updateTime;		
@@ -274,12 +292,10 @@ public class TextureMappingTester2 extends DoubleBufferedFrame implements MouseM
 	int counter;
 
 	public static void main(String[] args) {
-		TextureMappingTester2 main = new TextureMappingTester2();
+		IndoorTester main = new IndoorTester();
 		main.start();
 	}
 
-	
-	private Model3D model;	
 	
 	private Engine3D engine;
 
@@ -287,7 +303,7 @@ public class TextureMappingTester2 extends DoubleBufferedFrame implements MouseM
 
 
 	private TripodCamera camera;
-	private Lightsource lightsource;
+	private Lightsource lightsource;	
 
 	private int mouseX;
 	private int mouseY;

@@ -14,6 +14,7 @@ import gframe.DoubleBufferedFrame;
 import gframe.engine.Engine3D;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
+import gframe.engine.MaterialShader;
 import gframe.engine.Model3D;
 import gframe.engine.NormalMappedTextureShader;
 import gframe.engine.Point3D;
@@ -93,7 +94,7 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 			model.rotate(0, 0, 90);
 			model.scale(1, 1, 1);
 			
-			model.material = Material.GOLD;
+			model.setMaterial( Material.GOLD );
 			
 			engine.register(model);
 		} catch (Exception e) {
@@ -223,8 +224,11 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 //					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 324, 324), TextureGenerator.generateDefaultNormalMap(324, 324), TextureGenerator.generateRandomSpecularMap(324, 324));
 //					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 324, 324), TextureGenerator.generateMengerSpongeNormalMap(324), true);
 //					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateTileTextureNormalMap(324, 324, 30), true);					
-					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateDefaultNormalMap(324, 324), true);
+//					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateDefaultNormalMap(324, 324), true);
 //					Shader shader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateDiscoTileTexture(320, 320, 20), TextureGenerator.generateTileTextureNormalMap(320, 320, 20), true);
+					
+					Shader shader = new MaterialShader(lightsource, TextureGenerator.generateTileTextureNormalMap(320, 320, 40));
+					
 					engine.setDefaultShader(shader);
 				}
 				else if (keycode == KeyEvent.VK_7) {

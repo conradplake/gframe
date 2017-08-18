@@ -105,20 +105,20 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		Timer.getInstance().registerTimedObject(loader);
 				
 		
-//		// -- DISPLAY MODE SETTINGS		
-//		GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-//		if(device.isFullScreenSupported()){
-//			DisplayMode newMode = new DisplayMode(SCREENX, SCREENY, 32, 60);
-//			this.setUndecorated(true);
-//			this.setResizable(false);
-//			//this.setIgnoreRepaint(true);
-//			device.setFullScreenWindow(this);			
-//			device.setDisplayMode(newMode);			
-//		}else{
+		// -- DISPLAY MODE SETTINGS		
+		GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		if(device.isFullScreenSupported()){
+			DisplayMode newMode = new DisplayMode(SCREENX, SCREENY, 32, 60);
+			this.setUndecorated(true);
+			this.setResizable(false);
+			//this.setIgnoreRepaint(true);
+			device.setFullScreenWindow(this);			
+			device.setDisplayMode(newMode);			
+		}else{
 			setSize(SCREENX, SCREENY);
 			setLocation(20, 0);
 			setLayout(null);
-//		}
+		}
 		
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
 		addMouseMotionListener(this);
@@ -410,19 +410,23 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		TextureShader columnShader = new NormalMappedTextureShader(lightsource,
 				TextureGenerator.generateTileTexture(40, 500, 10, columnTileColor.darker().getRGB(), columnTileColor.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(40, 500, 10));		
 		
-		Model3D column1a = Model3DGenerator.buildBlock(40, 250, 40, Color.GRAY);		
+		Model3D column1a = Model3DGenerator.buildBlock(40, 250, 40, Color.GRAY);
+		column1a = Model3DGenerator.facify(column1a);
 		column1a.move(270, 125, 500);
 		engine.register(column1a, columnShader);
 		
-		Model3D column1b = Model3DGenerator.buildBlock(40, 250, 40, Color.GRAY);		
+		Model3D column1b = Model3DGenerator.buildBlock(40, 250, 40, Color.GRAY);
+		column1b = Model3DGenerator.facify(column1b);
 		column1b.move(270, 375, 500);
 		engine.register(column1b, columnShader);
 		
-		Model3D column2 = Model3DGenerator.buildBlock(40, 500, 40, Color.GRAY);		
+		Model3D column2 = Model3DGenerator.buildBlock(40, 500, 40, Color.GRAY);
+		column2 = Model3DGenerator.facify(column2);
 		column2.move(270, 250, 1000);
 		engine.register(column2, columnShader);
 		
-		Model3D column3 = Model3DGenerator.buildBlock(40, 500, 40, Color.GRAY);		
+		Model3D column3 = Model3DGenerator.buildBlock(40, 500, 40, Color.GRAY);
+		column3 = Model3DGenerator.facify(column3);
 		column3.move(270, 250, 1500);
 		engine.register(column3, columnShader);
 		
@@ -658,16 +662,16 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		lightsource.x = 0;
 		lightsource.y = 0;
 		lightsource.z = 40;
-		lightsource.setIntensity(Lightsource.MAX_INTENSITY);
+//		lightsource.setIntensity(Lightsource.MAX_INTENSITY);
 		
 		
 		cameraKeyPositions = AnimationsParser.parse(new File("animations/demo01/part7_camera.ani"),
 				System.currentTimeMillis(), 1f);		
 				
 		events = new ArrayList<Event>();		
-		events.add(new SparkTimedEvent(System.currentTimeMillis(), new FadeOutFadeIn(lightsource, 1, 7000)));
+		events.add(new SparkTimedEvent(System.currentTimeMillis(), new FadeOutFadeIn(lightsource, 1f, 1, 7000)));
 		events.add(new SparkTimedEvent(System.currentTimeMillis(), new Rotate(cupola, 20000, 0.02f, Rotate.AXIS_Y)));		
-		events.add(new SparkTimedEvent(System.currentTimeMillis()+18800, new FadeOut(lightsource, 1000)));
+		events.add(new SparkTimedEvent(System.currentTimeMillis()+18800, new FadeOut(lightsource, 1f, 1000)));
 		
 		shadowsEnabled = false;		
 								
@@ -880,8 +884,11 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				
 				nextPosition.updatePosition(lastTime, currentTime, lightsource);
 				nextPosition.updatePosition(lastTime, currentTime, lightsource.getMatrix());
+								
+				// TODO: alle änderungen über eine generelle schnittstelle bekannt machen
+				lightsource.recomputeLightZ();				
+				lightsource.recomputeInverse(); 
 				
-				lightsource.recomputeInverse(); // TODO: alle änderungen über eine generelle schnittstelle bekannt machen								
 				engine.recomputeShadowMaps();
 				
 				if (currentTime >= nextPosition.getTimestamp()) {
@@ -1255,10 +1262,10 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 			}
 		}
 
-		fpsCounter++;
-		if (fpsCounter % 20 == 0) {
-			System.out.println("FPS: " + (1000 / updateTime));
-		}
+//		fpsCounter++;
+//		if (fpsCounter % 20 == 0) {
+//			System.out.println("FPS: " + (1000 / updateTime));
+//		}
 
 	}
 

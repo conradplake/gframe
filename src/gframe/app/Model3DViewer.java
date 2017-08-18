@@ -281,6 +281,8 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 				mod.scale(5, 5, 5);	
 			}
 			
+			mod.recomputeFaceNormals();			
+			
 			counter = 0;
 			
 		} catch (java.io.IOException ioe) {
