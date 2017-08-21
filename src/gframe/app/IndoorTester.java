@@ -49,13 +49,11 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 //		lightsource.setShadowsEnabled(true);
 		engine.setLightsource(lightsource);
 									
-//		TextureShader shader = new TextureShader(lightsource);
-//		shader.setIsBilinearFiltering(true);
-		
+		Shader shader = new TextureShader(lightsource);
 //		Shader shader = new TextureShader(lightsource, TextureShader.getRGBRaster(Color.CYAN, 256, 256));
 //		Shader shader = new PhongShader(lightsource);
 //		Shader shader = new FlatShader(lightsource);
-		Shader shader = new MaterialShader(lightsource, TextureGenerator.generateTileTextureNormalMap(320, 320, 20));	
+//		Shader shader = new MaterialShader(lightsource, TextureGenerator.generateTileTextureNormalMap(320, 320, 20));	
 		
 		engine.setDefaultShader(shader);		
 	}
@@ -68,7 +66,7 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 		engine.clear();
 											
 		Model3D room = Model3DGenerator.buildRoom(Space3D.ONE_METER, Space3D.ONE_METER, Space3D.ONE_METER, Color.WHITE);
-		room.scale(10, 10, 10);		
+		room.scale(10, 5, 10);		
 		room = Model3DGenerator.facify(room);
 				
 		room.setMaterial(Material.RED_PLASTIC);

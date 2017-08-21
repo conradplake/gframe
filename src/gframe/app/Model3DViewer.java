@@ -159,7 +159,7 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 			// "+model.numberOfVertices()+", faces: "+model.numberOfFaces());
 			System.out.println("Registering new model: " + nextModel + " with vertices: " + model.numberOfVertices()
 					+ ", faces: " + model.numberOfFaces());
-			engine.register(model);
+			engine.register(model, false);
 		}
 	}
 
@@ -281,7 +281,7 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 				mod.scale(5, 5, 5);	
 			}
 			
-			mod.recomputeFaceNormals();			
+//			mod.recomputeFaceNormals();			
 			
 			counter = 0;
 			

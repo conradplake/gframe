@@ -46,7 +46,9 @@ public class TextureMappingTester extends DoubleBufferedFrame implements MouseMo
 		engine = new Engine3D(SCREENX, SCREENY);			
 					
 		// LIGHT SETTINGS
-		lightsource = new Lightsource(0, 0, 0, Color.white, Lightsource.MAX_INTENSITY);				
+		lightsource = new Lightsource(0, 0, 0, Color.white, Lightsource.MAX_INTENSITY);
+		lightsource.setIsDirectional(true);
+		lightsource.rotate(-90, 0, 0);
 		engine.setLightsource(lightsource);
 					
 		Shader shader = new TextureShader(lightsource, TextureShader.getRGBRaster(new File("textures/chessboard.jpg"), 256, 256));

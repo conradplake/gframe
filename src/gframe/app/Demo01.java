@@ -438,7 +438,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		litterBin.scale(scaleFactor, scaleFactor, scaleFactor);
 		litterBin.move(270, 0.5f, 465);
 		
-		engine.register(litterBin);
+		engine.register(litterBin, false);
 		Shader litterBinShader = new PhongShader(lightsource);
 		engine.setModelShader(litterBin, litterBinShader);
 		
@@ -448,15 +448,16 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		Color benchColor = new Color(138, 84, 45);
 		Model3D bench = WavefrontObjParser.parse(new File("models/outdoor/bench_v01.obj"), benchColor);
 		bench.move(270, 0, 310);
+		bench.rotate(0, 180, 0);
 		bench.scale(0.8f, 0.8f, 0.8f);
-		engine.register(bench);		
+		engine.register(bench, false);		
 		engine.setModelShader(bench, benchShader);
 		
 		
 		Model3D bench2 = WavefrontObjParser.parse(new File("models/outdoor/bench_v01.obj"), benchColor);
 		bench2.move(270, 0, 1200);
 		bench2.scale(0.8f, 0.8f, 0.8f);
-		engine.register(bench2);		
+		engine.register(bench2, false);		
 		engine.setModelShader(bench2, benchShader);
 				
 				
@@ -465,14 +466,14 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		Model3D cupOnBench1 = WavefrontObjParser.parse(new File("models/Coca-Cola Cup.obj"), Color.WHITE);
 		cupOnBench1.move(270, 38, 380);
 		//cupOnBench1.scale(0.8f, 0.8f, 0.8f);
-		engine.register(cupOnBench1);		
+		engine.register(cupOnBench1, false);		
 		engine.setModelShader(cupOnBench1, cupOnBench1Shader);
 		
 		Model3D cupNextToBin = WavefrontObjParser.parse(new File("models/Coca-Cola Cup.obj"), Color.WHITE);
 		cupNextToBin.move(240, 3, 450);
 		cupNextToBin.rotate(85, 0, 0);
 		//cupOnBench1.scale(0.8f, 0.8f, 0.8f);
-		engine.register(cupNextToBin);		
+		engine.register(cupNextToBin, false);		
 		engine.setModelShader(cupNextToBin, cupOnBench1Shader);
 				
 		
@@ -646,7 +647,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		Engine3D engine = new Engine3D(SCREENX, SCREENY);
 		engine.setLightsource(lightsource);
 		
-		Model3D cupola = WavefrontObjParser.parse(new File("./models/structures/nuraghe_inside.obj"), Color.ORANGE);
+		Model3D cupola = WavefrontObjParser.parseOldstyle(new File("./models/structures/nuraghe_inside.obj"), Color.ORANGE);
 		//cupola = Model3DGenerator.split(cupola);
 //		((Model3D)cupola.getChildren().get(465)).isVisible = false;
 		
