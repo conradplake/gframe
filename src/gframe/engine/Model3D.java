@@ -357,6 +357,11 @@ public class Model3D extends Object3D {
 	}
 	
 	
+	public Point3D getVertex(int index) {
+		return vertices.get(index);
+	}
+	
+	
 	public Material getMaterial() {
 		return material;
 	}
@@ -379,5 +384,6 @@ public class Model3D extends Object3D {
 	
 	// default light & reflection properties
 	Material material = Material.DEFAULT;
+
 
 }

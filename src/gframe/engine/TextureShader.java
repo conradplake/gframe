@@ -15,14 +15,15 @@ public class TextureShader extends AbstractShader{
 	ImageRaster textureLOD2;
 	ImageRaster textureLOD3;
 	
-	int originalTextureArea;
+	int originalTextureWidth;
+	int originalTextureHeight;
 	
 	int textureWidth;
 	int textureHeight;
 
-	boolean isBilinearFilteringEnabled = false;
+	boolean isBilinearFilteringEnabled = true;
 		
-	boolean isDithering = true;
+	boolean isDithering = false;
 	
 	/*
 	 * Dither kernel as in Unreal's software renderer (a.k.a. poor man's bilinear) 
@@ -66,7 +67,8 @@ public class TextureShader extends AbstractShader{
 		this.textureHeight = texture.getHeight();
 		this.texture = texture;
 		
-		this.originalTextureArea = this.textureWidth * this.textureHeight;		
+		this.originalTextureWidth  = this.textureWidth;		
+		this.originalTextureHeight = this.textureHeight;
 		
 		this.textureLOD0 = texture;
 		this.textureLOD1 = TextureGenerator.mipmap(texture);
@@ -118,15 +120,17 @@ public class TextureShader extends AbstractShader{
 	public void setIsDithering(boolean value){
 		this.isDithering = value;
 	}
-
+	
+	
+	public int getTexelFast(float x, float y){
+		return texture.getPixel((int)x, (int)y);
+	}
 	
 	public int getTexel(float x, float y){
 		
 		int pixel;
 		
 		if(!isBilinearFilteringEnabled){
-
-//			System.out.println(x+", "+y);			
 //			int x_int = (int)Math.floor(x + 0.5f);
 //			int y_int = (int)Math.floor(y + 0.5f);
 			int x_int = (int)x;
@@ -298,9 +302,12 @@ public class TextureShader extends AbstractShader{
 	 * 3 : very low
 	 * 
 	 * */
-	public int getLOD(RenderFace renderFace){
+public int getLOD(RenderFace renderFace){
+		
+//		return 0;
+		
 		float areaScreen = 0;
-		float areaTexture = originalTextureArea; // aktuell werden nur komplette texturen gemappt, daher ist areaTexture = texture.width * texture.height
+		float areaTexture = 0;
 		
 		//Shoelace formula
 		for(int i=0;i<renderFace.vertices.length;i++){
@@ -314,26 +321,17 @@ public class TextureShader extends AbstractShader{
 			float x_i1 = renderFace.cam_X[next];
 			float y_i1 = renderFace.cam_Y[next];
 			
-//			float u_i0 = renderFace.texel_U[i];
-//			float v_i0 = renderFace.texel_V[i];
-//			float u_i1 = renderFace.texel_U[next];
-//			float v_i1 = renderFace.texel_V[next];
-//			
-//			float zf_i0 = 1f/renderFace.zFactors[i];
-//			float zf_i1 = 1f/renderFace.zFactors[next];
-//			
-//			u_i0 *= zf_i0;
-//			v_i0 *= zf_i0;
-//			u_i1 *= zf_i1;
-//			v_i1 *= zf_i1;
+			float u_i0 = renderFace.vertices[i].u * originalTextureWidth;
+			float v_i0 = renderFace.vertices[i].v * originalTextureHeight;
+			float u_i1 = renderFace.vertices[next].u * originalTextureWidth;
+			float v_i1 = renderFace.vertices[next].v * originalTextureHeight;
 			
 			areaScreen  += ( (x_i0 * y_i1) - (y_i0 * x_i1) );
-//			areaTexture += ( (u_i0 * v_i1) - (v_i0 * u_i1) );
+			areaTexture += ( (u_i0 * v_i1) - (v_i0 * u_i1) );
 		}
 		
-		
 		areaScreen = 0.5f * Math.abs(areaScreen);
-//		areaTexture = 0.5f * Math.abs(areaTexture);
+		areaTexture = 0.5f * Math.abs(areaTexture);		
 		
 		float mmFactor = areaTexture / areaScreen;
 		
@@ -347,6 +345,8 @@ public class TextureShader extends AbstractShader{
 		else if( mmFactor<64f ){
 			lod = 2;
 		}
+		
+//		System.out.println("LOD="+lod);
 		
 		return lod;
 	}

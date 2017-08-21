@@ -33,7 +33,8 @@ public class Face {
 		for (int i=0;i<length;i++) {
 			this.vertices[i] = vertices[i]; 			
 		}
-	
+		
+//		recompute();
 		this.centroid = centroid;
 		
 		this.normal_x = normal_x;

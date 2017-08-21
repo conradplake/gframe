@@ -218,7 +218,12 @@ public class NormalMappedTextureShader extends TextureShader {
 		// see:
 		// - literature/26-BumpMap+ProcTex.pdf
 		// - http://www.terathon.com/code/tangent.html
-		Vector3D tangentLocalLightsourcePosition = renderFace.getInverseTangentSpace()
+		
+		Matrix3D inverseTangentSpace = renderFace.getInverseTangentSpace();
+		inverseTangentSpace.setZAxis(normal_x, normal_y, normal_z);
+		
+		//Vector3D tangentLocalLightsourcePosition = renderFace.getInverseTangentSpace()
+		Vector3D tangentLocalLightsourcePosition = inverseTangentSpace
 				.transform(new Vector3D(lightPos_x - world_x, lightPos_y - world_y, lightPos_z - world_z));
 		tangentLocalLightsourcePosition.normalize();
 
@@ -232,7 +237,8 @@ public class NormalMappedTextureShader extends TextureShader {
 			// here we do phong lighting in tangent space
 
 			// put vector world_position --> camera into tangent space
-			Vector3D tangentLocalViewPosition = renderFace.getInverseTangentSpace()
+			//Vector3D tangentLocalViewPosition = renderFace.getInverseTangentSpace()
+			Vector3D tangentLocalViewPosition = inverseTangentSpace
 					.transform(new Vector3D(camPosition.x - world_x, camPosition.y - world_y, camPosition.z - world_z));
 			tangentLocalViewPosition.normalize();
 
@@ -279,7 +285,7 @@ public class NormalMappedTextureShader extends TextureShader {
 			viewReflectionProduct = -viewReflectionProduct
 					/ (renderFace.material.shininess + (renderFace.material.shininess * viewReflectionProduct) - viewReflectionProduct);
 
-			specularIntensity = Math.max(viewReflectionProduct, 0);			
+			specularIntensity = Math.max(viewReflectionProduct, 0);
 			specularCoefficient = ((texelNormal >> 24) & 0xff) * iColorNorm; // specularity from normal map's alpha-channel in [0..1]
 
 			specIntermediate = specularIntensity * specularCoefficient;
@@ -312,53 +318,53 @@ public class NormalMappedTextureShader extends TextureShader {
 
 		int normal;
 
-		if (!super.isBilinearFilteringEnabled) {
+//		if (!super.isBilinearFilteringEnabled) {
 			// int x_int = (int)Math.floor(x + 0.5f);
 			// int y_int = (int)Math.floor(y + 0.5f);
 			normal = normalMap.getPixel((int) x, (int) y);
-		} else {
-			int x_int = (int) x;
-			int y_int = (int) y;
-
-			normal = normalMap.getPixel(x_int, y_int);
-
-			float x_fract = x - x_int;
-			float y_fract = y - y_int;
-
-			int c0_x = (normal >> 16) & 0xff;
-			int c0_y = (normal >> 8) & 0xff;
-			int c0_z = (normal >> 0) & 0xff;
-
-			int c1_normal = x_int + 1 < textureWidth ? normalMap.getPixel(x_int + 1, y_int) : normal;
-			int c1_x = (c1_normal >> 16) & 0xff;
-			int c1_y = (c1_normal >> 8) & 0xff;
-			int c1_z = (c1_normal >> 0) & 0xff;
-
-			int c2_normal = y_int + 1 < textureHeight ? normalMap.getPixel(x_int, y_int + 1) : normal;
-			int c2_x = (c2_normal >> 16) & 0xff;
-			int c2_y = (c2_normal >> 8) & 0xff;
-			int c2_z = (c2_normal >> 0) & 0xff;
-
-			int c3_normal = x_int + 1 < textureWidth && y_int + 1 < textureHeight
-					? normalMap.getPixel(x_int + 1, y_int + 1) : normal;
-			int c3_x = (c3_normal >> 16) & 0xff;
-			int c3_y = (c3_normal >> 8) & 0xff;
-			int c3_z = (c3_normal >> 0) & 0xff;
-
-			float c0_weight = (1 - x_fract) * (1 - y_fract);
-			float c1_weight = x_fract * (1 - y_fract);
-			float c2_weight = (1 - x_fract) * y_fract;
-			float c3_weight = x_fract * y_fract;
-
-			int newX = (int) (c0_x * c0_weight + c1_x * c1_weight + c2_x * c2_weight + c3_x * c3_weight);
-
-			int newY = (int) (c0_y * c0_weight + c1_y * c1_weight + c2_y * c2_weight + c3_y * c3_weight);
-
-			int newZ = (int) (c0_z * c0_weight + c1_z * c1_weight + c2_z * c2_weight + c3_z * c3_weight);
-
-			normal = ((newX & 0xFF) << 16) | ((newY & 0xFF) << 8) | ((newZ & 0xFF) << 0);
-
-		}
+//		} else {
+//			int x_int = (int) x;
+//			int y_int = (int) y;
+//
+//			normal = normalMap.getPixel(x_int, y_int);
+//
+//			float x_fract = x - x_int;
+//			float y_fract = y - y_int;
+//
+//			int c0_x = (normal >> 16) & 0xff;
+//			int c0_y = (normal >> 8) & 0xff;
+//			int c0_z = (normal >> 0) & 0xff;
+//
+//			int c1_normal = x_int + 1 < textureWidth ? normalMap.getPixel(x_int + 1, y_int) : normal;
+//			int c1_x = (c1_normal >> 16) & 0xff;
+//			int c1_y = (c1_normal >> 8) & 0xff;
+//			int c1_z = (c1_normal >> 0) & 0xff;
+//
+//			int c2_normal = y_int + 1 < textureHeight ? normalMap.getPixel(x_int, y_int + 1) : normal;
+//			int c2_x = (c2_normal >> 16) & 0xff;
+//			int c2_y = (c2_normal >> 8) & 0xff;
+//			int c2_z = (c2_normal >> 0) & 0xff;
+//
+//			int c3_normal = x_int + 1 < textureWidth && y_int + 1 < textureHeight
+//					? normalMap.getPixel(x_int + 1, y_int + 1) : normal;
+//			int c3_x = (c3_normal >> 16) & 0xff;
+//			int c3_y = (c3_normal >> 8) & 0xff;
+//			int c3_z = (c3_normal >> 0) & 0xff;
+//
+//			float c0_weight = (1 - x_fract) * (1 - y_fract);
+//			float c1_weight = x_fract * (1 - y_fract);
+//			float c2_weight = (1 - x_fract) * y_fract;
+//			float c3_weight = x_fract * y_fract;
+//
+//			int newX = (int) (c0_x * c0_weight + c1_x * c1_weight + c2_x * c2_weight + c3_x * c3_weight);
+//
+//			int newY = (int) (c0_y * c0_weight + c1_y * c1_weight + c2_y * c2_weight + c3_y * c3_weight);
+//
+//			int newZ = (int) (c0_z * c0_weight + c1_z * c1_weight + c2_z * c2_weight + c3_z * c3_weight);
+//
+//			normal = ((newX & 0xFF) << 16) | ((newY & 0xFF) << 8) | ((newZ & 0xFF) << 0);
+//
+//		}
 
 		return normal;
 	}

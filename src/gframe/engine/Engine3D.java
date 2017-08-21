@@ -76,13 +76,30 @@ public class Engine3D {
 		this.register(model);
 		this.setModelShader(model, shader);
 	}
+	
+	public void register(Model3D model, Shader shader, boolean computeVertexNormals) {
+		this.register(model, computeVertexNormals);
+		this.setModelShader(model, shader);
+	}
 
 	public void register(Model3D model) {
-		this.register(model, activeSegment);
+		this.register(model, activeSegment, true);
+	}
+	
+	public void register(Model3D model, boolean computeVertexNormals) {
+		this.register(model, activeSegment, computeVertexNormals);
 	}
 
 	public void register(Model3D model, int seg) {
-		model.computeVertexNormals();
+		this.register(model, seg, true);
+	}
+	
+	public void register(Model3D model, int seg, boolean computeVertexNormals) {
+		
+		if(computeVertexNormals){
+		  model.computeVertexNormals();
+		}
+		
 		if (seg >= 0 && seg < segments.length) {
 			segments[seg].add(model);
 		} else {
@@ -105,6 +122,9 @@ public class Engine3D {
 	}
 
 	public void deregister(Model3D model) {
+		if(model==null)
+			return;
+		
 		for (int i = 0; i < segments.length; i++) {
 			if (segments[i].remove(model)) {
 				break;

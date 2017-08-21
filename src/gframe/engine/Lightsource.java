@@ -103,6 +103,16 @@ public class Lightsource extends Point3D {
 		this.light_z= matrix.getZVector();
 	}	
 	
+	
+	public boolean isDirectional(){
+		return isDirectional;
+	}
+	
+	
+	public void setIsDirectional(boolean value){
+		isDirectional = value;
+	}
+	
 	public boolean isSpotLight(){
 		return isSpotLight;
 	}
@@ -130,6 +140,7 @@ public class Lightsource extends Point3D {
 	private ZBuffer depthMap;
 	private boolean recomputeDepthMap = true;
 	private boolean isSpotLight = true;
+	private boolean isDirectional = false;
 	
 	private boolean setShadowsEnabled = false;
 }
