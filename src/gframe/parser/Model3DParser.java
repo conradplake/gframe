@@ -1,7 +1,11 @@
 package gframe.parser;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
 
 import gframe.engine.Model3D;
 import gframe.engine.Point3D;
@@ -40,7 +44,7 @@ public class Model3DParser {
 	}
 
 	private static Model3D parse(Model3D model, String filename) throws java.io.IOException, NumberFormatException {
-		model.clear();
+		model.clearGeometry();
 		InputStream is = new BufferedInputStream(new FileInputStream(filename));
 		float x = 0, y = 0, z = 0;
 		int r = 0, g = 0, b = 0, p1 = 0, p2 = 0, p3 = 0, p4 = 0, rad = 0, state = 0;
