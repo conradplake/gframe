@@ -560,10 +560,8 @@ public class Model3DGenerator {
 		
 		Model3DGenerator.removeHiddenFaces(mengerSponge);
 		
-
 		masterMengerCube.clearGeometry();		
-		masterMengerCube.setOrigin(new Point3D());
-//		masterMengerCube = new Model3D();					
+		masterMengerCube.setOrigin(new Point3D());				
 		int totalVertexCount = 0;
 		for (Model3D model3d : mengerSponge) {
 			for(Face face : model3d.getFaces()){
@@ -571,13 +569,14 @@ public class Model3DGenerator {
 					masterMengerCube.addVertex(vertex.copy().add(model3d.getOrigin()));
 				}
 				
-				masterMengerCube.stretchFace(totalVertexCount, totalVertexCount+1, totalVertexCount+2, totalVertexCount+3, face.getColor());
-//				masterMengerCube.stretchFace(totalVertexCount+3, totalVertexCount+2, totalVertexCount+1, totalVertexCount, face.getColor());
+				if(face.normal_y<0){ // otherwise normal mapping will produce inverted output
+					masterMengerCube.stretchFace(totalVertexCount+2, totalVertexCount+3, totalVertexCount, totalVertexCount+1, face.getColor());
+				}else{
+					masterMengerCube.stretchFace(totalVertexCount, totalVertexCount+1, totalVertexCount+2, totalVertexCount+3, face.getColor());	
+				}	
 				
 				totalVertexCount += 4;
-			}									
-			
-//			masterMengerCube.addChild(model3d);
+			}
 		}
 												
 		return masterMengerCube;
@@ -664,7 +663,12 @@ public class Model3DGenerator {
 //			}
 //			else if(vertices.length==4){
 			if(vertices.length==4){
-				result.stretchFace(totalVertexCount, totalVertexCount+1, totalVertexCount+2, totalVertexCount+3, face.getColor());
+				
+				if(face.normal_y<0){ // otherwise normal mapping will produce inverted output
+					result.stretchFace(totalVertexCount+2, totalVertexCount+3, totalVertexCount, totalVertexCount+1, face.getColor());
+				}else{
+					result.stretchFace(totalVertexCount, totalVertexCount+1, totalVertexCount+2, totalVertexCount+3, face.getColor());	
+				}			
 				totalVertexCount+=4;
 			}
 			else{
