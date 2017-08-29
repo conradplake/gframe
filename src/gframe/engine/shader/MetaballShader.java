@@ -83,16 +83,7 @@ public class MetaballShader extends AbstractShader {
 		Color c= Color.getHSBColor(color, 1, 1);
 //		Color c = new Color(color, color, color);
 		
-		
-		int r = c.getRed();
-		int g = c.getGreen();
-		int b = c.getBlue();
-		return super.shade(renderFace.getColor().getAlpha(), r, g, b, world_x, world_y, world_z, normal_x, normal_y, normal_z);
-		
-//		return  ((renderFace.getColor().getAlpha() & 0xFF) << 24) |
-//                ((c.getRed() & 0xFF) << 16) |
-//                ((c.getGreen() & 0xFF) << 8)  |
-//                ((c.getBlue() & 0xFF) << 0);
+		return super.shade(c.getRGB(), world_x, world_y, world_z, normal_x, normal_y, normal_z);
 	}
 	
 

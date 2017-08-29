@@ -22,7 +22,7 @@ public class LSystemTurtleShader extends AbstractShader {
 	long lastTimeInMillis = 0;
 	long timePassedInMillis = 0;
 
-	int textureWidth  = 300;
+	int textureWidth = 300;
 	int textureHeight = 300;
 
 	ImageRaster texture;
@@ -46,13 +46,13 @@ public class LSystemTurtleShader extends AbstractShader {
 		this.rules = new ArrayList<Rule>();
 
 		// this rule generates a nice tree structure:
-//		rules.add(new Rule('F', "FF+[+F-F-F]-[-F+F+F]"));			
-//		turtle.turningAngle = 25;
-//		turtle.shrinkageFactor = .9f;
+		// rules.add(new Rule('F', "FF+[+F-F-F]-[-F+F+F]"));
+		// turtle.turningAngle = 25;
+		// turtle.shrinkageFactor = .9f;
 
 		// koch curve:
-		 rules.add(new Rule('F', "F+F-F-F+F"));
-		 turtle.turningAngle = 90;
+		rules.add(new Rule('F', "F+F-F-F+F"));
+		turtle.turningAngle = 90;
 
 		axiom = "-F";
 		sentence = axiom;
@@ -94,7 +94,7 @@ public class LSystemTurtleShader extends AbstractShader {
 				sentence = nextSentence;
 
 				turtle.reset();
-			    turtle.stepLength *= turtle.shrinkageFactor;
+				turtle.stepLength *= turtle.shrinkageFactor;
 				turtle.move(sentence, texture);
 				// turtle.move("F[+F-F+F]-F", texture);
 
@@ -108,23 +108,15 @@ public class LSystemTurtleShader extends AbstractShader {
 	};
 
 	@Override
-	public int shade(RenderFace renderFace, float world_x, float world_y, float world_z, float normal_x, float normal_y, float normal_z, float texel_u,
-			float texel_v, int screen_x, int screen_y) {
+	public int shade(RenderFace renderFace, float world_x, float world_y, float world_z, float normal_x, float normal_y,
+			float normal_z, float texel_u, float texel_v, int screen_x, int screen_y) {
 
 		float x = Math.min(textureWidth - 1, texel_u * (textureWidth));
 		float y = Math.min(textureHeight - 1, texel_v * (textureHeight));
 
 		int texel = texture.getPixel((int) x, (int) y);
 
-		int red = (texel >> 16) & 0xff;
-		int green = (texel >> 8) & 0xff;
-		int blue = (texel) & 0xff;
-
-		return super.shade(255, red, green, blue, world_x,
-				world_y, world_z, normal_x, normal_y, normal_z);
-
-//		return ((renderFace.getColor().getAlpha() & 0xFF) << 24) | ((red & 0xFF) << 16) | ((green & 0xFF) << 8)
-//				| ((blue & 0xFF) << 0);
+		return super.shade(texel, world_x, world_y, world_z, normal_x, normal_y, normal_z);
 	}
 
 	@Override
@@ -197,13 +189,11 @@ public class LSystemTurtleShader extends AbstractShader {
 					int newx = (int) position.x;
 					int newy = (int) position.y;
 
-					if (Toolbox.isOutisde(oldx, 0, textureWidth - 1) 							
-						|| Toolbox.isOutisde(oldy, 0, textureHeight - 1)
-						|| Toolbox.isOutisde(newx, 0, textureWidth - 1)
-						|| Toolbox.isOutisde(newy, 0, textureHeight - 1)
-						){
+					if (Toolbox.isOutisde(oldx, 0, textureWidth - 1) || Toolbox.isOutisde(oldy, 0, textureHeight - 1)
+							|| Toolbox.isOutisde(newx, 0, textureWidth - 1)
+							|| Toolbox.isOutisde(newy, 0, textureHeight - 1)) {
 						continue;
-					}else{
+					} else {
 						Tool.drawPolygon(texture, new int[] { oldx, newx }, new int[] { oldy, newy }, c.getRGB());
 					}
 

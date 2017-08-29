@@ -117,17 +117,8 @@ public class CirclesShader extends AbstractShader {
 		float y = Math.min(textureHeight-1, texel_v*(textureHeight));
 		
 		int texel = texture.getPixel((int)x, (int)y);		
-				
-		int red = (texel >> 16) & 0xff;
-		int green = (texel >> 8) & 0xff;
-		int blue = (texel) & 0xff;
-		
-		return super.shade(255, red, green, blue, world_x, world_y, world_z, normal_x, normal_y, normal_z);
-		
-//		return  ((renderFace.getColor().getAlpha() & 0xFF) << 24) |
-//                ((red & 0xFF) << 16) |
-//                ((green & 0xFF) << 8)  |
-//                ((blue & 0xFF) << 0);
+
+		return super.shade(texel, world_x, world_y, world_z, normal_x, normal_y, normal_z);
 	}
 	
 
