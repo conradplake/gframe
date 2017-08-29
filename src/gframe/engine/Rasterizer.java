@@ -13,6 +13,10 @@ public interface Rasterizer {
 	
 	public ZBuffer createZBuffer();
 	
-	public void setScreenSize(int xoffset, int yoffset, int frameX, int frameY);			
+	public void setScreenSize(int xoffset, int yoffset, int frameX, int frameY);
+	
+	public int getXOffset();
+	
+	public int getYOffset();
 
 }

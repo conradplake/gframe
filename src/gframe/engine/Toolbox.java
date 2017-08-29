@@ -212,5 +212,21 @@ public class Toolbox {
 		curve.add(pArr[pArr.length - 1].copy());
 		return curve;
 	}
+	
+	
+	/**
+	 * see: http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+	 * */
+	public static float distanceToLine(Point3D lineFrom, Point3D lineTo, Point3D p){
+		
+		Vector3D v1 = p.copy().subtract(lineFrom).toVector();
+		Vector3D v2 = p.copy().subtract(lineTo).toVector();
+		Vector3D v3 = lineTo.copy().subtract(lineFrom).toVector();
+		
+		float nominator = v1.crossProduct(v2).length();
+		float denominator = v3.length();
+		
+		return nominator / denominator;
+	}
 
 }

@@ -21,9 +21,10 @@ public class DoppelgangerPoint3D extends Point3D{
   }
   
   @Override
-  public void move(float dx, float dy, float dz){
+  public Point3D move(float dx, float dy, float dz){
     super.move(dx,dy,dz);
     doppelganger.move(dx,dy,dz);
+    return this;
   }
   
   @Override

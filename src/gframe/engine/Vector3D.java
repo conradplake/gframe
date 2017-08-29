@@ -114,6 +114,17 @@ public class Vector3D {
 	}
 	
 	
+	public Vector3D getReflectionVector(Vector3D normal){
+		float dotProduct = this.dotProduct(normal);
+		
+		float rx = this.x - 2 * dotProduct * normal.x;
+		float ry = this.y - 2 * dotProduct * normal.y;
+		float rz = this.z - 2 * dotProduct * normal.z;
+		
+		return new Vector3D(rx, ry, rz);
+	}
+	
+	
 	public Vector3D crossProduct(Vector3D v) {
 		float r_x = (v.y*z) - (v.z*y);
 		float r_y = (v.z*x) - (v.x*z);

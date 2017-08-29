@@ -2,14 +2,22 @@ package gframe.engine;
 
 public class FlatShader extends AbstractShader {
 	
+	private int currentColor;
+	
 	public FlatShader(Lightsource lightsource){
 		super(lightsource);
 	}
 
 	
 	@Override
+	public void preShade(RenderFace renderFace){
+		this.currentColor = renderFace.col.getRGB(); 
+	}
+	
+	
+	@Override
 	public int shade(RenderFace renderFace) {		
-		return super.shade(renderFace.col, renderFace.centroid.x, renderFace.centroid.y, renderFace.centroid.z, renderFace.normal_x, renderFace.normal_y, renderFace.normal_z);
+		return super.shade(currentColor, renderFace.centroid.x, renderFace.centroid.y, renderFace.centroid.z, renderFace.normal_x, renderFace.normal_y, renderFace.normal_z);
 	}
 
 

@@ -86,7 +86,9 @@ public class ZBuffer {
 	 * Possible filter matrices: see e.g. imaging.ImageHelper.TPFILTER33
 	 * */
 	public void filter(float[][] filterMtx) {
-
+		
+		// TODO: split into hblur + vblur!
+		
 		int fmLX = filterMtx.length;
 		int fmLX2 = fmLX / 2;
 

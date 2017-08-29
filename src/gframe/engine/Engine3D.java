@@ -76,7 +76,7 @@ public class Engine3D {
 		this.register(model);
 		this.setModelShader(model, shader);
 	}
-	
+
 	public void register(Model3D model, Shader shader, boolean computeVertexNormals) {
 		this.register(model, computeVertexNormals);
 		this.setModelShader(model, shader);
@@ -85,7 +85,7 @@ public class Engine3D {
 	public void register(Model3D model) {
 		this.register(model, activeSegment, true);
 	}
-	
+
 	public void register(Model3D model, boolean computeVertexNormals) {
 		this.register(model, activeSegment, computeVertexNormals);
 	}
@@ -93,13 +93,13 @@ public class Engine3D {
 	public void register(Model3D model, int seg) {
 		this.register(model, seg, true);
 	}
-	
+
 	public void register(Model3D model, int seg, boolean computeVertexNormals) {
-		
-		if(computeVertexNormals){
-		  model.computeVertexNormals();
+
+		if (computeVertexNormals) {
+			model.computeVertexNormals();
 		}
-		
+
 		if (seg >= 0 && seg < segments.length) {
 			segments[seg].add(model);
 		} else {
@@ -122,9 +122,9 @@ public class Engine3D {
 	}
 
 	public void deregister(Model3D model) {
-		if(model==null)
+		if (model == null)
 			return;
-		
+
 		for (int i = 0; i < segments.length; i++) {
 			if (segments[i].remove(model)) {
 				break;
@@ -160,6 +160,31 @@ public class Engine3D {
 	public void recomputeShadowMaps() {
 		lightsource.recomputeDepthMap();
 	}
+
+	
+	/**
+	 * Returns a vector in world space coordinates that points from the screen at the given position
+	 * towards the viewing direction of the camera. Returned vector is normalized to unit length.
+	 */
+	public Vector3D getWorldspaceRay(int screenPosX, int screenPosY) {
+		// do all the reverse transformations from screen space to world space
+
+		int xoffset = rasterizer.getXOffset();
+		int yoffset = rasterizer.getYOffset();
+
+		// ray to cam/eye space
+		Vector3D ray = new Vector3D(screenPosX-xoffset, yoffset-screenPosY, 1);				
+
+		// ray to world space
+		// since we have a vector rather than a 3D-position, no invert of the perspective divide is necessary
+		Matrix3D camToWorldMatrix = camera.getMatrix();
+		camToWorldMatrix.transform(ray);
+
+		ray.normalize();
+
+		return ray;
+	}
+	
 
 	public Lightsource getLightsource() {
 		return lightsource;
@@ -355,14 +380,14 @@ public class Engine3D {
 
 	}
 
-	
 	/**
 	 * 
-	 * Here is where all the transformation takes place.
-	 * Results in polygons of specified model added to a poly heap. 
-	 * This method is invoked recursively for all sub models.   
+	 * Here is where all the transformation takes place. Results in polygons of
+	 * specified model added to a poly heap. This method is invoked recursively
+	 * for all sub models.
 	 * 
 	 * * /
+	 * 
 	 * @param model
 	 * @param parentOrigin
 	 * @param parentMatrix
@@ -383,22 +408,25 @@ public class Engine3D {
 		Matrix3D modelInverse = modelMatrix.getInverse();
 		camPosInObjectSpace = modelInverse.transform(camOrigin.copy().subtract(modelOrigin));
 		camZInObjectSapce = modelInverse.transform(cam_z.copy());
-		
+
 		for (Iterator<Face> it = model.getFaces().iterator(); it.hasNext();) {
 
 			Face face = (Face) it.next();
 
 			// 3d clipping should take place in object space!
 			// if new face is temporarily created due to clipping then nothing
-			// needs to change along the pipeline (createRenderFace etc)							
+			// needs to change along the pipeline (createRenderFace etc)
 			face = Clipper3D.clip(face, camPosInObjectSpace, camZInObjectSapce);
-			if(face==null){
+			if (face == null) {
 				continue; // face is out of view
 			}
 
 			RenderFace renderFace = face.createRenderFace(model.getMaterial());
 
+			// put in world space
 			renderFace.transform(modelMatrix, modelOrigin);
+
+			// put in camera space
 			renderFace.transformToCamSpace(camOrigin, icammat, true);
 
 			if (!rasterizer.isOutsideScreen(renderFace)) {
@@ -422,9 +450,8 @@ public class Engine3D {
 		}
 	}
 
-
 	/**
-	 * A perspective division factor to apply for perspective correction. 
+	 * A perspective division factor to apply for perspective correction.
 	 * 
 	 * Returns a factor depending on the z-value so that bigger z-values make
 	 * Objects appear smaller --> factor decreases

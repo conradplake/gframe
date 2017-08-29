@@ -1,7 +1,6 @@
 package gframe.engine;
 
 import gframe.engine.generator.TextureGenerator;
-import imaging.ImageHelper;
 import imaging.ImageRaster;
 
 public class NormalMappedTextureShader extends TextureShader {
@@ -100,13 +99,8 @@ public class NormalMappedTextureShader extends TextureShader {
 		super(lightsource, texture);
 
 		// specular map als alpha-channel in die normal map kopieren
-		for (int x = 0; x < texture.getWidth(); x++) {
-			for (int y = 0; y < texture.getHeight(); y++) {
-				int specRgb = specularMap.getPixel(x, y);
-				int grayValue = ImageHelper.toGray(specRgb);
-				normalMap.setAlpha(x, y, grayValue);
-			}
-		}
+		TextureGenerator.copySpecularMapToAlphaChannel(specularMap, normalMap);
+		
 		this.specularityFromAlphaChannel = true;
 
 		this.normalMap = normalMap;
@@ -166,7 +160,7 @@ public class NormalMappedTextureShader extends TextureShader {
 	@Override
 	public void preShade(RenderFace renderFace) {
 		
-		super.preShade(renderFace);
+		super.preShade(renderFace);						
 		
 		this.lightPos_x = lightsource.x;
 		this.lightPos_y = lightsource.y;
@@ -206,7 +200,9 @@ public class NormalMappedTextureShader extends TextureShader {
 		// texel_v*(textureHeight) + dv));
 		u = Math.min(textureWidth - 1, texel_u * (textureWidth) + du);
 		v = Math.min(textureHeight - 1, texel_v * (textureHeight) + dv);
-
+		if(u<0)u=0;
+		if(v<0)v=0;
+		
 		texel = super.getTexel(u, v);
 		
 
@@ -220,6 +216,8 @@ public class NormalMappedTextureShader extends TextureShader {
 		// - http://www.terathon.com/code/tangent.html
 		
 		Matrix3D inverseTangentSpace = renderFace.getInverseTangentSpace();
+		
+		// overwrite z-axis with interpolated normal vector
 		inverseTangentSpace.setZAxis(normal_x, normal_y, normal_z);
 		
 		//Vector3D tangentLocalLightsourcePosition = renderFace.getInverseTangentSpace()

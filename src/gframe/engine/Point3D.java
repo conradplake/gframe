@@ -47,10 +47,11 @@ public class Point3D {
 		return (float) Math.sqrt((px - x) * (px - x) + (py - y) * (py - y) + (pz - z) * (pz - z));
 	}
 
-	public void move(float dx, float dy, float dz) {
+	public Point3D move(float dx, float dy, float dz) {
 		x += dx;
 		y += dy;
 		z += dz;
+		return this;
 	}
 	
 	
@@ -115,6 +116,10 @@ public class Point3D {
 	
 	public static float distance(float px1, float py1, float pz1, float px2, float py2, float pz2) {
 		return (float) Math.sqrt((px2 - px1) * (px2 - px1) + (py2 - py1) * (py2 - py1) + (pz2 - pz1) * (pz2 - pz1));
+	}
+	
+	public Vector3D toVector() {
+		return new Vector3D(x, y, z);
 	}
 	
 

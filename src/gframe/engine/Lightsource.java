@@ -69,9 +69,10 @@ public class Lightsource extends Point3D {
 		return this.setShadowsEnabled;
 	}
 	
-	public void move(float dx, float dy, float dz){
+	public Point3D move(float dx, float dy, float dz){
 		super.move(dx, dy, dz);
 		recomputeDepthMap = true;
+		return this;
 	}
 	
 	

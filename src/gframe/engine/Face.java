@@ -262,7 +262,7 @@ public class Face {
 	
 	Point3D centroid;
 	
-	float normal_x, normal_y, normal_z;
+	public float normal_x, normal_y, normal_z;
 	
 	RenderFace renderFace;
 }

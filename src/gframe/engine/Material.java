@@ -2,7 +2,7 @@ package gframe.engine;
 
 public enum Material {
 	
-	DEFAULT(0.01f, 0.01f, 0.01f,  1f, 1f, 1f,  1f, 1f, 1f, 10f), // pure whiteness
+	DEFAULT(0.25f, 0.25f, 0.25f,  1f, 1f, 1f,  1f, 1f, 1f, 10f), // pure whiteness
 	
 	GOLD(0.24725f, 0.1995f, 0.0745f,  0.75164f, 0.60648f, 0.22648f,  0.628281f, 0.555802f, 0.366065f, 51.2f),
 	SILVER(0.19225f, 0.19225f, 0.19225f,  0.50754f, 0.50754f, 0.50754f, 0.508273f, 0.508273f, 0.508273f, 51.2f),

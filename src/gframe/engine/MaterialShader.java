@@ -1,6 +1,6 @@
 package gframe.engine;
 
-import imaging.ImageHelper;
+import gframe.engine.generator.TextureGenerator;
 import imaging.ImageRaster;
 
 public class MaterialShader extends TextureShader {
@@ -64,23 +64,23 @@ public class MaterialShader extends TextureShader {
 	 */
 	public MaterialShader(Lightsource lightsource, ImageRaster normalMap, ImageRaster specularMap) {
 		super(lightsource, normalMap);
-
-		// specular map als alpha-channel in die normal map kopieren
-		for (int x = 0; x < texture.getWidth(); x++) {
-			for (int y = 0; y < texture.getHeight(); y++) {
-				int specRgb = specularMap.getPixel(x, y);
-				int grayValue = ImageHelper.toGray(specRgb);
-				texture.setAlpha(x, y, grayValue);
-			}
-		}
+		TextureGenerator.copySpecularMapToAlphaChannel(specularMap, normalMap);
 		super.recomputeMipmaps();
+	}
+
+	public boolean isAddSpecularity() {
+		return addSpecularity;
+	}
+
+	public void setAddSpecularity(boolean addSpecularity) {
+		this.addSpecularity = addSpecularity;
 	}
 
 	@Override
 	public void preShade(RenderFace renderFace) {
 
 		super.preShade(renderFace);
-
+		
 		this.lightPos_x = lightsource.x;
 		this.lightPos_y = lightsource.y;
 		this.lightPos_z = lightsource.z;
@@ -99,42 +99,30 @@ public class MaterialShader extends TextureShader {
 	public int shade(RenderFace renderFace, float world_x, float world_y, float world_z, float normal_x, float normal_y,
 			float normal_z, float texel_u, float texel_v, int screen_x, int screen_y) {
 
+				
 		u = Math.min(textureWidth - 1, texel_u * (textureWidth));
 		v = Math.min(textureHeight - 1, texel_v * (textureHeight));
+		if(u<0)u=0;
+		if(v<0)v=0;
 
-		texelNormal = this.getTexelFast(u, v);
+		texelNormal = this.getTexel(u, v);
 		tNormal_x = (((texelNormal >> 16) & 0xff) - 128) * iNormalNorm; // red
 		tNormal_y = -(((texelNormal >> 8) & 0xff) - 128) * iNormalNorm; // green
 		tNormal_z = (((texelNormal >> 0) & 0xff) - 128) * iNormalNorm; // blue
 
-		// see:
-		// - literature/26-BumpMap+ProcTex.pdf
-		// - http://www.terathon.com/code/tangent.html
-
 		Matrix3D inverseTangentSpace = renderFace.getInverseTangentSpace();
+
+		// overwrite the face normal with interpolated normal
 		inverseTangentSpace.setZAxis(normal_x, normal_y, normal_z);
 
 		Vector3D tangentLocalLightsourcePosition = inverseTangentSpace
 				.transform(new Vector3D(lightPos_x - world_x, lightPos_y - world_y, lightPos_z - world_z));
 		tangentLocalLightsourcePosition.normalize();
 
+		// diffuse Intensity
 		lightNormalProduct = tangentLocalLightsourcePosition.dotProduct(tNormal_x, tNormal_y, tNormal_z);
 
-		// here we do phong lighting in tangent space
-
-		// put vector world_position --> camera into tangent space
-		Vector3D tangentLocalViewPosition = renderFace.getInverseTangentSpace()
-				.transform(new Vector3D(camPosition.x - world_x, camPosition.y - world_y, camPosition.z - world_z));
-		tangentLocalViewPosition.normalize();
-
-		// an oberfläche reflekierten Lichtvektor berechnen
-		// this overwrites the original vector so make sure it is not used
-		// for seomething els later on!
-		tangentLocalLightsourcePosition.x = tangentLocalLightsourcePosition.x - 2 * lightNormalProduct * tNormal_x;
-		tangentLocalLightsourcePosition.y = tangentLocalLightsourcePosition.y - 2 * lightNormalProduct * tNormal_y;
-		tangentLocalLightsourcePosition.z = tangentLocalLightsourcePosition.z - 2 * lightNormalProduct * tNormal_z;
-
-		// object color
+		// object/diffuse color
 		diffuseAlpha = 255;
 		diffuseRed = 1;
 		diffuseGreen = 1;
@@ -162,32 +150,55 @@ public class MaterialShader extends TextureShader {
 		diffuse_blue = diffuseIntensity * renderFace.material.diffuseCoefficientBlue * diffuseBlue;
 
 		// SPECULAR
-		// wenn camera genau in den reflektierten lichtstrahl blickt, dann
-		// haben wir maximale spekularität (shininess)
-		viewReflectionProduct = tangentLocalViewPosition.dotProduct(tangentLocalLightsourcePosition);
+		specular_red = 0;
+		specular_green = 0;
+		specular_blue = 0;
 
-		// viewReflectionProduct = (float) Math.pow(viewReflectionProduct, 16);
-		// // too expensive :(
-		// --> schlick's approximation:
-		viewReflectionProduct = -viewReflectionProduct / (renderFace.material.shininess
-				+ (renderFace.material.shininess * viewReflectionProduct) - viewReflectionProduct);
+		if (addSpecularity) {
 
-		specularIntensity = Math.max(viewReflectionProduct, 0);
-		specularCoefficient = ((texelNormal >> 24) & 0xff) * iColorNorm; // specularity
-																			// from
-																			// normal
-																			// map's
-																			// alpha-channel
-																			// in
-																			// [0..1]
+			// put vector world_position --> camera into tangent space
+			Vector3D tangentLocalViewPosition = renderFace.getInverseTangentSpace()
+					.transform(new Vector3D(camPosition.x - world_x, camPosition.y - world_y, camPosition.z - world_z));
+			tangentLocalViewPosition.normalize();
 
-		specIntermediate = specularIntensity * specularCoefficient;
-		// specular_red = specIntermediate * lightsource.rgbComponents[0];
-		// specular_green = specIntermediate * lightsource.rgbComponents[1];
-		// specular_blue = specIntermediate * lightsource.rgbComponents[2];
-		specular_red = specIntermediate * renderFace.material.specularCoefficientRed * lightsource.rgbComponents[0];
-		specular_green = specIntermediate * renderFace.material.specularCoefficientGreen * lightsource.rgbComponents[1];
-		specular_blue = specIntermediate * renderFace.material.specularCoefficientBlue * lightsource.rgbComponents[2];
+			// an oberfläche reflekierten Lichtvektor berechnen
+			// this overwrites the original vector so make sure it is not used
+			// for seomething els later on!
+			tangentLocalLightsourcePosition.x = tangentLocalLightsourcePosition.x - 2 * lightNormalProduct * tNormal_x;
+			tangentLocalLightsourcePosition.y = tangentLocalLightsourcePosition.y - 2 * lightNormalProduct * tNormal_y;
+			tangentLocalLightsourcePosition.z = tangentLocalLightsourcePosition.z - 2 * lightNormalProduct * tNormal_z;
+
+			// wenn camera genau in den reflektierten lichtstrahl blickt, dann
+			// haben wir maximale spekularität (shininess)
+			viewReflectionProduct = tangentLocalViewPosition.dotProduct(tangentLocalLightsourcePosition);
+
+			// viewReflectionProduct = (float) Math.pow(viewReflectionProduct,
+			// 16);
+			// // too expensive :(
+			// --> schlick's approximation:
+			viewReflectionProduct = -viewReflectionProduct / (renderFace.material.shininess
+					+ (renderFace.material.shininess * viewReflectionProduct) - viewReflectionProduct);
+
+			specularIntensity = Math.max(viewReflectionProduct, 0);
+			specularCoefficient = ((texelNormal >> 24) & 0xff) * iColorNorm; // specularity
+																				// from
+																				// normal
+																				// map's
+																				// alpha-channel
+																				// in
+																				// [0..1]
+
+			specIntermediate = specularIntensity * specularCoefficient;
+			// specular_red = specIntermediate * lightsource.rgbComponents[0];
+			// specular_green = specIntermediate * lightsource.rgbComponents[1];
+			// specular_blue = specIntermediate * lightsource.rgbComponents[2];
+			specular_red = specIntermediate * renderFace.material.specularCoefficientRed * lightsource.rgbComponents[0];
+			specular_green = specIntermediate * renderFace.material.specularCoefficientGreen
+					* lightsource.rgbComponents[1];
+			specular_blue = specIntermediate * renderFace.material.specularCoefficientBlue
+					* lightsource.rgbComponents[2];
+
+		}
 
 		redColor = (int) ((ambientColor_red + diffuse_red + specular_red) * 255);
 		greenColor = (int) ((ambientColor_green + diffuse_green + specular_green) * 255);
