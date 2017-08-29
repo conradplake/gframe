@@ -6,18 +6,17 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
 
 import gframe.DoubleBufferedFrame;
 import gframe.engine.Engine3D;
 import gframe.engine.Lightsource;
-import gframe.engine.Material;
 import gframe.engine.Model3D;
 import gframe.engine.NormalMappedTextureShader;
 import gframe.engine.Shader;
 import gframe.engine.TextureShader;
 import gframe.engine.camera.TripodCamera;
 import gframe.engine.generator.Model3DGenerator;
-import gframe.engine.generator.TextureGenerator;
 import imaging.ImageRaster;
 
 public class TextureMappingTester2 extends DoubleBufferedFrame implements MouseMotionListener {
@@ -48,14 +47,14 @@ public class TextureMappingTester2 extends DoubleBufferedFrame implements MouseM
 		engine.setLightsource(lightsource);
 					
 //		TextureShader shader = new TextureShader(lightsource, TextureShader.getRGBRaster(new File("textures/chessboard.jpg"), 256, 256));
-//		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.MAGENTA, 4096, 4096), TextureShader.getRGBRaster(new File("textures/normal/Normal_map_example.png"), 4096, 4096));
+		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.MAGENTA, 4096, 4096), TextureShader.getRGBRaster(new File("textures/normal/Normal_map_example.png"), 4096, 4096));
 		
 //		Shader shader = new TestShader(lightsource);
 //		Shader shader = new MetaballShader(lightsource, 2);
 		
 //		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateTileTextureNormalMap(324, 324, 30), true);
 //		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateMengerSpongeNormalMap(324), true);
-		Shader shader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateDiscoTileTexture(320, 320, 20), TextureGenerator.generateTileTextureNormalMap(320, 320, 20), true);
+//		Shader shader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateDiscoTileTexture(320, 320, 20), TextureGenerator.generateTileTextureNormalMap(320, 320, 20), true);
 //		Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateDefaultNormalMap(324, 324), true);
 		
 //		((TextureShader)shader).setIsBilinearFiltering(true);

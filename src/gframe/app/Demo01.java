@@ -2,10 +2,7 @@ package gframe.app;
 
 import java.awt.AWTEvent;
 import java.awt.Color;
-import java.awt.DisplayMode;
 import java.awt.Graphics;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -20,6 +17,8 @@ import gframe.Space3D;
 import gframe.engine.Engine3D;
 import gframe.engine.KeyPosition;
 import gframe.engine.Lightsource;
+import gframe.engine.Material;
+import gframe.engine.MaterialShader;
 import gframe.engine.Model3D;
 import gframe.engine.NormalMappedTextureShader;
 import gframe.engine.PhongShader;
@@ -106,19 +105,19 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				
 		
 		// -- DISPLAY MODE SETTINGS		
-		GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-		if(device.isFullScreenSupported()){
-			DisplayMode newMode = new DisplayMode(SCREENX, SCREENY, 32, 60);
-			this.setUndecorated(true);
-			this.setResizable(false);
-			//this.setIgnoreRepaint(true);
-			device.setFullScreenWindow(this);			
-			device.setDisplayMode(newMode);			
-		}else{
+//		GraphicsDevice device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+//		if(device.isFullScreenSupported()){
+//			DisplayMode newMode = new DisplayMode(SCREENX, SCREENY, 32, 60);
+//			this.setUndecorated(true);
+//			this.setResizable(false);
+//			//this.setIgnoreRepaint(true);
+//			device.setFullScreenWindow(this);			
+//			device.setDisplayMode(newMode);			
+//		}else{
 			setSize(SCREENX, SCREENY);
 			setLocation(20, 0);
 			setLayout(null);
-		}
+//		}
 		
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
 		addMouseMotionListener(this);
@@ -208,79 +207,47 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		TextureShader wallShader = new NormalMappedTextureShader(lightsource,
 				TextureGenerator.generateTileTexture(textureWidth, textureHeight, tilesize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
 				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize), true);
+//		wallShader.setIsBilinearFiltering(false);
+		
+//		Shader wallShader = new MaterialShader(lightsource, TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize));
+		
+		
+		
+//		Color graffitiColor = new Color(220, 20, 20);		
+//		TextureShader wallBerlinShader = new NormalMappedTextureShader(lightsource,
+//				TextureGenerator.generateTileTexture(textureWidth, textureHeight, tilesize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
+//				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize), true);		
+//		wallBerlinShader.addEffect(berlinRaster, 100, graffitiColor);
+//		
+//		TextureShader wallGraffittiShader = new NormalMappedTextureShader(lightsource,
+//				TextureGenerator.generateTileTexture(textureWidth, textureHeight, tilesize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
+//				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize), true);		
+//		//wallGraffittiShader.addEffect(graffitiRaster, 100, new Color(220, 220, 220));
+//		wallGraffittiShader.addEffect(graffitiRaster, 100, graffitiColor);
 
-		wallShader.setIsBilinearFiltering(false);
-		
-		Color graffitiColor = new Color(220, 20, 20);
-		
-		TextureShader wallBerlinShader = new NormalMappedTextureShader(lightsource,
-				TextureGenerator.generateTileTexture(textureWidth, textureHeight, tilesize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
-				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize), true);		
-		wallBerlinShader.addEffect(berlinRaster, 100, graffitiColor);
-		
-		TextureShader wallGraffittiShader = new NormalMappedTextureShader(lightsource,
-				TextureGenerator.generateTileTexture(textureWidth, textureHeight, tilesize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
-				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize), true);		
-		//wallGraffittiShader.addEffect(graffitiRaster, 100, new Color(220, 220, 220));
-		wallGraffittiShader.addEffect(graffitiRaster, 100, graffitiColor);
-
-		// right wall
+		Model3D[] rooms = new Model3D[12];
+		int roomcounter = 0;
 		for (int i = 0; i < 10; i++) {
-			Model3D wallSegment = Model3DGenerator.buildPlane(100, new Point3D(), Color.black);
-			wallSegment.move(50, 0, i * (100));
-			wallSegment.rotate(0, -90, 270);
-//			wallSegment.rotate(0, -90, 0);
-			engine.register(wallSegment);
-			
-			if(i==4){
-				engine.setModelShader(wallSegment, wallBerlinShader);
-			}else{
-				engine.setModelShader(wallSegment, wallShader);	
-			}										
-			
+			Model3D room = Model3DGenerator.buildRoom(100, 100, 100, Color.white);			
+			room = Model3DGenerator.facify(room);
+			room.move(50, 0, i * (100));
+			rooms[roomcounter++] = room;
 		}
-
-		// floor
-		for (int i = 0; i < 10; i++) {
-			Model3D wallSegment = Model3DGenerator.buildPlane(100, new Point3D(), Color.black);
-			wallSegment.move(0, -50, i * (100));
-			wallSegment.rotate(-90, 0, 180);
-			engine.register(wallSegment);
-			engine.setModelShader(wallSegment, wallShader);
-		}
-
-		// ceiling
-		for (int i = 0; i < 10; i++) {
-			Model3D wallSegment = Model3DGenerator.buildPlane(100, new Point3D(), Color.black);
-			wallSegment.move(0, 50, i * (100));
-			wallSegment.rotate(90, 0, 180);
-			engine.register(wallSegment,wallShader);			
+		Model3D extraroom1 = Model3DGenerator.buildRoom(100, 100, 100, Color.white);			
+		extraroom1 = Model3DGenerator.facify(extraroom1);
+		extraroom1.move(-50, 0, 9 * (100));
+		rooms[roomcounter++] = extraroom1;
+		Model3D extraroom2 = Model3DGenerator.buildRoom(100, 100, 100, Color.white);			
+		extraroom2 = Model3DGenerator.facify(extraroom2);
+		extraroom2.move(-150, 0, 9 * (100));
+		rooms[roomcounter++] = extraroom2;
+		
+		Model3DGenerator.removeHiddenFaces(rooms);
+		for (Model3D room : rooms) {
+//			room.setMaterial(Material.TURQUOISE);
+			engine.register(room, wallShader);
 		}
 		
-		Model3D ceilingSegment = Model3DGenerator.buildPlane(100, new Point3D(), Color.black);
-		ceilingSegment.move(-100, 50, 9 * (100));
-		ceilingSegment.rotate(90, 0, 180);
-		engine.register(ceilingSegment, wallShader);		
-
-		// end wall
-		Model3D wallSegment = Model3DGenerator.buildPlane(100, new Point3D(), Color.black);
-		wallSegment.move(0, 0, 10 * (100) - 50);
-		wallSegment.rotate(0, 0, -90);	
-		engine.register(wallSegment);
-		engine.setModelShader(wallSegment, wallGraffittiShader);
-
-		wallSegment = Model3DGenerator.buildPlane(100, new Point3D(), Color.black);
-		wallSegment.move(-100, 0, 10 * (100) - 50);
-		wallSegment.rotate(0, 0, -90);
-		engine.register(wallSegment);
-		engine.setModelShader(wallSegment, wallShader);
-
-		// floor
-		wallSegment = Model3DGenerator.buildPlane(100, new Point3D(), Color.black);
-		wallSegment.move(-100, -50, 900);
-		wallSegment.rotate(-90, 0, 180);
-		engine.register(wallSegment);
-		engine.setModelShader(wallSegment, wallShader);
 
 		lightsource.x = 0;
 		lightsource.y = 0;
@@ -310,10 +277,13 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 	
 	private void initPart2_menger_sponge_scene() {		
 
-		Color tileColor = new Color(118, 206, 235);
+//		Color tileColor = new Color(118, 206, 235);
 				
-		TextureShader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(tileColor, 243, 243), TextureGenerator.generateMengerSpongeNormalMap(243));
-				
+		//TextureShader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(tileColor, 243, 243), TextureGenerator.generateMengerSpongeNormalMap(243));
+		MaterialShader shader = new MaterialShader(lightsource, TextureGenerator.generateMengerSpongeNormalMap(243));
+		shader.setAddSpecularity(false);
+		shader.setIsBilinearFiltering(true);				
+		masterMengerCube.setMaterial(Material.WHITE_PLASTIC);
 		masterMengerCube.isVisible = false;
 		
 		engine.setDefaultShader(shader);
@@ -564,7 +534,8 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		
 		int tileSize = 40;
 		Color floorTileColor = new Color(118, 206, 235);
-		TextureShader floorShader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateTileTexture(320, 320, tileSize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(320, 320, tileSize));		
+		TextureShader floorShader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateTileTexture(320, 320, tileSize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(320, 320, tileSize));
+		floorShader.setIsBilinearFiltering(false);
 		//TextureShader floorShader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateTileTexture(320, 320, tileSize*2, floorTileColor.getRGB(), floorTileColor.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(320, 320, tileSize*2));
 		
 		Model3D floor = Model3DGenerator.buildTiledFloor(4, 4, tileSize, Color.BLUE);
@@ -903,7 +874,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				
 				if (currentTime >= nextPosition.getTimestamp()) {
 					cameraKeyPositions.remove(0);
-				}
+				}						
 			}
 			if (!events.isEmpty()) {
 				allKeyPositionsReached = false;

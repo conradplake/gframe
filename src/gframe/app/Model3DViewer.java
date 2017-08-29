@@ -159,7 +159,7 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 			// "+model.numberOfVertices()+", faces: "+model.numberOfFaces());
 			System.out.println("Registering new model: " + nextModel + " with vertices: " + model.numberOfVertices()
 					+ ", faces: " + model.numberOfFaces());
-			engine.register(model, false);
+			engine.register(model, true);
 		}
 	}
 
@@ -251,7 +251,7 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 			if (filename.endsWith(".m3d")) {
 				mod = Model3DParser.parseModel3D(filename);
 			} else if (filename.endsWith(".obj")) {
-				mod = WavefrontObjParser.parse(new File(filename), Color.white);
+				mod = WavefrontObjParser.parseOldstyle(new File(filename), Color.white);
 			}
 			
 			

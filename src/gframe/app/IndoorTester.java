@@ -49,7 +49,15 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 //		lightsource.setShadowsEnabled(true);
 		engine.setLightsource(lightsource);
 									
-		Shader shader = new TextureShader(lightsource);
+//		Shader shader = new TextureShader(lightsource);
+		
+		Color floorTileColor = new Color(118, 206, 235);
+//		TextureShader shader = new NormalMappedTextureShader(lightsource,
+//				TextureGenerator.generateTileTexture(160, 160, 20, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
+//				TextureGenerator.generateTileTextureNormalMap(160, 160, 20), true);
+		
+		MaterialShader shader = new MaterialShader(lightsource, TextureGenerator.generateMengerSpongeNormalMap(243));
+		
 //		Shader shader = new TextureShader(lightsource, TextureShader.getRGBRaster(Color.CYAN, 256, 256));
 //		Shader shader = new PhongShader(lightsource);
 //		Shader shader = new FlatShader(lightsource);
@@ -121,7 +129,7 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 	private void start(long millidelay) {
 		setSize(SCREENX, SCREENY);
 		setLocation(20, 0);
-		setBackground(Color.black);
+		setBackground(Color.YELLOW);
 		setForeground(Color.black);
 		setLayout(null);
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
@@ -241,10 +249,10 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 					lightsource.move(0, 0, -10);
 				}
 				else if (keycode == KeyEvent.VK_PAGE_UP) {
-					lightsource.move(0, 1, 0);
+					lightsource.move(0, 10, 0);
 				}
 				else if (keycode == KeyEvent.VK_PAGE_DOWN) {
-					lightsource.move(0, -1, 0);
+					lightsource.move(0, -10, 0);
 				}
 				else if (keycode == KeyEvent.VK_B) {
 					Shader shader = engine.getDefaultShader();

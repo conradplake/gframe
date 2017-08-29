@@ -117,7 +117,7 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 		initEngine();
 		initWorld();
 		
-		setBackground(Color.black);
+		setBackground(Color.YELLOW);
 		setForeground(Color.black);
 //		setLayout(null);
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
@@ -201,7 +201,8 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 				} 
 				else if (keycode == KeyEvent.VK_3) {	
 					//Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.blue, 512, 512), TextureShader.getRGBRaster(new File("textures/normal/Hand-Normal-Map.png"), 512, 512));
-					Shader shader = new CirclesShader(lightsource);
+					//Shader shader = new CirclesShader(lightsource);
+					TextureShader shader = new TextureShader(engine.getLightsource(), TextureGenerator.generateTileTexture(240, 240, 40, Color.white.getRGB(), Color.BLACK.getRGB()));
 					engine.setDefaultShader(shader);
 				}
 				else if (keycode == KeyEvent.VK_4) {
