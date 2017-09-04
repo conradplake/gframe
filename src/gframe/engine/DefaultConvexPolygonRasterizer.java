@@ -25,7 +25,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 	float[] edgeDeltas;
 
-	int shadowColorRGB = Color.black.getRGB();
+	final int shadowColorRGB = Color.black.getRGB();
 
 	public DefaultConvexPolygonRasterizer(int frameX, int frameY) {
 		this(frameX / 2, frameY / 2, frameX, frameY);
@@ -188,27 +188,27 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 		return new int[] { top, bot };
 	}
-	
+
 	private void fillEdgeTableEntry(EdgeTableEntry edgeTableEntry, RenderFace renderFace, int startVertex,
 			boolean onlyZPass, float height, float subPix, float[] deltas) {
-	
+
 		float draw_x = xoffset + renderFace.cam_X[startVertex] + height * deltas[0] + subPix * deltas[0];
 		if (draw_x < edgeTableEntry.min_draw_x || !edgeTableEntry.visited) {
-	
+
 			edgeTableEntry.min_draw_x = draw_x;
 			edgeTableEntry.min_zFactor = renderFace.zFactors[startVertex] + height * deltas[2] + subPix * deltas[2];
-	
+
 			if (!onlyZPass) {
 				edgeTableEntry.min_texel_u = renderFace.texel_U[startVertex] + height * deltas[3] + subPix * deltas[3];
 				edgeTableEntry.min_texel_v = renderFace.texel_V[startVertex] + height * deltas[4] + subPix * deltas[4];
-	
+
 				edgeTableEntry.min_normal_x = renderFace.vertices[startVertex].normal_x + height * deltas[5]
 						+ subPix * deltas[5];
 				edgeTableEntry.min_normal_y = renderFace.vertices[startVertex].normal_y + height * deltas[6]
 						+ subPix * deltas[6];
 				edgeTableEntry.min_normal_z = renderFace.vertices[startVertex].normal_z + height * deltas[7]
 						+ subPix * deltas[7];
-	
+
 				edgeTableEntry.min_pcorrectedWorld_x = renderFace.pcorrectedWorld_X[startVertex] + height * deltas[8]
 						+ subPix * deltas[8];
 				edgeTableEntry.min_pcorrectedWorld_y = renderFace.pcorrectedWorld_Y[startVertex] + height * deltas[9]
@@ -218,21 +218,21 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			}
 		}
 		if (draw_x > edgeTableEntry.max_draw_x || !edgeTableEntry.visited) {
-	
+
 			edgeTableEntry.max_draw_x = draw_x;
 			edgeTableEntry.max_zFactor = renderFace.zFactors[startVertex] + height * deltas[2] + subPix * deltas[2];
-	
+
 			if (!onlyZPass) {
 				edgeTableEntry.max_texel_u = renderFace.texel_U[startVertex] + height * deltas[3] + subPix * deltas[3];
 				edgeTableEntry.max_texel_v = renderFace.texel_V[startVertex] + height * deltas[4] + subPix * deltas[4];
-	
+
 				edgeTableEntry.max_normal_x = renderFace.vertices[startVertex].normal_x + height * deltas[5]
 						+ subPix * deltas[5];
 				edgeTableEntry.max_normal_y = renderFace.vertices[startVertex].normal_y + height * deltas[6]
 						+ subPix * deltas[6];
 				edgeTableEntry.max_normal_z = renderFace.vertices[startVertex].normal_z + height * deltas[7]
 						+ subPix * deltas[7];
-	
+
 				edgeTableEntry.max_pcorrectedWorld_x = renderFace.pcorrectedWorld_X[startVertex] + height * deltas[8]
 						+ subPix * deltas[8];
 				edgeTableEntry.max_pcorrectedWorld_y = renderFace.pcorrectedWorld_Y[startVertex] + height * deltas[9]
@@ -240,250 +240,12 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 				edgeTableEntry.max_pcorrectedWorld_z = renderFace.pcorrectedWorld_Z[startVertex] + height * deltas[10]
 						+ subPix * deltas[10];
 			}
-	
+
 		}
-	
+
 		edgeTableEntry.visited = true;
 	}
 
-	// public void interpolateScanlines(RenderFace renderFace, ImageRaster
-	// colorBuffer, ZBuffer zBuffer, Shader shader,
-	// int minY, int maxY, boolean doOnlyZPass) {
-	//
-	// int rgb = shader == null ? renderFace.col.getRGB() :
-	// shader.shade(renderFace);
-	//
-	// Lightsource lightsource = shader != null ? shader.getLightsource() :
-	// null;
-	// boolean shadowsEnabled = lightsource != null ?
-	// lightsource.isShadowsEnabled() : false;
-	// Matrix3D inverseLightMatrix = shadowsEnabled ?
-	// lightsource.getInverseMatrix() : null;
-	// ZBuffer shadowMap = shadowsEnabled ? lightsource.getDepthMap() : null;
-	//
-	// for (int draw_y = minY; draw_y <= maxY; draw_y++) {
-	//
-	// EdgeTableEntry edgeTableEntry = edgeTable[draw_y]; // each
-	// // entry
-	// // represents
-	// // one
-	// // scan
-	// // line
-	//
-	// if (!edgeTableEntry.visited) {
-	// continue;
-	// }
-	//
-	// final float iScanlineLength = 1f / (edgeTableEntry.max_draw_x -
-	// edgeTableEntry.min_draw_x + 1);
-	//
-	// final float pcorr_world_dx_stepfactor =
-	// (edgeTableEntry.max_pcorrectedWorld_x
-	// - edgeTableEntry.min_pcorrectedWorld_x) * iScanlineLength;
-	// final float pcorr_world_dy_stepfactor =
-	// (edgeTableEntry.max_pcorrectedWorld_y
-	// - edgeTableEntry.min_pcorrectedWorld_y) * iScanlineLength;
-	// final float pcorr_world_dz_stepfactor =
-	// (edgeTableEntry.max_pcorrectedWorld_z
-	// - edgeTableEntry.min_pcorrectedWorld_z) * iScanlineLength;
-	//
-	// final float texel_du_stepfactor = (edgeTableEntry.max_texel_u -
-	// edgeTableEntry.min_texel_u)
-	// * iScanlineLength;
-	// final float texel_dv_stepfactor = (edgeTableEntry.max_texel_v -
-	// edgeTableEntry.min_texel_v)
-	// * iScanlineLength;
-	//
-	// final float zfactor_stepfactor = (edgeTableEntry.max_zFactor -
-	// edgeTableEntry.min_zFactor)
-	// * iScanlineLength;
-	//
-	// final float vn_dx_stepfactor = (edgeTableEntry.max_normal_x -
-	// edgeTableEntry.min_normal_x)
-	// * iScanlineLength;
-	// final float vn_dy_stepfactor = (edgeTableEntry.max_normal_y -
-	// edgeTableEntry.min_normal_y)
-	// * iScanlineLength;
-	// final float vn_dz_stepfactor = (edgeTableEntry.max_normal_z -
-	// edgeTableEntry.min_normal_z)
-	// * iScanlineLength;
-	//
-	// if (edgeTableEntry.min_draw_x < 0) {
-	// // das abgeschnittene ende auf alle min-werte drauf
-	// // interpolieren
-	//
-	// edgeTableEntry.min_pcorrectedWorld_x += -edgeTableEntry.min_draw_x *
-	// pcorr_world_dx_stepfactor;
-	// edgeTableEntry.min_pcorrectedWorld_y += -edgeTableEntry.min_draw_x *
-	// pcorr_world_dy_stepfactor;
-	// edgeTableEntry.min_pcorrectedWorld_z += -edgeTableEntry.min_draw_x *
-	// pcorr_world_dz_stepfactor;
-	//
-	// // texel
-	// edgeTableEntry.min_texel_u += -edgeTableEntry.min_draw_x *
-	// texel_du_stepfactor;
-	// edgeTableEntry.min_texel_v += -edgeTableEntry.min_draw_x *
-	// texel_dv_stepfactor;
-	// edgeTableEntry.min_zFactor += -edgeTableEntry.min_draw_x *
-	// zfactor_stepfactor;
-	//
-	// // vertex normals
-	// edgeTableEntry.min_normal_x += -edgeTableEntry.min_draw_x *
-	// vn_dx_stepfactor;
-	// edgeTableEntry.min_normal_y += -edgeTableEntry.min_draw_x *
-	// vn_dy_stepfactor;
-	// edgeTableEntry.min_normal_z += -edgeTableEntry.min_draw_x *
-	// vn_dz_stepfactor;
-	//
-	// edgeTableEntry.min_draw_x = 0;
-	// }
-	// if (edgeTableEntry.max_draw_x >= frameX) {
-	// edgeTableEntry.max_draw_x = frameX - 1;
-	// }
-	//
-	// final int startX = (int) edgeTableEntry.min_draw_x;
-	// final float endX = edgeTableEntry.max_draw_x;
-	//
-	// // sub-tex accuracy
-	// final float subTex = (float) startX - edgeTableEntry.min_draw_x;
-	// // subTex = 0;
-	// // System.out.println("subTex="+subTex);
-	//
-	// float dx = -1;
-	// for (int draw_x = startX; draw_x <= endX; draw_x++) {
-	//
-	// // final float dx = draw_x - startX;
-	// dx++;
-	//
-	// float zfa = edgeTableEntry.min_zFactor + (dx * zfactor_stepfactor);
-	//
-	// if (dx > 0) {
-	// zfa += zfactor_stepfactor * subTex;
-	// }
-	//
-	// float inverseZfactor = 1 / zfa;
-	//
-	// float draw_z = Engine3D.inverseZFactor(zfa, inverseZfactor);
-	//
-	// if (zBuffer.update(draw_x, draw_y, draw_z)) {
-	//
-	// if (doOnlyZPass)
-	// continue;
-	//
-	// if (shader != null && shader.isPerPixelShader()) {
-	//
-	// // lerp, lerp...
-	// float pcorr_world_x = edgeTableEntry.min_pcorrectedWorld_x + dx *
-	// pcorr_world_dx_stepfactor;
-	// float pcorr_world_y = edgeTableEntry.min_pcorrectedWorld_y + dx *
-	// pcorr_world_dy_stepfactor;
-	// float pcorr_world_z = edgeTableEntry.min_pcorrectedWorld_z + dx *
-	// pcorr_world_dz_stepfactor;
-	//
-	// float texel_u = edgeTableEntry.min_texel_u + dx * texel_du_stepfactor;
-	// float texel_v = edgeTableEntry.min_texel_v + dx * texel_dv_stepfactor;
-	//
-	// // vertex normals
-	// float vn_x = edgeTableEntry.min_normal_x + dx * vn_dx_stepfactor;
-	// float vn_y = edgeTableEntry.min_normal_y + dx * vn_dy_stepfactor;
-	// float vn_z = edgeTableEntry.min_normal_z + dx * vn_dz_stepfactor;
-	//
-	// // sub-tex accuracy
-	// if (dx > 0) {
-	// pcorr_world_x += pcorr_world_dx_stepfactor * subTex;
-	// pcorr_world_y += pcorr_world_dy_stepfactor * subTex;
-	// pcorr_world_z += pcorr_world_dz_stepfactor * subTex;
-	//
-	// texel_u += texel_du_stepfactor * subTex;
-	// texel_v += texel_dv_stepfactor * subTex;
-	//
-	// vn_x += vn_dx_stepfactor * subTex;
-	// vn_y += vn_dy_stepfactor * subTex;
-	// vn_z += vn_dz_stepfactor * subTex;
-	// }
-	//
-	// // perspektiven korrektur
-	// texel_u *= inverseZfactor;
-	// texel_v *= inverseZfactor;
-	//
-	// // perspektivenkorrektur der weltkoordinaten aus kamera
-	// // sicht
-	// pcorr_world_x *= inverseZfactor;
-	// pcorr_world_y *= inverseZfactor;
-	// pcorr_world_z *= inverseZfactor;
-	//
-	// // vn_x *= inverseZfactor;
-	// // vn_y *= inverseZfactor;
-	// // vn_z *= inverseZfactor;
-	//
-	// // Shadow mapping: anhand der world space coordinaten
-	// // noch den punkt im light space bestimmen
-	// if (shadowMap != null) {
-	// float[] lightCoords = inverseLightMatrix.transform(pcorr_world_x -
-	// lightsource.x,
-	// pcorr_world_y - lightsource.y, pcorr_world_z - lightsource.z);
-	//
-	// // perspektiven korrektur innerhalb des light space
-	// float zf = Engine3D.zFactor(lightCoords[2]);
-	// lightCoords[0] = lightCoords[0] * zf;
-	// lightCoords[1] = lightCoords[1] * zf;
-	//
-	// // to "screenspace" (weil ja auf diese weise auch
-	// // die werte beim eintragen in die shadow map
-	// // berechnet wurden)
-	// float light_x = shadowMap.xoffset + lightCoords[0];
-	// float light_y = shadowMap.yoffset - lightCoords[1];
-	//
-	// if (light_x < 0 || light_x >= shadowMap.w || light_y < 0 || light_y >=
-	// shadowMap.h) { // alles
-	// // ausserhalb
-	// // des
-	// // lichtkegels
-	// // ist
-	// // im
-	// // schatten
-	//
-	// if (lightsource.isSpotLight()) {
-	// colorBuffer.setPixel(draw_x, draw_y, shadowColorRGB);
-	// continue; // TODO: schatten-info an den
-	// // shader weiter geben und ihn
-	// // machen lassen
-	// }
-	// } else {
-	// if (shadowMap.getValue(light_x, light_y, true) < lightCoords[2]
-	// - /* bias gegen schatten akne= */2) { // etwas
-	// // anderes
-	// // war
-	// // näher
-	// // dran
-	// // ->
-	// // wir
-	// // sind
-	// // im
-	// // schatten
-	// colorBuffer.setPixel(draw_x, draw_y, shadowColorRGB);
-	// continue; // TODO: schatten-info an den
-	// // shader weiter geben und ihn
-	// // machen lassen
-	// }
-	// }
-	// }
-	//
-	// rgb = shader.shade(renderFace, pcorr_world_x, pcorr_world_y,
-	// pcorr_world_z, vn_x, vn_y, vn_z,
-	// texel_u, texel_v, draw_x, draw_y);
-	// }
-	//
-	// colorBuffer.setPixel(draw_x, draw_y, rgb);
-	// }
-	//
-	// } // draw_x
-	//
-	// edgeTableEntry.clear();
-	//
-	// } // draw_y
-	// }
-	
 
 	public void interpolateScanlines(RenderFace renderFace, ImageRaster colorBuffer, ZBuffer zBuffer, Shader shader,
 			int minY, int maxY, boolean doOnlyZPass) {
@@ -546,10 +308,6 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 			edgeTableEntry.min_texel_u += subTex * texel_du_stepfactor;
 			edgeTableEntry.min_texel_v += subTex * texel_dv_stepfactor;
-			// if(edgeTableEntry.min_texel_u<0)
-			// edgeTableEntry.min_texel_u = 0;
-			// if(edgeTableEntry.min_texel_v<0)
-			// edgeTableEntry.min_texel_v = 0;
 
 			edgeTableEntry.min_zFactor += subTex * zfactor_stepfactor;
 
@@ -588,20 +346,23 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			for (int draw_x = startX; draw_x <= endX; draw_x++) {
 
 				float zfa = edgeTableEntry.min_zFactor;
-				float inverseZfactor = 1 / zfa; // here comes the pixel devide
+				float inverseZfactor = 1 / zfa; // this is the pixel divide
 												// for accurate perspective
-												// correct texture mapping
+												// correct texture mapping.
+												// since we linearly
+												// interpolated 1/z we now have
+												// to transform back to z.
 
 				float draw_z = Engine3D.inverseZFactor(zfa, inverseZfactor);
 
 				if (zBuffer.update(draw_x, draw_y, draw_z)) {
 
 					if (!doOnlyZPass) {
-						
+
 						if (shader != null && shader.isPerPixelShader()) {
-							
+
 							boolean insideShadow = false;
-							
+
 							float pcorr_world_x = edgeTableEntry.min_pcorrectedWorld_x;
 							float pcorr_world_y = edgeTableEntry.min_pcorrectedWorld_y;
 							float pcorr_world_z = edgeTableEntry.min_pcorrectedWorld_z;
@@ -625,9 +386,9 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 							pcorr_world_y *= inverseZfactor;
 							pcorr_world_z *= inverseZfactor;
 
-							// vn_x *= inverseZfactor;
-							// vn_y *= inverseZfactor;
-							// vn_z *= inverseZfactor;
+//							 vn_x *= inverseZfactor;
+//							 vn_y *= inverseZfactor;
+//							 vn_z *= inverseZfactor;
 
 							// Shadow mapping: anhand der world space
 							// coordinaten
@@ -695,243 +456,6 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		} // draw_y
 	}
 
-	// public void interpolateScanlines(RenderFace renderFace, ImageRaster
-	// colorBuffer, ZBuffer zBuffer, Shader shader,
-	// int minY, int maxY, boolean doOnlyZPass) {
-	//
-	// int rgb = shader == null ? renderFace.col.getRGB() :
-	// shader.shade(renderFace);
-	//
-	// Lightsource lightsource = shader != null ? shader.getLightsource() :
-	// null;
-	// boolean shadowsEnabled = lightsource != null ?
-	// lightsource.isShadowsEnabled() : false;
-	// Matrix3D inverseLightMatrix = shadowsEnabled ?
-	// lightsource.getInverseMatrix() : null;
-	// ZBuffer shadowMap = shadowsEnabled ? lightsource.getDepthMap() : null;
-	//
-	// for (int draw_y = minY; draw_y <= maxY; draw_y++) {
-	//
-	// EdgeTableEntry edgeTableEntry = edgeTable[draw_y]; // each
-	// // entry
-	// // represents
-	// // one
-	// // scan
-	// // line
-	//
-	// if (!edgeTableEntry.visited) {
-	// continue;
-	// }
-	//
-	// final float iScanlineLength = 1f / (edgeTableEntry.max_draw_x -
-	// edgeTableEntry.min_draw_x + 1);
-	//
-	// final float pcorr_world_dx_stepfactor =
-	// (edgeTableEntry.max_pcorrectedWorld_x
-	// - edgeTableEntry.min_pcorrectedWorld_x) * iScanlineLength;
-	// final float pcorr_world_dy_stepfactor =
-	// (edgeTableEntry.max_pcorrectedWorld_y
-	// - edgeTableEntry.min_pcorrectedWorld_y) * iScanlineLength;
-	// final float pcorr_world_dz_stepfactor =
-	// (edgeTableEntry.max_pcorrectedWorld_z
-	// - edgeTableEntry.min_pcorrectedWorld_z) * iScanlineLength;
-	//
-	// final float texel_du_stepfactor = (edgeTableEntry.max_texel_u -
-	// edgeTableEntry.min_texel_u)
-	// * iScanlineLength;
-	// final float texel_dv_stepfactor = (edgeTableEntry.max_texel_v -
-	// edgeTableEntry.min_texel_v)
-	// * iScanlineLength;
-	//
-	// final float zfactor_stepfactor = (edgeTableEntry.max_zFactor -
-	// edgeTableEntry.min_zFactor)
-	// * iScanlineLength;
-	//
-	// final float vn_dx_stepfactor = (edgeTableEntry.max_normal_x -
-	// edgeTableEntry.min_normal_x)
-	// * iScanlineLength;
-	// final float vn_dy_stepfactor = (edgeTableEntry.max_normal_y -
-	// edgeTableEntry.min_normal_y)
-	// * iScanlineLength;
-	// final float vn_dz_stepfactor = (edgeTableEntry.max_normal_z -
-	// edgeTableEntry.min_normal_z)
-	// * iScanlineLength;
-	//
-	// if (edgeTableEntry.min_draw_x < 0) {
-	// // das abgeschnittene ende auf alle min-werte drauf
-	// // interpolieren
-	//
-	// edgeTableEntry.min_pcorrectedWorld_x += -edgeTableEntry.min_draw_x *
-	// pcorr_world_dx_stepfactor;
-	// edgeTableEntry.min_pcorrectedWorld_y += -edgeTableEntry.min_draw_x *
-	// pcorr_world_dy_stepfactor;
-	// edgeTableEntry.min_pcorrectedWorld_z += -edgeTableEntry.min_draw_x *
-	// pcorr_world_dz_stepfactor;
-	//
-	// // texel
-	// edgeTableEntry.min_texel_u += -edgeTableEntry.min_draw_x *
-	// texel_du_stepfactor;
-	// edgeTableEntry.min_texel_v += -edgeTableEntry.min_draw_x *
-	// texel_dv_stepfactor;
-	// edgeTableEntry.min_zFactor += -edgeTableEntry.min_draw_x *
-	// zfactor_stepfactor;
-	//
-	// // vertex normals
-	// edgeTableEntry.min_normal_x += -edgeTableEntry.min_draw_x *
-	// vn_dx_stepfactor;
-	// edgeTableEntry.min_normal_y += -edgeTableEntry.min_draw_x *
-	// vn_dy_stepfactor;
-	// edgeTableEntry.min_normal_z += -edgeTableEntry.min_draw_x *
-	// vn_dz_stepfactor;
-	//
-	// edgeTableEntry.min_draw_x = 0;
-	// }
-	// if (edgeTableEntry.max_draw_x >= frameX) {
-	// edgeTableEntry.max_draw_x = frameX - 1;
-	// }
-	//
-	// final int startX = (int) edgeTableEntry.min_draw_x;
-	// final float endX = edgeTableEntry.max_draw_x;
-	//
-	// // sub-tex accuracy
-	// final float subTex = (float) startX - edgeTableEntry.min_draw_x;
-	// // subTex = 0;
-	// // System.out.println("subTex="+subTex);
-	//
-	// float dx = -1;
-	// for (int draw_x = startX; draw_x <= endX; draw_x++) {
-	//
-	// // final float dx = draw_x - startX;
-	// dx++;
-	//
-	// float zfa = edgeTableEntry.min_zFactor + (dx * zfactor_stepfactor);
-	//
-	// if (dx > 0) {
-	// zfa += zfactor_stepfactor * subTex;
-	// }
-	//
-	// float inverseZfactor = 1 / zfa;
-	//
-	// float draw_z = Engine3D.inverseZFactor(zfa, inverseZfactor);
-	//
-	// if (zBuffer.update(draw_x, draw_y, draw_z)) {
-	//
-	// if (doOnlyZPass)
-	// continue;
-	//
-	// if (shader != null && shader.isPerPixelShader()) {
-	//
-	// // lerp, lerp...
-	// float pcorr_world_x = edgeTableEntry.min_pcorrectedWorld_x + dx *
-	// pcorr_world_dx_stepfactor;
-	// float pcorr_world_y = edgeTableEntry.min_pcorrectedWorld_y + dx *
-	// pcorr_world_dy_stepfactor;
-	// float pcorr_world_z = edgeTableEntry.min_pcorrectedWorld_z + dx *
-	// pcorr_world_dz_stepfactor;
-	//
-	// float texel_u = edgeTableEntry.min_texel_u + dx * texel_du_stepfactor;
-	// float texel_v = edgeTableEntry.min_texel_v + dx * texel_dv_stepfactor;
-	//
-	// // vertex normals
-	// float vn_x = edgeTableEntry.min_normal_x + dx * vn_dx_stepfactor;
-	// float vn_y = edgeTableEntry.min_normal_y + dx * vn_dy_stepfactor;
-	// float vn_z = edgeTableEntry.min_normal_z + dx * vn_dz_stepfactor;
-	//
-	// // sub-tex accuracy
-	// if (dx > 0) {
-	// pcorr_world_x += pcorr_world_dx_stepfactor * subTex;
-	// pcorr_world_y += pcorr_world_dy_stepfactor * subTex;
-	// pcorr_world_z += pcorr_world_dz_stepfactor * subTex;
-	//
-	// texel_u += texel_du_stepfactor * subTex;
-	// texel_v += texel_dv_stepfactor * subTex;
-	//
-	// vn_x += vn_dx_stepfactor * subTex;
-	// vn_y += vn_dy_stepfactor * subTex;
-	// vn_z += vn_dz_stepfactor * subTex;
-	// }
-	//
-	// // perspektiven korrektur
-	// texel_u *= inverseZfactor;
-	// texel_v *= inverseZfactor;
-	//
-	// // perspektivenkorrektur der weltkoordinaten aus kamera
-	// // sicht
-	// pcorr_world_x *= inverseZfactor;
-	// pcorr_world_y *= inverseZfactor;
-	// pcorr_world_z *= inverseZfactor;
-	//
-	// // vn_x *= inverseZfactor;
-	// // vn_y *= inverseZfactor;
-	// // vn_z *= inverseZfactor;
-	//
-	// // Shadow mapping: anhand der world space coordinaten
-	// // noch den punkt im light space bestimmen
-	// if (shadowMap != null) {
-	// float[] lightCoords = inverseLightMatrix.transform(pcorr_world_x -
-	// lightsource.x,
-	// pcorr_world_y - lightsource.y, pcorr_world_z - lightsource.z);
-	//
-	// // perspektiven korrektur innerhalb des light space
-	// float zf = Engine3D.zFactor(lightCoords[2]);
-	// lightCoords[0] = lightCoords[0] * zf;
-	// lightCoords[1] = lightCoords[1] * zf;
-	//
-	// // to "screenspace" (weil ja auf diese weise auch
-	// // die werte beim eintragen in die shadow map
-	// // berechnet wurden)
-	// float light_x = shadowMap.xoffset + lightCoords[0];
-	// float light_y = shadowMap.yoffset - lightCoords[1];
-	//
-	// if (light_x < 0 || light_x >= shadowMap.w || light_y < 0 || light_y >=
-	// shadowMap.h) { // alles
-	// // ausserhalb
-	// // des
-	// // lichtkegels
-	// // ist
-	// // im
-	// // schatten
-	//
-	// if (lightsource.isSpotLight()) {
-	// colorBuffer.setPixel(draw_x, draw_y, shadowColorRGB);
-	// continue; // TODO: schatten-info an den
-	// // shader weiter geben und ihn
-	// // machen lassen
-	// }
-	// } else {
-	// if (shadowMap.getValue(light_x, light_y, true) < lightCoords[2]
-	// - /* bias gegen schatten akne= */2) { // etwas
-	// // anderes
-	// // war
-	// // näher
-	// // dran
-	// // ->
-	// // wir
-	// // sind
-	// // im
-	// // schatten
-	// colorBuffer.setPixel(draw_x, draw_y, shadowColorRGB);
-	// continue; // TODO: schatten-info an den
-	// // shader weiter geben und ihn
-	// // machen lassen
-	// }
-	// }
-	// }
-	//
-	// rgb = shader.shade(renderFace, pcorr_world_x, pcorr_world_y,
-	// pcorr_world_z, vn_x, vn_y, vn_z,
-	// texel_u, texel_v, draw_x, draw_y);
-	// }
-	//
-	// colorBuffer.setPixel(draw_x, draw_y, rgb);
-	// }
-	//
-	// } // draw_x
-	//
-	// edgeTableEntry.clear();
-	//
-	// } // draw_y
-	// }
 
 	public boolean isOutsideScreen(RenderFace renderFace) {
 		if (renderFace.maxX() < -xoffset) {
@@ -1013,27 +537,6 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		return y;
 	}
 
-	public boolean allInside(Point3D[] vertices) {
-		boolean result = true;
-		for (Point3D point3d : vertices) {
-			if (point3d.x < -xoffset || point3d.x > xoffset || point3d.y > yoffset || point3d.y < -yoffset) {
-				result = false;
-				break;
-			}
-		}
-		return result;
-	}
-
-	public boolean allOutside(Point3D[] vertices) {
-		boolean result = true;
-		for (Point3D point3d : vertices) {
-			if (point3d.x >= -xoffset || point3d.x <= xoffset || point3d.y <= yoffset || point3d.y >= -yoffset) {
-				result = false;
-				break;
-			}
-		}
-		return result;
-	}
 
 	@Override
 	public int getXOffset() {
@@ -1045,6 +548,8 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		return yoffset;
 	}
 
+	
+	
 	protected class EdgeTableEntry {
 
 		boolean visited;
