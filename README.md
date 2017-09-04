@@ -8,3 +8,4 @@ Features include:
  - normal & specular mapping
  - shadow mapping
  - physics support & particles
+ - importer for OBJ fies
