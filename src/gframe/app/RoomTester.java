@@ -9,6 +9,7 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 
 import gframe.DoubleBufferedFrame;
+import gframe.ImageRaster;
 import gframe.engine.Engine3D;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
@@ -17,7 +18,6 @@ import gframe.engine.Shader;
 import gframe.engine.TextureShader;
 import gframe.engine.camera.TripodCamera;
 import gframe.parser.WavefrontObjParser;
-import imaging.ImageRaster;
 
 public class RoomTester extends DoubleBufferedFrame implements MouseMotionListener {
 

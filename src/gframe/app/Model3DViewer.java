@@ -17,11 +17,9 @@ import java.util.Properties;
 
 import gframe.DoubleBufferedFrame;
 import gframe.engine.Engine3D;
-import gframe.engine.FlatShader;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
 import gframe.engine.Point3D;
-import gframe.engine.Shader;
 import gframe.engine.camera.Camera;
 import gframe.engine.camera.TripodCamera;
 import gframe.engine.camera.ViewCone;

@@ -11,6 +11,7 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 
 import gframe.DoubleBufferedFrame;
+import gframe.ImageRaster;
 import gframe.engine.Engine3D;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
@@ -23,7 +24,6 @@ import gframe.engine.TextureShader;
 import gframe.engine.camera.TripodCamera;
 import gframe.engine.generator.Model3DGenerator;
 import gframe.engine.generator.TextureGenerator;
-import gframe.engine.shader.CirclesShader;
 import gframe.engine.shader.FlowFieldShader;
 import gframe.engine.shader.MandelbrotShader;
 import gframe.engine.shader.MetaballShader;
@@ -32,7 +32,6 @@ import gframe.engine.shader.ReactionDiffusionShader;
 import gframe.engine.shader.RocketEvolutionShader;
 import gframe.engine.shader.SuperEllipseShader;
 import gframe.engine.shader.TestShader;
-import imaging.ImageRaster;
 
 public class ShaderTester extends DoubleBufferedFrame implements MouseMotionListener {
 

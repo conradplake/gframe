@@ -8,18 +8,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
 import gframe.DoubleBufferedFrame;
+import gframe.ImageRaster;
 import gframe.engine.Engine3D;
 import gframe.engine.FlatShader;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
-import gframe.engine.PhongShader;
 import gframe.engine.Point3D;
 import gframe.engine.camera.TripodCamera;
 import gframe.engine.generator.Model3DGenerator;
 import gframe.engine.shader.SkyShader;
 import gframe.engine.timing.Rotate;
 import gframe.engine.timing.Timer;
-import imaging.ImageRaster;
 
 public class SkydomeTester extends DoubleBufferedFrame implements MouseMotionListener {
 

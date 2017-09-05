@@ -9,13 +9,13 @@ import java.awt.event.MouseMotionListener;
 import java.util.List;
 
 import gframe.DoubleBufferedFrame;
+import gframe.ImageRaster;
 import gframe.engine.Engine3D;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
 import gframe.engine.Point3D;
 import gframe.engine.Toolbox;
 import gframe.engine.camera.TripodCamera;
-import imaging.ImageRaster;
 
 public class CurveTester extends DoubleBufferedFrame implements MouseMotionListener {
 

@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
 import gframe.DoubleBufferedFrame;
+import gframe.ImageRaster;
 import gframe.engine.Engine3D;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
@@ -17,7 +18,6 @@ import gframe.engine.camera.TripodCamera;
 import gframe.engine.generator.Model3DGenerator;
 import gframe.engine.timing.Rotate;
 import gframe.engine.timing.Timer;
-import imaging.ImageRaster;
 
 public class ClippingTester extends DoubleBufferedFrame implements MouseMotionListener {
 
@@ -74,6 +74,7 @@ public class ClippingTester extends DoubleBufferedFrame implements MouseMotionLi
 		// CAMERA SETTINGS
 		if (camera == null) {
 			camera = new TripodCamera();
+			camera.move(0, 20, 0);
 //			camera.move(0, 4000, -5000);
 //			camera.rotate(-20, 0);
 			engine.setCamera(camera);							

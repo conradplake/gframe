@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
 import gframe.DoubleBufferedFrame;
+import gframe.ImageRaster;
 import gframe.Space3D;
 import gframe.engine.Engine3D;
 import gframe.engine.Lightsource;
@@ -19,7 +20,6 @@ import gframe.engine.TextureShader;
 import gframe.engine.camera.TripodCamera;
 import gframe.engine.generator.Model3DGenerator;
 import gframe.engine.generator.TextureGenerator;
-import imaging.ImageRaster;
 
 public class IndoorTester extends DoubleBufferedFrame implements MouseMotionListener {
 
@@ -74,7 +74,7 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 		engine.clear();
 											
 		Model3D room = Model3DGenerator.buildRoom(Space3D.ONE_METER, Space3D.ONE_METER, Space3D.ONE_METER, Color.WHITE);
-		room.scale(10, 5, 10);		
+		room.scale(10, 10, 10);		
 		room = Model3DGenerator.facify(room);
 				
 		room.setMaterial(Material.RED_PLASTIC);

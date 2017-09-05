@@ -9,6 +9,7 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 
 import gframe.DoubleBufferedFrame;
+import gframe.ImageRaster;
 import gframe.engine.Engine3D;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
@@ -20,7 +21,6 @@ import gframe.engine.camera.TripodCamera;
 import gframe.engine.generator.Model3DGenerator;
 import gframe.engine.generator.TextureGenerator;
 import gframe.parser.WavefrontObjParser;
-import imaging.ImageRaster;
 
 public class TexturedModelViewer extends DoubleBufferedFrame implements MouseMotionListener {
 
@@ -320,15 +320,11 @@ public class TexturedModelViewer extends DoubleBufferedFrame implements MouseMot
 				}
 				else if (keycode == KeyEvent.VK_9) {
 					engine.deregister(model);
-					model = WavefrontObjParser.parse(new File("models/texturemapped/Old_EU_House/house_01.obj"),
+					model = WavefrontObjParser.parse(new File("models/texturemapped/Pistol/tt.obj"),
 							Color.GRAY);
-					Shader shader = new NormalMappedTextureShader(lightsource,
+					Shader shader = new TextureShader(lightsource,
 							TextureGenerator.getRGBRaster(
-									new File("models/texturemapped/Old_EU_House/DSC_5871_DIF.jpg"), 4096, 4096),
-							TextureGenerator.getRGBRaster(
-									new File("models/texturemapped/Old_EU_House//DSC_5871_NRM.png"), 4096, 4096),
-							TextureGenerator.getRGBRaster(
-									new File("models/texturemapped/Old_EU_House//DSC_5871_SPEC.png"), 4096, 4096));
+									new File("models/texturemapped/Pistol/tt_textures.jpg"), 512, 256));
 					Model3DGenerator.normalizeOrigin(model);
 					model.setMaterial(Material.PEARL);
 					engine.register(model, shader, false);

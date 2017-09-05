@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import gframe.DoubleBufferedFrame;
+import gframe.ImageRaster;
 import gframe.Space3D;
 import gframe.engine.Engine3D;
 import gframe.engine.KeyPosition;
@@ -42,7 +43,6 @@ import gframe.engine.timing.Timed;
 import gframe.engine.timing.Timer;
 import gframe.parser.AnimationsParser;
 import gframe.parser.WavefrontObjParser;
-import imaging.ImageRaster;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -56,6 +56,7 @@ public class Xmas2016 extends DoubleBufferedFrame implements MouseMotionListener
 	public Xmas2016() {
 		super();
 		setBackground(Color.BLACK);
+		setResizable(false);
 		frame = new ImageRaster(SCREENX, SCREENY);
 		snow = new ArrayList<Particle>();
 		space3D = new Space3D(Space3D.MOON_G/10f);	

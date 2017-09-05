@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gframe.DoubleBufferedFrame;
+import gframe.ImageRaster;
 import gframe.Space3D;
 import gframe.engine.Engine3D;
 import gframe.engine.KeyPosition;
@@ -43,7 +44,6 @@ import gframe.engine.timing.Timed;
 import gframe.engine.timing.Timer;
 import gframe.parser.AnimationsParser;
 import gframe.parser.WavefrontObjParser;
-import imaging.ImageRaster;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaException;
@@ -55,6 +55,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 	public Demo01() {
 		super();
 		setBackground(Color.lightGray);
+		setResizable(false);
 		frame = new ImageRaster(SCREENX, SCREENY);
 		new JFXPanel(); // init java fx for audio playback
 	}	
@@ -207,7 +208,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		TextureShader wallShader = new NormalMappedTextureShader(lightsource,
 				TextureGenerator.generateTileTexture(textureWidth, textureHeight, tilesize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
 				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize), true);
-//		wallShader.setIsBilinearFiltering(false);
+		wallShader.setIsBilinearFiltering(false);
 		
 //		Shader wallShader = new MaterialShader(lightsource, TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize));
 		
@@ -1226,7 +1227,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		g.drawImage(frame.createImage(), 0, 0, frame.getWidth(), frame.getHeight(), null);
 				
 		updateTime = System.currentTimeMillis() - updateTime;
-		if (updateTime < 33) { // 33ms ~ 30 FPS
+		if (updateTime < 33) { // cap at 33ms ~ 30 FPS
 			try {
 				Thread.sleep(33 - updateTime);
 				updateTime = 33;
@@ -1234,10 +1235,10 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 			}
 		}
 
-//		fpsCounter++;
-//		if (fpsCounter % 20 == 0) {
-//			System.out.println("FPS: " + (1000 / updateTime));
-//		}
+		fpsCounter++;
+		if (fpsCounter % 20 == 0) {
+			System.out.println("FPS: " + (1000 / updateTime));
+		}
 
 	}
 

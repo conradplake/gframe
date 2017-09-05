@@ -9,6 +9,7 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 
 import gframe.DoubleBufferedFrame;
+import gframe.ImageRaster;
 import gframe.engine.Engine3D;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
@@ -21,7 +22,6 @@ import gframe.engine.generator.Model3DGenerator;
 import gframe.engine.timing.Rotate;
 import gframe.engine.timing.Timer;
 import gframe.parser.WavefrontObjParser;
-import imaging.ImageRaster;
 
 public class ShadowMapTester extends DoubleBufferedFrame implements MouseMotionListener {
 

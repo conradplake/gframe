@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
 import gframe.DoubleBufferedFrame;
+import gframe.ImageRaster;
 import gframe.engine.Engine3D;
 import gframe.engine.Face;
 import gframe.engine.Lightsource;
@@ -15,7 +16,6 @@ import gframe.engine.Model3D;
 import gframe.engine.Point3D;
 import gframe.engine.camera.TripodCamera;
 import gframe.engine.generator.Model3DGenerator;
-import imaging.ImageRaster;
 
 public class SubdivisionTester extends DoubleBufferedFrame implements MouseMotionListener {
 
