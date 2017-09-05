@@ -6,12 +6,11 @@ import java.awt.Polygon;
 import java.awt.Toolkit;
 import java.io.File;
 
+import gframe.ImageRaster;
 import gframe.engine.Toolbox;
 import gframe.engine.Vector3D;
 import graph.Graph;
 import graph.Node;
-import imaging.ImageHelper;
-import imaging.ImageRaster;
 
 public class TextureGenerator {
 
@@ -718,7 +717,7 @@ public class TextureGenerator {
 		for (int x = 0; x < specularMap.getWidth(); x++) {
 			for (int y = 0; y < specularMap.getHeight(); y++) {
 				int specRgb = specularMap.getPixel(x, y);
-				int grayValue = ImageHelper.toGray(specRgb);
+				int grayValue = Toolbox.toGray(specRgb);
 				target.setAlpha(x, y, grayValue);
 			}
 		}
@@ -740,7 +739,7 @@ public class TextureGenerator {
 			return null;
 		}
 
-		return ImageHelper.getImageRaster(img, 0, 0, w, h);
+		return Toolbox.getImageRaster(img, 0, 0, w, h);
 	}
 
 	public static int toColor(Vector3D normalVector, int alpha) {

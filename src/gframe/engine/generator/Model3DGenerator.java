@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import gframe.ImageRaster;
 import gframe.engine.Face;
 import gframe.engine.Model3D;
 import gframe.engine.Point3D;
@@ -18,8 +19,6 @@ import gframe.engine.Vector3D;
 import gframe.parser.WavefrontObjParser;
 import graph.Graph;
 import graph.Node;
-import imaging.ImageHelper;
-import imaging.ImageRaster;
 
 public class Model3DGenerator {
 	
@@ -115,7 +114,7 @@ public class Model3DGenerator {
 		for(int y=0;y<h;y++){
 			for(int x=0;x<w;x++){									
 				int rgb = heightMap.getPixel(x, y);																	
-				int grayValue = ImageHelper.toGray(rgb);															
+				int grayValue = Toolbox.toGray(rgb);															
 				Point3D vertex = mesh.getVertices().get(w*y+x);											
 				vertex.move(0, grayValue, 0);			
 			}
@@ -137,7 +136,7 @@ public class Model3DGenerator {
 		for(int y=0;y<h;y++){
 			for(int x=0;x<w;x++){									
 				int rgb = heightMap.getPixel(x, y);																	
-				int grayValue = ImageHelper.toGray(rgb);															
+				int grayValue = Toolbox.toGray(rgb);															
 					
 			}
 		}				
@@ -504,6 +503,20 @@ public class Model3DGenerator {
 		figure.addVertex(size / 2, -size / 2, 0);
 		figure.addVertex(-size / 2, -size / 2, 0);
 		figure.stretchFace(0, 1, 2, 3, col);
+		return figure;
+	}
+	
+	public static Model3D buildPlane(int size, Point3D origin, java.awt.Color col, boolean doublesided) {
+		Model3D figure = new Model3D(origin);
+		figure.addVertex(-size / 2, size / 2, 0);
+		figure.addVertex(size / 2, size / 2, 0);
+		figure.addVertex(size / 2, -size / 2, 0);
+		figure.addVertex(-size / 2, -size / 2, 0);
+		figure.stretchFace(0, 1, 2, 3, col);
+		
+		if(doublesided){
+			figure.stretchFace(3, 2, 1, 0, col);
+		}
 		return figure;
 	}
 	
