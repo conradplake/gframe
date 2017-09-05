@@ -3,6 +3,12 @@ package gframe;
 import gframe.engine.Matrix3D;
 import gframe.engine.Vector3D;
 
+/**
+ * A 3d space.
+ * 
+ * Use this class for applying simple physics.
+ * 
+ * */
 public class Space3D {
 
 	public Space3D() {
