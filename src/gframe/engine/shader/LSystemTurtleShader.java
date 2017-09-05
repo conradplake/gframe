@@ -5,14 +5,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Stack;
 
+import gframe.ImageRaster;
 import gframe.engine.AbstractShader;
 import gframe.engine.Lightsource;
 import gframe.engine.Point3D;
 import gframe.engine.RenderFace;
 import gframe.engine.Toolbox;
 import gframe.engine.Vector3D;
-import imaging.ImageRaster;
-import imaging.draw.Tool;
 
 /**
  * 
@@ -194,7 +193,7 @@ public class LSystemTurtleShader extends AbstractShader {
 							|| Toolbox.isOutisde(newy, 0, textureHeight - 1)) {
 						continue;
 					} else {
-						Tool.drawPolygon(texture, new int[] { oldx, newx }, new int[] { oldy, newy }, c.getRGB());
+						Toolbox.drawPolygon(texture, new int[] { oldx, newx }, new int[] { oldy, newy }, c.getRGB());
 					}
 
 				} else if (current == 'f') {

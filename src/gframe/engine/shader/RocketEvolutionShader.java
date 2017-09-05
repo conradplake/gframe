@@ -12,6 +12,7 @@ import eve.ga.Generation;
 import eve.ga.PopulationListener;
 import eve.ga.PopulationManager;
 import eve.ga.RandomMutationOnePntCrossOver;
+import gframe.ImageRaster;
 import gframe.OIS3D;
 import gframe.Space3D;
 import gframe.engine.AbstractShader;
@@ -22,8 +23,6 @@ import gframe.engine.RenderFace;
 import gframe.engine.Toolbox;
 import gframe.engine.Vector3D;
 import gframe.engine.shader.CirclesShader.Circle;
-import imaging.ImageRaster;
-import imaging.draw.Tool;
 
 
 /**
@@ -172,7 +171,7 @@ public class RocketEvolutionShader extends AbstractShader {
 
 			// draw the obstacles
 			for (Obstacle obstacle : obstacles) {
-				Tool.fillPolygon(texture, obstacle.getX(), obstacle.getY(), Color.red.getRGB());
+				Toolbox.fillPolygon(texture, obstacle.getX(), obstacle.getY(), Color.red.getRGB());
 			}				
 			
 			for (Rocket rocket : rockets) {

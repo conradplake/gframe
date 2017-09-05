@@ -4,6 +4,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.tools.Tool;
+
+import gframe.ImageRaster;
 import gframe.Space3D;
 import gframe.engine.AbstractShader;
 import gframe.engine.Lightsource;
@@ -13,8 +16,6 @@ import gframe.engine.RenderFace;
 import gframe.engine.Toolbox;
 import gframe.engine.Vector3D;
 import gframe.engine.generator.NoiseGenerator;
-import imaging.ImageRaster;
-import imaging.draw.Tool;
 
 /**
  *
@@ -158,13 +159,13 @@ public class FlowFieldShader extends AbstractShader {
 						Color c = new Color(255, 0, 0, 100);
 						Vector3D pos = new Vector3D(x, y, 0);
 						pos.add(forceVector);
-						pos.x = (float) Toolbox.constrain(pos.x, 0, textureWidth - 1);
-						pos.y = (float) Toolbox.constrain(pos.y, 0, textureHeight - 1);
+						pos.x = (float) Toolbox.clamp(pos.x, 0, textureWidth - 1);
+						pos.y = (float) Toolbox.clamp(pos.y, 0, textureHeight - 1);
 						int[] forceVectorX = new int[] { x, (int) (pos.x) };
 						// int[] forceVectorX = new int[]{(int)pos.x, x};
 						int[] forceVectorY = new int[] { y, (int) (pos.y) };
 						// int[] forceVectorY = new int[]{(int)pos.y, y};
-						Tool.drawPolygon(texture, forceVectorX, forceVectorY, c.getRGB());
+						Toolbox.drawPolygon(texture, forceVectorX, forceVectorY, c.getRGB());
 					}
 					yoff += yInc;
 				}

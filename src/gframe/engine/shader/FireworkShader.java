@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import gframe.ImageRaster;
 import gframe.Space3D;
 import gframe.engine.AbstractShader;
 import gframe.engine.Lightsource;
@@ -13,7 +14,6 @@ import gframe.engine.Point3D;
 import gframe.engine.RenderFace;
 import gframe.engine.Toolbox;
 import gframe.engine.Vector3D;
-import imaging.ImageRaster;
 
 public class FireworkShader extends AbstractShader {
 

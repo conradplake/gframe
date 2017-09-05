@@ -5,10 +5,10 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import gframe.ImageRaster;
 import gframe.engine.AbstractShader;
 import gframe.engine.Lightsource;
 import gframe.engine.RenderFace;
-import imaging.ImageRaster;
 
 
 /**
