@@ -45,6 +45,16 @@ public class Object3D {
 		Vector3D z = matrix.getZVector(); // move along z axis
 		origin.move(z.x * units, z.y * units, z.z * units);
 	}
+	
+	
+	/**
+	 * Only moves the origin along x and z direction relative to object space.
+	 * Useful for FPS-Walking mechanics :)
+	 * */
+	public void moveXZ(float units) {
+		Vector3D z = getMatrix().getZVector(); // move along z axis
+		getOrigin().move(z.x * units, 0, z.z * units);
+	}
 
 	public void move(float dx, float dy, float dz) {
 		Point3D ttarget = matrix.transform(new Point3D(dx, dy, dz));

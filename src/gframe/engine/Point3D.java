@@ -68,6 +68,13 @@ public class Point3D {
 		z += p.z;
 		return this;
 	}
+	
+	public Point3D add(Vector3D v) {
+		x += v.x;
+		y += v.y;
+		z += v.z;
+		return this;
+	}
 
 	public void setCoordinates(float x, float y, float z) {
 		this.x = x;

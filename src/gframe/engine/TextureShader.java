@@ -3,8 +3,8 @@ package gframe.engine;
 import java.awt.Color;
 import java.io.File;
 
+import gframe.ImageRaster;
 import gframe.engine.generator.TextureGenerator;
-import imaging.ImageRaster;
 
 public class TextureShader extends AbstractShader {
 
@@ -203,15 +203,10 @@ public class TextureShader extends AbstractShader {
 			du = DITHER_KERNEL[x_index][y_index][0];
 			dv = DITHER_KERNEL[x_index][y_index][1];
 		}
-
-		float u = Math.min(textureWidth - 1, texel_u * (textureWidth) + du);
-		float v = Math.min(textureHeight - 1, texel_v * (textureHeight) + dv);
-		if(u<0)u=0;
-		if(v<0)v=0;
-
-		int texel = getTexel(u, v);		
-
-		return super.shade(texel, world_x, world_y, world_z, normal_x, normal_y, normal_z);
+				
+		float u = Toolbox.clamp(texel_u * (textureWidth) + du, 0, textureWidth - 1);
+		float v = Toolbox.clamp(texel_v * (textureHeight) + dv, 0, textureHeight - 1);
+		return super.shade(getTexel(u, v), world_x, world_y, world_z, normal_x, normal_y, normal_z);
 	}
 
 	public static ImageRaster getRGBRaster(File imagefile, int w, int h) {

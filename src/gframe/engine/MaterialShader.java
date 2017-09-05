@@ -1,7 +1,7 @@
 package gframe.engine;
 
+import gframe.ImageRaster;
 import gframe.engine.generator.TextureGenerator;
-import imaging.ImageRaster;
 
 public class MaterialShader extends TextureShader {
 
@@ -99,11 +99,8 @@ public class MaterialShader extends TextureShader {
 	public int shade(RenderFace renderFace, float world_x, float world_y, float world_z, float normal_x, float normal_y,
 			float normal_z, float texel_u, float texel_v, int screen_x, int screen_y) {
 
-				
-		u = Math.min(textureWidth - 1, texel_u * (textureWidth));
-		v = Math.min(textureHeight - 1, texel_v * (textureHeight));
-		if(u<0)u=0;
-		if(v<0)v=0;
+		u = Toolbox.clamp(texel_u * (textureWidth), 0, textureWidth - 1);
+		v = Toolbox.clamp(texel_v * (textureHeight), 0, textureHeight - 1);
 
 		texelNormal = this.getTexel(u, v);
 		tNormal_x = (((texelNormal >> 16) & 0xff) - 128) * iNormalNorm; // red

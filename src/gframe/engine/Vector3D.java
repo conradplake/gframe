@@ -67,10 +67,11 @@ public class Vector3D {
 		z += v.z;
 	}
 
-	public void scale(float fac) {
+	public Vector3D scale(float fac) {
 		x *= fac;
 		y *= fac;
 		z *= fac;
+		return this;
 	}
 
 	public float getZ() {

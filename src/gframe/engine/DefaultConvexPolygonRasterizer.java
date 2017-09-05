@@ -2,7 +2,7 @@ package gframe.engine;
 
 import java.awt.Color;
 
-import imaging.ImageRaster;
+import gframe.ImageRaster;
 
 /**
  * Can rasterize any convex n-gon (triangles, quads, etc.)
@@ -79,6 +79,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		int[] minMaxY = interpolateEdges(renderFace, doOnlyZPass);
 		interpolateScanlines(renderFace, colorBuffer, zBuffer, shader, minMaxY[0], minMaxY[1], doOnlyZPass);
 	}
+	
 
 	public int[] interpolateEdges(RenderFace renderFace, boolean onlyZPass) {
 
@@ -315,7 +316,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			edgeTableEntry.min_normal_y += subTex * vn_dy_stepfactor;
 			edgeTableEntry.min_normal_z += subTex * vn_dz_stepfactor;
 
-			// clip agains teft side of screen
+			// clip against left side of screen
 			if (edgeTableEntry.min_draw_x < 0) {
 				// das abgeschnittene ende auf alle min-werte drauf
 				// interpolieren
@@ -455,6 +456,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 		} // draw_y
 	}
+	
 
 
 	public boolean isOutsideScreen(RenderFace renderFace) {

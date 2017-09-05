@@ -11,9 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import gframe.ImageRaster;
 import gframe.engine.camera.Camera;
-import imaging.ImageHelper;
-import imaging.ImageRaster;
 
 /**
  * 
@@ -173,7 +172,7 @@ public class Engine3D {
 		int yoffset = rasterizer.getYOffset();
 
 		// ray to cam/eye space
-		Vector3D ray = new Vector3D(screenPosX-xoffset, yoffset-screenPosY, 1);				
+		Vector3D ray = new Vector3D(screenPosX-xoffset, yoffset-screenPosY, 1000);
 
 		// ray to world space
 		// since we have a vector rather than a 3D-position, no invert of the perspective divide is necessary
@@ -264,7 +263,7 @@ public class Engine3D {
 			}
 
 			if (filterDepthBuffer) {
-				depthBuffer.filter(ImageHelper.TPFILTER33); // 3x3 box filter
+//				depthBuffer.filter(ImageHelper.TPFILTER33); // 3x3 box filter
 			}
 
 			lightsource.setDepthMap(depthBuffer);
@@ -411,7 +410,7 @@ public class Engine3D {
 
 		for (Iterator<Face> it = model.getFaces().iterator(); it.hasNext();) {
 
-			Face face = (Face) it.next();
+			Face face = it.next();
 
 			// 3d clipping should take place in object space!
 			// if new face is temporarily created due to clipping then nothing
@@ -445,8 +444,9 @@ public class Engine3D {
 
 		for (Iterator it = model.getChildren().iterator(); it.hasNext();) {
 			Model3D subModel = (Model3D) it.next();
-			if (subModel.isVisible)
+			if (subModel.isVisible){
 				fillPolyBuffers(subModel, modelOrigin, modelMatrix, camOrigin, cam_z, icammat, zSortPolyHeap);
+			}
 		}
 	}
 
