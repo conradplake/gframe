@@ -34,8 +34,11 @@ public class ImageRaster {
 	}
 
 	public void clear(){
-		this.pixels = new int[this.pixels.length];
-		producer = new MemoryImageSource(w, h, pixels, 0, w);
+//		this.pixels = new int[this.pixels.length];
+//		producer = new MemoryImageSource(w, h, pixels, 0, w);
+		for (int i = 0; i < pixels.length; i++) {
+			pixels[i] = 0;
+		}
 	}
 	
 	public Image createImage() {
