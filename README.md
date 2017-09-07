@@ -9,3 +9,7 @@ Features include:
  - shadow mapping
  - physics support & particles
  - importer for OBJ files
+
+
+This project has a single dependency to lib/graph.jar, a library of graph algorithms, for genereating voroni textures. 
+Simply don't use the corresponding method in gframe/generator/Texturegenerator if you want no other dependency than standard java.
