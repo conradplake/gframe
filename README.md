@@ -1,5 +1,5 @@
 # gframe
-A java 3D engine that comes with a software rasterizer plus some demo applications
+A Java 3D engine that comes with a software rasterizer plus some demo applications
 
 Features include:
  - pixel-perfect perspective correct texture mapping
@@ -11,6 +11,6 @@ Features include:
  - importer for OBJ files
 
 
-This project has a single dependency to lib/graph.jar, a library of graph algorithms I wrote during my time at university. It is only used for generating voroni textures. Simply don't use the corresponding method in TextureGenerator.class if you want no other dependency than standard java.
+This project has a single dependency to lib/graph.jar, a library of graph algorithms I wrote during my time at university. It is only used for generating voroni textures. Simply don't use the corresponding method in TextureGenerator.class if you want no other dependency than standard Java.
 
 Feel free to do whatever you want with this code.
