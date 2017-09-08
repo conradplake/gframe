@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import gframe.ImageRaster;
 import gframe.engine.Face;
+import gframe.engine.ImageRaster;
 import gframe.engine.Model3D;
 import gframe.engine.Point3D;
 import gframe.engine.Toolbox;

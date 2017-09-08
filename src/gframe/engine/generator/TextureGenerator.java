@@ -6,7 +6,7 @@ import java.awt.Polygon;
 import java.awt.Toolkit;
 import java.io.File;
 
-import gframe.ImageRaster;
+import gframe.engine.ImageRaster;
 import gframe.engine.Toolbox;
 import gframe.engine.Vector3D;
 import graph.Graph;
