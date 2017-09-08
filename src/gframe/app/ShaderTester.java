@@ -11,8 +11,8 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 
 import gframe.DoubleBufferedFrame;
-import gframe.ImageRaster;
 import gframe.engine.Engine3D;
+import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
 import gframe.engine.MaterialShader;
@@ -93,7 +93,7 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 			model.rotate(0, 0, 90);
 			model.scale(1, 1, 1);
 			
-			model.setMaterial( Material.GOLD );
+			model.setMaterial( Material.WHITE_PLASTIC );
 			
 			engine.register(model);
 		} catch (Exception e) {
@@ -227,7 +227,9 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 //					Shader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(Color.white, 324, 324), TextureGenerator.generateDefaultNormalMap(324, 324), true);
 //					Shader shader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateDiscoTileTexture(320, 320, 20), TextureGenerator.generateTileTextureNormalMap(320, 320, 20), true);
 					
-					Shader shader = new MaterialShader(lightsource, TextureGenerator.generateTileTextureNormalMap(320, 320, 40));
+//					Shader shader = new MaterialShader(lightsource, TextureGenerator.generateTileTextureNormalMap(320, 320, 40));
+					TextureShader shader = new MaterialShader(engine.getLightsource(), TextureGenerator.getRGBRaster(new File("./textures/normal/wall_NM.jpg"), 1024, 1024));
+//					shader.setAddSpecularity(false);
 					
 					engine.setDefaultShader(shader);
 				}

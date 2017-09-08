@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gframe.DoubleBufferedFrame;
-import gframe.ImageRaster;
 import gframe.Space3D;
 import gframe.engine.Engine3D;
+import gframe.engine.ImageRaster;
 import gframe.engine.KeyPosition;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
@@ -1211,8 +1211,6 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 	public void paint(Graphics g) {
 		long updateTime = System.currentTimeMillis();
 
-		frame.clear();
-		
 		if(isLoading){			
 			// draw loading screen
 		}
@@ -1235,10 +1233,10 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 			}
 		}
 
-		fpsCounter++;
-		if (fpsCounter % 20 == 0) {
-			System.out.println("FPS: " + (1000 / updateTime));
-		}
+//		fpsCounter++;
+//		if (fpsCounter % 20 == 0) {
+//			System.out.println("FPS: " + (1000 / updateTime));
+//		}
 
 	}
 

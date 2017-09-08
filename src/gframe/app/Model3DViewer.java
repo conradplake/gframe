@@ -17,6 +17,7 @@ import java.util.Properties;
 
 import gframe.DoubleBufferedFrame;
 import gframe.engine.Engine3D;
+import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
 import gframe.engine.Point3D;
@@ -40,6 +41,8 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 		setLocation(20, 0);
 		setIgnoreRepaint(true);
 
+		frame = new ImageRaster(SCREENX, SCREENY);
+		
 		setLayout(null);
 		selectList = new Choice();		
 		selectList.addItemListener(this);
@@ -296,7 +299,8 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 
 	public void paint(Graphics g) {
 		long updateTime = System.currentTimeMillis();
-		engine.drawScene(g);		
+		engine.drawScene(frame);
+		g.drawImage(frame.createImage(), 0, 0, frame.getWidth(), frame.getHeight(), null);
 		updateTime = System.currentTimeMillis() - updateTime;		
 		if(updateTime<16){ // 33ms ~ 30 FPS
 			try {
@@ -327,4 +331,6 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 	int partCounter = 0;
 	private Choice selectList;
 	private Lightsource lightsource;
+	
+	private ImageRaster frame;
 }

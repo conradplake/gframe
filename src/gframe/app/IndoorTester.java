@@ -8,9 +8,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
 import gframe.DoubleBufferedFrame;
-import gframe.ImageRaster;
 import gframe.Space3D;
 import gframe.engine.Engine3D;
+import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
 import gframe.engine.MaterialShader;
@@ -273,7 +273,6 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 	public void paint(Graphics g) {				
 		long updateTime = System.currentTimeMillis();
 		
-		frame.clear();
 		engine.drawShadowedScene(frame);
 //		engine.drawScene(frame);
 		g.drawImage(frame.createImage(), 0, 0, frame.getWidth(), frame.getHeight(), null);		

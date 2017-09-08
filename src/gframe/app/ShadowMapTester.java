@@ -9,8 +9,8 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 
 import gframe.DoubleBufferedFrame;
-import gframe.ImageRaster;
 import gframe.engine.Engine3D;
+import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
 import gframe.engine.PhongShader;
@@ -334,7 +334,6 @@ public class ShadowMapTester extends DoubleBufferedFrame implements MouseMotionL
 	public void paint(Graphics g) {				
 		long updateTime = System.currentTimeMillis();
 		
-		frame.clear();
 		engine.drawShadowedScene(frame);
 //		engine.drawScene(frame);
 		g.drawImage(frame.createImage(), 0, 0, frame.getWidth(), frame.getHeight(), null);		

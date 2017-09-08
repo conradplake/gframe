@@ -9,8 +9,8 @@ import java.awt.event.MouseMotionListener;
 import java.io.File;
 
 import gframe.DoubleBufferedFrame;
-import gframe.ImageRaster;
 import gframe.engine.Engine3D;
+import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
 import gframe.engine.Model3D;

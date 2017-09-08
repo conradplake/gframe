@@ -18,9 +18,9 @@ import java.util.Collections;
 import java.util.List;
 
 import gframe.DoubleBufferedFrame;
-import gframe.ImageRaster;
 import gframe.Space3D;
 import gframe.engine.Engine3D;
+import gframe.engine.ImageRaster;
 import gframe.engine.KeyPosition;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
@@ -483,8 +483,6 @@ public class Xmas2016 extends DoubleBufferedFrame implements MouseMotionListener
 	@Override
 	public void paint(Graphics g) {
 		long updateTime = System.currentTimeMillis();
-
-		frame.clear();
 		
 		if(shadowsEnabled){
 			engine.drawShadowedScene(frame);

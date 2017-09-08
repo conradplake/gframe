@@ -8,9 +8,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
 import gframe.DoubleBufferedFrame;
-import gframe.ImageRaster;
 import gframe.engine.Engine3D;
 import gframe.engine.FlatShader;
+import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
 import gframe.engine.Point3D;
