@@ -241,6 +241,10 @@ public class Face {
 	}
 	
 	
+	public Vector3D getNormal() {
+		return new Vector3D(normal_x, normal_y, normal_z);
+	}
+	
 	
 	public Point3D getCentroid() {
 		return centroid;
@@ -265,4 +269,5 @@ public class Face {
 	public float normal_x, normal_y, normal_z;
 	
 	RenderFace renderFace;
+	
 }

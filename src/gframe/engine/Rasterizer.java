@@ -1,7 +1,5 @@
 package gframe.engine;
 
-import gframe.ImageRaster;
-
 public interface Rasterizer {
 
 	

@@ -1,6 +1,5 @@
 package gframe.engine;
 
-import gframe.ImageRaster;
 import gframe.engine.generator.TextureGenerator;
 
 public class MaterialShader extends TextureShader {
@@ -68,13 +67,6 @@ public class MaterialShader extends TextureShader {
 		super.recomputeMipmaps();
 	}
 
-	public boolean isAddSpecularity() {
-		return addSpecularity;
-	}
-
-	public void setAddSpecularity(boolean addSpecularity) {
-		this.addSpecularity = addSpecularity;
-	}
 
 	@Override
 	public void preShade(RenderFace renderFace) {

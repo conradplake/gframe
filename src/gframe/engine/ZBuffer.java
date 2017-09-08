@@ -19,10 +19,8 @@ public class ZBuffer {
 		
 
 	public void clear(){
-		for (int x = 0; x < w; x++) {
-			for (int y = 0; y < h; y++) {				
-				pixels[y * w + x] = Integer.MAX_VALUE;
-			}
+		for (int i = 0; i < pixels.length; i++) {				
+			pixels[i] = Integer.MAX_VALUE;		
 		}
 	}
 		

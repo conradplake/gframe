@@ -1,6 +1,5 @@
 package gframe.engine;
 
-import gframe.ImageRaster;
 import gframe.engine.generator.TextureGenerator;
 
 public class NormalMappedTextureShader extends TextureShader {

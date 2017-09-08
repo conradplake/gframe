@@ -3,7 +3,6 @@ package gframe.engine;
 import java.awt.Color;
 import java.io.File;
 
-import gframe.ImageRaster;
 import gframe.engine.generator.TextureGenerator;
 
 public class TextureShader extends AbstractShader {

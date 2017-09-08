@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import gframe.ImageRaster;
 import gframe.engine.camera.Camera;
 
 /**
@@ -285,7 +284,7 @@ public class Engine3D {
 			}
 		}
 
-		zBuffer.clear();
+		colorBuffer.clear(zBuffer);
 		while (!polyHeap.isEmpty()) {
 			RenderFace renderFace = polyHeap.remove();
 			Shader shader = shadingEnabled ? defaultShader : null;
@@ -339,7 +338,7 @@ public class Engine3D {
 
 		// now clear zBuffer AFTER everything is put into scene so the
 		// information can be used during this stage for occlusion culling
-		zBuffer.clear();
+		colorBuffer.clear(zBuffer);
 
 		while (!polyHeap.isEmpty()) {
 			RenderFace renderFace = polyHeap.remove();
@@ -378,6 +377,7 @@ public class Engine3D {
 		depthTestCuller.clearOccluded();
 
 	}
+
 
 	/**
 	 * 

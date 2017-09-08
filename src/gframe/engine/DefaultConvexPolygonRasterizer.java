@@ -2,8 +2,6 @@ package gframe.engine;
 
 import java.awt.Color;
 
-import gframe.ImageRaster;
-
 /**
  * Can rasterize any convex n-gon (triangles, quads, etc.)
  */

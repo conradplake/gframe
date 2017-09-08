@@ -23,6 +23,14 @@ public abstract class AbstractShader implements Shader {
 	public Lightsource getLightsource() {
 		return this.lightsource;
 	}
+	
+	public boolean isAddSpecularity() {
+		return addSpecularity;
+	}
+
+	public void setAddSpecularity(boolean addSpecularity) {
+		this.addSpecularity = addSpecularity;
+	}
 
 	/**
 	 * Does nothing by default.
