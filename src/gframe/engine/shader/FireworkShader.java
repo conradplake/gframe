@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import gframe.ImageRaster;
 import gframe.Space3D;
 import gframe.engine.AbstractShader;
+import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Particle;
 import gframe.engine.Point3D;

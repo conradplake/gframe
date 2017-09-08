@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Stack;
 
-import gframe.ImageRaster;
 import gframe.engine.AbstractShader;
+import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Point3D;
 import gframe.engine.RenderFace;

@@ -2,8 +2,8 @@ package gframe.engine.shader;
 
 import java.awt.Color;
 
-import gframe.ImageRaster;
 import gframe.engine.AbstractShader;
+import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.RenderFace;
 
