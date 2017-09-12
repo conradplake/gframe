@@ -45,7 +45,7 @@ public class Vector3D {
 		return (this.x * x + this.y * y + this.z * z);
 	}
 
-	public void normalize() {
+	public Vector3D normalize() {
 		float len = length();
 		if (len > 0) {
 			len = 1/len;
@@ -53,12 +53,14 @@ public class Vector3D {
 			y *= len;
 			z *= len;
 		}
+		return this;
 	}
 
-	public void subtract(Vector3D v) {
+	public Vector3D subtract(Vector3D v) {
 		x -= v.x;
 		y -= v.y;
 		z -= v.z;
+		return this;
 	}
 
 	public void add(Vector3D v) {
@@ -67,11 +69,15 @@ public class Vector3D {
 		z += v.z;
 	}
 
-	public Vector3D scale(float fac) {
+	public Vector3D multiply(float fac) {
 		x *= fac;
 		y *= fac;
 		z *= fac;
 		return this;
+	}
+	
+	public Vector3D scale(float fac) {
+		return multiply(fac);
 	}
 
 	public float getZ() {
