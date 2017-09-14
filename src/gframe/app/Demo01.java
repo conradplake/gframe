@@ -82,8 +82,8 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				}
 				
 				//preload menger sponge into segment 1		
-				masterMengerCube = Model3DGenerator.buildMengerSponge(3, 6561, Color.blue);
-				engine.register(masterMengerCube, 1);
+//				masterMengerCube = Model3DGenerator.buildMengerSponge(3, 6561, Color.blue);
+//				engine.register(masterMengerCube, 1);
 
 				oooohRaster = TextureShader.getRGBRaster(new File("./textures/height/Ooooh.png"), 400, 200);
 				creditsRaster = TextureShader.getRGBRaster(new File("./textures/height/Credits.png"), 400, 200);
@@ -133,10 +133,10 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		//startPart0();		
 		
 		// tiled wall
-		startPart1();
-		
-		// menger
-		startPart2();
+//		startPart1();
+//		
+//		// menger
+//		startPart2();
 		
 		// metro station senefelder platz
 		startPart3();
@@ -161,6 +161,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		engine = new Engine3D(2, SCREENX, SCREENY);
 
 		// LIGHT SETTINGS
+		Lightsource.AMBIENT_LIGHT_INTENSITY = 0;
 		lightsource = new Lightsource(0, 0, 0, Color.WHITE, Lightsource.MAX_INTENSITY);
 		engine.setLightsource(lightsource);
 
@@ -1233,10 +1234,10 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 			}
 		}
 
-//		fpsCounter++;
-//		if (fpsCounter % 20 == 0) {
-//			System.out.println("FPS: " + (1000 / updateTime));
-//		}
+		fpsCounter++;
+		if (fpsCounter % 20 == 0) {
+			System.out.println("FPS: " + (1000 / updateTime));
+		}
 
 	}
 
