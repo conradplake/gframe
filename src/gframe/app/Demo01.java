@@ -82,8 +82,8 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				}
 				
 				//preload menger sponge into segment 1		
-//				masterMengerCube = Model3DGenerator.buildMengerSponge(3, 6561, Color.blue);
-//				engine.register(masterMengerCube, 1);
+				masterMengerCube = Model3DGenerator.buildMengerSponge(3, 6561, Color.blue);
+				engine.register(masterMengerCube, 1);
 
 				oooohRaster = TextureShader.getRGBRaster(new File("./textures/height/Ooooh.png"), 400, 200);
 				creditsRaster = TextureShader.getRGBRaster(new File("./textures/height/Credits.png"), 400, 200);
@@ -133,10 +133,10 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		//startPart0();		
 		
 		// tiled wall
-//		startPart1();
-//		
-//		// menger
-//		startPart2();
+		startPart1();
+		
+		// menger
+		startPart2();
 		
 		// metro station senefelder platz
 		startPart3();
@@ -370,6 +370,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		// station sign
 		TextureShader signShader = new TextureShader(lightsource, new File("textures/senefelder_platz_1.jpg"), 703, 105);
 		signShader.setIsBilinearFiltering(true);
+		signShader.setAddSpecularity(false);
 		Model3D sign = Model3DGenerator.buildPlane(500, 70, new Point3D(), Color.GRAY);		
 		sign.move(730, 150, 550);
 		sign.rotate(0, -90, 0);
@@ -416,7 +417,8 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		
 		
 		// bench
-		Shader benchShader = new PhongShader(lightsource);
+		PhongShader benchShader = new PhongShader(lightsource);
+		benchShader.setAddSpecularity(false);
 		Color benchColor = new Color(138, 84, 45);
 		Model3D bench = WavefrontObjParser.parse(new File("models/outdoor/bench_v01.obj"), benchColor);
 		bench.move(270, 0, 310);
@@ -434,7 +436,8 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				
 				
 		// coffee cups
-		Shader cupOnBench1Shader = new PhongShader(lightsource);
+		PhongShader cupOnBench1Shader = new PhongShader(lightsource);
+		cupOnBench1Shader.setAddSpecularity(false);
 		Model3D cupOnBench1 = WavefrontObjParser.parse(new File("models/Coca-Cola Cup.obj"), Color.WHITE);
 		cupOnBench1.move(270, 38, 380);
 		//cupOnBench1.scale(0.8f, 0.8f, 0.8f);
@@ -566,6 +569,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 
 		// the wide screen
 		FlowFieldShader flowFieldShader = new FlowFieldShader(lightsource, 10000);
+		flowFieldShader.setAddSpecularity(false);
 		Model3D screen = Model3DGenerator.buildPlane(130, 35, new Point3D(80, 30, 140), Color.black);
 		screen.rotate(0, 0, 180);		
 		engine.register(screen, flowFieldShader);
