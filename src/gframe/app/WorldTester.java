@@ -39,7 +39,7 @@ public class WorldTester extends DoubleBufferedFrame implements MouseMotionListe
 
 	
 	private void initEngine() {
-		engine = new Engine3D(2, SCREENX, SCREENY);			
+		engine = new Engine3D(1, SCREENX, SCREENY);			
 	}
 	
 

@@ -139,7 +139,7 @@ public class Xmas2016 extends DoubleBufferedFrame implements MouseMotionListener
 		}
 		
 		Color houseColor = new Color(210, 100, 0);
-		house = WavefrontObjParser.parseOldstyle(new File("./models/buildings/house.obj"), houseColor);		
+		house = WavefrontObjParser.parseGeometry(new File("./models/buildings/house.obj"), houseColor);		
 		house = Model3DGenerator.split(house);
 		Model3D window = (Model3D)house.getChildren().get(32);
 		Color windowColor = new Color(250, 230, 0);

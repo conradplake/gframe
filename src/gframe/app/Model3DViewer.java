@@ -252,7 +252,7 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 			if (filename.endsWith(".m3d")) {
 				mod = Model3DParser.parseModel3D(filename);
 			} else if (filename.endsWith(".obj")) {
-				mod = WavefrontObjParser.parseOldstyle(new File(filename), Color.white);
+				mod = WavefrontObjParser.parseGeometry(new File(filename), Color.white);
 			}
 			
 			

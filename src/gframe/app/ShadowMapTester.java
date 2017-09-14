@@ -34,7 +34,7 @@ public class ShadowMapTester extends DoubleBufferedFrame implements MouseMotionL
 	public void start() {
 		initEngine();
 		initWorld();
-		start(10);
+		start(5);
 	}
 	
 	

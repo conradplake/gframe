@@ -15,7 +15,7 @@ import gframe.engine.Engine3D;
 import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
-import gframe.engine.MaterialShader;
+import gframe.engine.NormalMappedMaterialShader;
 import gframe.engine.Model3D;
 import gframe.engine.NormalMappedTextureShader;
 import gframe.engine.Point3D;
@@ -228,7 +228,10 @@ public class ShaderTester extends DoubleBufferedFrame implements MouseMotionList
 //					Shader shader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateDiscoTileTexture(320, 320, 20), TextureGenerator.generateTileTextureNormalMap(320, 320, 20), true);
 					
 //					Shader shader = new MaterialShader(lightsource, TextureGenerator.generateTileTextureNormalMap(320, 320, 40));
-					TextureShader shader = new MaterialShader(engine.getLightsource(), TextureGenerator.getRGBRaster(new File("./textures/normal/wall_NM.jpg"), 1024, 1024));
+					TextureShader shader = new NormalMappedMaterialShader(engine.getLightsource(), TextureGenerator.getRGBRaster(new File("./textures/normal/wall_NM.jpg"), 1024, 1024));
+					
+//					MaterialShader shader = new MaterialShader(lightsource, TextureGenerator.generateMengerSpongeNormalMap(243));
+					
 //					shader.setAddSpecularity(false);
 					
 					engine.setDefaultShader(shader);

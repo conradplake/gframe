@@ -19,7 +19,7 @@ import gframe.engine.ImageRaster;
 import gframe.engine.KeyPosition;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
-import gframe.engine.MaterialShader;
+import gframe.engine.NormalMappedMaterialShader;
 import gframe.engine.Model3D;
 import gframe.engine.NormalMappedTextureShader;
 import gframe.engine.PhongShader;
@@ -282,7 +282,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 //		Color tileColor = new Color(118, 206, 235);
 				
 		//TextureShader shader = new NormalMappedTextureShader(lightsource, TextureShader.getRGBRaster(tileColor, 243, 243), TextureGenerator.generateMengerSpongeNormalMap(243));
-		MaterialShader shader = new MaterialShader(lightsource, TextureGenerator.generateMengerSpongeNormalMap(243));
+		NormalMappedMaterialShader shader = new NormalMappedMaterialShader(lightsource, TextureGenerator.generateMengerSpongeNormalMap(243));
 		shader.setAddSpecularity(false);
 		shader.setIsBilinearFiltering(true);				
 		masterMengerCube.setMaterial(Material.WHITE_PLASTIC);
@@ -620,7 +620,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		Engine3D engine = new Engine3D(SCREENX, SCREENY);
 		engine.setLightsource(lightsource);
 		
-		Model3D cupola = WavefrontObjParser.parseOldstyle(new File("./models/structures/nuraghe_inside.obj"), Color.ORANGE);
+		Model3D cupola = WavefrontObjParser.parseGeometry(new File("./models/structures/nuraghe_inside.obj"), Color.ORANGE);
 		//cupola = Model3DGenerator.split(cupola);
 //		((Model3D)cupola.getChildren().get(465)).isVisible = false;
 		

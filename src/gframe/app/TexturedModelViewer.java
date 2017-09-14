@@ -267,13 +267,15 @@ public class TexturedModelViewer extends DoubleBufferedFrame implements MouseMot
 					engine.deregister(model);
 					model = WavefrontObjParser.parse(new File("models/texturemapped/Barrel/Gunpowder_Keg.obj"),
 							Color.GRAY);
-					Shader shader = new NormalMappedTextureShader(lightsource,
+					NormalMappedTextureShader shader = new NormalMappedTextureShader(lightsource,
 							TextureGenerator.getRGBRaster(
 									new File("models/texturemapped/Barrel/Gunpowder_Keg_Diffuse.png"), 4096, 4096),
 							TextureGenerator.getRGBRaster(
 									new File("models/texturemapped/Barrel/Gunpowder_Keg_Normal.png"), 4096, 4096),
 							TextureGenerator.getRGBRaster(
 									new File("models/texturemapped/Barrel/Gunpowder_Keg_Specular.png"), 4096, 4096));
+					
+					shader.setIsBilinearFiltering(false);
 					model.setMaterial(Material.PEARL);
 					engine.register(model, shader, false);
 				} else if (keycode == KeyEvent.VK_6) {
