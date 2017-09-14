@@ -1234,10 +1234,10 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 			}
 		}
 
-		fpsCounter++;
-		if (fpsCounter % 20 == 0) {
-			System.out.println("FPS: " + (1000 / updateTime));
-		}
+//		fpsCounter++;
+//		if (fpsCounter % 20 == 0) {
+//			System.out.println("FPS: " + (1000 / updateTime));
+//		}
 
 	}
 
