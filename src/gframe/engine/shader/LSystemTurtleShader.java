@@ -81,6 +81,8 @@ public class LSystemTurtleShader extends AbstractShader {
 	@Override
 	public void preShade(RenderFace renderFace) {
 
+		super.preShade(renderFace);
+		
 		long currentTimeInMillis = System.currentTimeMillis();
 		timePassedInMillis += (currentTimeInMillis - lastTimeInMillis);
 

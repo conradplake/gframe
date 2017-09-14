@@ -40,6 +40,8 @@ public class PhyllotaxisShader extends AbstractShader {
 	@Override
 	public void preShade(RenderFace renderFace) {
 
+		super.preShade(renderFace);
+		
 		long currentTime = System.currentTimeMillis();
 
 		timePassed += (currentTime - lastTime);
