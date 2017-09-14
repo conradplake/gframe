@@ -20,6 +20,7 @@ public abstract class AbstractShader implements Shader {
 	private float lightPos_x;
 	private float lightPos_y;
 	private float lightPos_z;
+	private float lightIntensity;
 
 	private Vector3D toLight;
 
@@ -37,7 +38,6 @@ public abstract class AbstractShader implements Shader {
 	private float viewReflectionProduct;
 
 	private float specularIntensity;
-	private float specularCoefficient;
 	private float specIntermediate;
 	private float specular_red;
 	private float specular_green;
@@ -78,11 +78,16 @@ public abstract class AbstractShader implements Shader {
 		this.lightPos_x = lightsource.x;
 		this.lightPos_y = lightsource.y;
 		this.lightPos_z = lightsource.z;
+		this.lightIntensity = lightsource.getIntensity();
 		
 		if (lightsource.isDirectional()) {
 			toLight = lightsource.getZVector().copy().multiply(-1);
 		}
 		
+		this.camPosition = renderFace.getCameraPosition();
+		
+		
+		// AMBIENT
 		material = renderFace.material;
 		if(material!=null){			
 			ambientColor_red = material.ambientCoefficientRed * Lightsource.AMBIENT_LIGHT_INTENSITY;
@@ -93,9 +98,7 @@ public abstract class AbstractShader implements Shader {
 			ambientColor_red = 0;
 			ambientColor_green = 0;
 			ambientColor_blue = 0;
-		}	
-							
-		this.camPosition = renderFace.getCameraPosition();
+		}									
 	}
 
 	public int shade(RenderFace renderFace) {
@@ -121,34 +124,11 @@ public abstract class AbstractShader implements Shader {
 //
 //		return shade(diffuseColor, 1.0f, dp);
 //	}
-
-	public int shade(int diffuseColor, float diffuseReflectionCoefficient, float lightNormalProduct) {
-
-		int diffuseAlpha = (diffuseColor >> 24) & 0xff;
-		int diffuseRed = (diffuseColor >> 16) & 0xff;
-		int diffuseGreen = (diffuseColor >> 8) & 0xff;
-		int diffuseBlue = (diffuseColor >> 0) & 0xff;
-
-		float diffuseRedIntensity = diffuseRed * iColorNorm;
-		float diffuseGreenIntensity = diffuseGreen * iColorNorm;
-		float diffuseBlueIntensity = diffuseBlue * iColorNorm;
-
-		float redIntensity = diffuseRedIntensity * diffuseReflectionCoefficient * lightsource.rgbComponents[0]
-				* lightsource.intensity * lightNormalProduct;
-		float greenIntensity = diffuseGreenIntensity * diffuseReflectionCoefficient * lightsource.rgbComponents[1]
-				* lightsource.intensity * lightNormalProduct;
-		float blueIntensity = diffuseBlueIntensity * diffuseReflectionCoefficient * lightsource.rgbComponents[2]
-				* lightsource.intensity * lightNormalProduct;
-
-		int newDiffuseRed = (int) (diffuseRed * redIntensity);
-		int newDiffuseGreen = (int) (diffuseGreen * greenIntensity);
-		int newDiffuseBlue = (int) (diffuseBlue * blueIntensity);
-
-		return ((diffuseAlpha & 0xFF) << 24) | ((newDiffuseRed & 0xFF) << 16) | ((newDiffuseGreen & 0xFF) << 8)
-				| ((newDiffuseBlue & 0xFF) << 0);
-	}
 	
 
+	/**
+	 * Returns a color made of diffuse and specular components. 
+	 * */
 	public int shade(int diffuseColor, float world_x, float world_y, float world_z,
 			float normal_x, float normal_y, float normal_z) {
 
@@ -165,7 +145,7 @@ public abstract class AbstractShader implements Shader {
 		diffuse_green = ((diffuseColor >> 8) & 0xff) * iColorNorm;
 		diffuse_blue = ((diffuseColor >> 0) & 0xff) * iColorNorm;
 
-		diffuseIntensity = Math.max(lightNormalProduct, 0) * lightsource.getIntensity();
+		diffuseIntensity = Math.max(lightNormalProduct, 0) * lightIntensity;
 		if(material!=null){
 			diffuse_red = diffuseIntensity * material.diffuseCoefficientRed * diffuse_red;
 			diffuse_green = diffuseIntensity * material.diffuseCoefficientGreen * diffuse_green;
@@ -194,15 +174,14 @@ public abstract class AbstractShader implements Shader {
 			viewReflectionProduct = viewPosition.dotProduct(reflection);
 
 			// viewReflectionProduct = (float) Math.pow(viewReflectionProduct,
-			// 16);
+			// material.shininess);
 			// // too expensive :(
 			// --> schlick's approximation:
 			viewReflectionProduct = -viewReflectionProduct
 					/ (material.shininess + (material.shininess * viewReflectionProduct) - viewReflectionProduct);
 
-			specularIntensity = Math.max(viewReflectionProduct, 0) * lightsource.getIntensity();
-			specularCoefficient = material.specularCoefficient;
-			specIntermediate = specularIntensity * specularCoefficient;
+			specularIntensity = Math.max(viewReflectionProduct, 0) * lightIntensity;			
+			specIntermediate = specularIntensity * material.specularCoefficient;
 			specular_red = specIntermediate * material.specularCoefficientRed * lightsource.rgbComponents[0];
 			specular_green = specIntermediate * material.specularCoefficientGreen * lightsource.rgbComponents[1];
 			specular_blue = specIntermediate * material.specularCoefficientBlue * lightsource.rgbComponents[2];
@@ -226,4 +205,33 @@ public abstract class AbstractShader implements Shader {
 
 	}
 
+	
+	/**
+	 * Returns only a diffuse color without specular component
+	 * */
+	public int shadeDiffuse(int diffuseColor, float diffuseReflectionCoefficient, float lightNormalProduct) {
+
+		int diffuseAlpha = (diffuseColor >> 24) & 0xff;
+		int diffuseRed = (diffuseColor >> 16) & 0xff;
+		int diffuseGreen = (diffuseColor >> 8) & 0xff;
+		int diffuseBlue = (diffuseColor >> 0) & 0xff;
+
+		float diffuseRedIntensity = diffuseRed * iColorNorm;
+		float diffuseGreenIntensity = diffuseGreen * iColorNorm;
+		float diffuseBlueIntensity = diffuseBlue * iColorNorm;
+
+		float redIntensity = diffuseRedIntensity * diffuseReflectionCoefficient * lightsource.rgbComponents[0]
+				* lightsource.intensity * lightNormalProduct;
+		float greenIntensity = diffuseGreenIntensity * diffuseReflectionCoefficient * lightsource.rgbComponents[1]
+				* lightsource.intensity * lightNormalProduct;
+		float blueIntensity = diffuseBlueIntensity * diffuseReflectionCoefficient * lightsource.rgbComponents[2]
+				* lightsource.intensity * lightNormalProduct;
+
+		int newDiffuseRed = (int) (diffuseRed * redIntensity);
+		int newDiffuseGreen = (int) (diffuseGreen * greenIntensity);
+		int newDiffuseBlue = (int) (diffuseBlue * blueIntensity);
+
+		return ((diffuseAlpha & 0xFF) << 24) | ((newDiffuseRed & 0xFF) << 16) | ((newDiffuseGreen & 0xFF) << 8)
+				| ((newDiffuseBlue & 0xFF) << 0);
+	}
 }

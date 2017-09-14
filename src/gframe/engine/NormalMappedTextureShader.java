@@ -190,7 +190,7 @@ public class NormalMappedTextureShader extends TextureShader {
 
 		if (!specularityFromAlphaChannel) {
 			// return diffuse color
-			return super.shade(texel, 1f, Math.max(lightNormalProduct, 0));
+			return super.shadeDiffuse(texel, 1f, Math.max(lightNormalProduct, 0));
 		} 
 		else {
 			// here we do phong lighting in tangent space		
