@@ -10,11 +10,6 @@ public class TextureShader extends AbstractShader {
 	ImageRaster texture;
 
 	ImageRaster[] textureLODs;
-	
-//	ImageRaster textureLOD0;
-//	ImageRaster textureLOD1;
-//	ImageRaster textureLOD2;
-//	ImageRaster textureLOD3;
 
 	int originalTextureWidth;
 	int originalTextureHeight;
@@ -70,11 +65,6 @@ public class TextureShader extends AbstractShader {
 
 		this.originalTextureWidth = this.textureWidth;
 		this.originalTextureHeight = this.textureHeight;
-
-//		this.textureLOD0 = texture;
-//		this.textureLOD1 = TextureGenerator.mipmap(texture, true);
-//		this.textureLOD2 = TextureGenerator.mipmap(textureLOD1, true);
-//		this.textureLOD3 = TextureGenerator.mipmap(textureLOD2, true);
 		
 		textureLODs = TextureGenerator.mipmaps(texture, true);		
 	}
@@ -108,10 +98,6 @@ public class TextureShader extends AbstractShader {
 
 	void recomputeMipmaps() {
 		this.textureLODs = TextureGenerator.mipmaps(textureLODs[0], true);
-//		this.textureLOD0 = texture;
-//		this.textureLOD1 = TextureGenerator.mipmap(texture, true);
-//		this.textureLOD2 = TextureGenerator.mipmap(textureLOD1, true);
-//		this.textureLOD3 = TextureGenerator.mipmap(textureLOD2, true);
 	}
 
 	public void setIsBilinearFiltering(boolean value) {
@@ -248,16 +234,6 @@ public class TextureShader extends AbstractShader {
 		int lod = getLOD(renderFace);
 
 		ImageRaster lodTexture = textureLODs[lod];
-		
-//		ImageRaster lodTexture = textureLOD3;
-//
-//		if (lod == 0) {
-//			lodTexture = textureLOD0;
-//		} else if (lod == 1) {
-//			lodTexture = textureLOD1;
-//		} else if (lod == 2) {
-//			lodTexture = textureLOD2;
-//		}
 
 		this.texture = lodTexture;
 		this.textureWidth = lodTexture.getWidth();

@@ -182,15 +182,11 @@ public abstract class AbstractShader implements Shader {
 		specular_blue = 0;
 		if (addSpecularity && material!=null) {
 
-			// put vector world_position --> camera into tangent space
 			Vector3D viewPosition = new Vector3D(camPosition.x - world_x, camPosition.y - world_y,
 					camPosition.z - world_z);
 			viewPosition.normalize();
 
 			// an oberfläche reflekierten Lichtvektor berechnen
-			// this overwrites the original vector so make sure it is not used
-			// for seomething els later on!
-			
 			Vector3D reflection = new Vector3D(toLight.x - 2 * lightNormalProduct * normal_x,  toLight.y - 2 * lightNormalProduct * normal_y,  toLight.z - 2 * lightNormalProduct * normal_z);
 
 			// wenn camera genau in den reflektierten lichtstrahl blickt, dann
