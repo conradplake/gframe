@@ -66,6 +66,9 @@ public class Xmas2016 extends DoubleBufferedFrame implements MouseMotionListener
 		engine = new Engine3D(2, SCREENX, SCREENY);
 		
 		// LIGHT SETTINGS
+		
+		Lightsource.AMBIENT_LIGHT_INTENSITY = 0;
+		
 		lightsource = new Lightsource(0, 0, 0, Color.WHITE, Lightsource.MAX_INTENSITY);
 		engine.setLightsource(lightsource);		
 				
