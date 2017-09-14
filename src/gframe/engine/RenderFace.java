@@ -244,7 +244,7 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 		Vector3D bitangent = getNormal().crossProduct(tangent);		
 		
 		float handedness = bitangent.dotProduct(bitangent_x, bitangent_y, bitangent_z) < 0 ? -1 : 1;	
-		bitangent.multiply(handedness);
+		bitangent.multiply(handedness); // flip if necessary
 
 		tangentSpace = new Matrix3D();
 		tangentSpace.setYAxis(tangent);				

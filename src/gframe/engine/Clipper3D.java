@@ -47,7 +47,7 @@ public class Clipper3D {
 			return null; // all vertices behind camera
 		}
 
-		// we need to clip *sigh*
+		// we need to clip *sigh*		
 		Point3D[] newVertices = new Point3D[vertices.length << 1]; // double
 																	// size is
 																	// an upper

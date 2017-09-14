@@ -9,10 +9,12 @@ public class TextureShader extends AbstractShader {
 
 	ImageRaster texture;
 
-	ImageRaster textureLOD0;
-	ImageRaster textureLOD1;
-	ImageRaster textureLOD2;
-	ImageRaster textureLOD3;
+	ImageRaster[] textureLODs;
+	
+//	ImageRaster textureLOD0;
+//	ImageRaster textureLOD1;
+//	ImageRaster textureLOD2;
+//	ImageRaster textureLOD3;
 
 	int originalTextureWidth;
 	int originalTextureHeight;
@@ -23,6 +25,8 @@ public class TextureShader extends AbstractShader {
 	boolean isBilinearFilteringEnabled = true;
 
 	boolean isDithering = false;
+	
+	public static final double LOG_4_INV = 1d / Math.log10(4);
 
 	/*
 	 * Dither kernel as in Unreal's software renderer (a.k.a. poor man's
@@ -67,10 +71,12 @@ public class TextureShader extends AbstractShader {
 		this.originalTextureWidth = this.textureWidth;
 		this.originalTextureHeight = this.textureHeight;
 
-		this.textureLOD0 = texture;
-		this.textureLOD1 = TextureGenerator.mipmap(texture, true);
-		this.textureLOD2 = TextureGenerator.mipmap(textureLOD1, true);
-		this.textureLOD3 = TextureGenerator.mipmap(textureLOD2, true);
+//		this.textureLOD0 = texture;
+//		this.textureLOD1 = TextureGenerator.mipmap(texture, true);
+//		this.textureLOD2 = TextureGenerator.mipmap(textureLOD1, true);
+//		this.textureLOD3 = TextureGenerator.mipmap(textureLOD2, true);
+		
+		textureLODs = TextureGenerator.mipmaps(texture, true);		
 	}
 
 	void setEffectPixel(int x, int y, int c) {
@@ -101,10 +107,11 @@ public class TextureShader extends AbstractShader {
 	}
 
 	void recomputeMipmaps() {
-		this.textureLOD0 = texture;
-		this.textureLOD1 = TextureGenerator.mipmap(texture, true);
-		this.textureLOD2 = TextureGenerator.mipmap(textureLOD1, true);
-		this.textureLOD3 = TextureGenerator.mipmap(textureLOD2, true);
+		this.textureLODs = TextureGenerator.mipmaps(textureLODs[0], true);
+//		this.textureLOD0 = texture;
+//		this.textureLOD1 = TextureGenerator.mipmap(texture, true);
+//		this.textureLOD2 = TextureGenerator.mipmap(textureLOD1, true);
+//		this.textureLOD3 = TextureGenerator.mipmap(textureLOD2, true);
 	}
 
 	public void setIsBilinearFiltering(boolean value) {
@@ -185,6 +192,7 @@ public class TextureShader extends AbstractShader {
 
 	@Override
 	public void preShade(RenderFace renderFace) {
+		super.preShade(renderFace);
 		adjustLOD(renderFace);
 	}
 
@@ -239,15 +247,17 @@ public class TextureShader extends AbstractShader {
 
 		int lod = getLOD(renderFace);
 
-		ImageRaster lodTexture = textureLOD3;
-
-		if (lod == 0) {
-			lodTexture = textureLOD0;
-		} else if (lod == 1) {
-			lodTexture = textureLOD1;
-		} else if (lod == 2) {
-			lodTexture = textureLOD2;
-		}
+		ImageRaster lodTexture = textureLODs[lod];
+		
+//		ImageRaster lodTexture = textureLOD3;
+//
+//		if (lod == 0) {
+//			lodTexture = textureLOD0;
+//		} else if (lod == 1) {
+//			lodTexture = textureLOD1;
+//		} else if (lod == 2) {
+//			lodTexture = textureLOD2;
+//		}
 
 		this.texture = lodTexture;
 		this.textureWidth = lodTexture.getWidth();
@@ -256,8 +266,7 @@ public class TextureShader extends AbstractShader {
 
 	/**
 	 * Returns the best level of detail for texturing the specified face.
-	 * 
-	 * 0 : high 1 : med 2 : low 3 : very low
+	 * 0 - highest level (original texture)
 	 * 
 	 */
 	public int getLOD(RenderFace renderFace) {
@@ -292,17 +301,17 @@ public class TextureShader extends AbstractShader {
 		areaTexture = 0.5f * Math.abs(areaTexture);
 
 		float mmFactor = areaTexture / areaScreen;
-
-		int lod = 3;
-		if (mmFactor < 4f) {
-			lod = 0;
-		} else if (mmFactor < 16f) {
-			lod = 1;
-		} else if (mmFactor < 64f) {
-			lod = 2;
+		
+		
+		int lod = 0;
+		if(mmFactor>1){
+			lod = (int) (Math.log10(mmFactor) * LOG_4_INV);
+		}	
+		if(lod>=textureLODs.length){
+			lod = textureLODs.length-1;
 		}
 
-		// System.out.println("LOD="+lod);
+//		System.out.println("LOD="+lod);
 
 		return lod;
 	}

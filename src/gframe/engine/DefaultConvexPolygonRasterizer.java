@@ -136,7 +136,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		float lineHeight = screen_y_bot - screen_y_top;
 
 		// sub pixel height
-		float subPix = (int) screen_y_top - screen_y_top;
+		float subPix = (int) screen_y_top - screen_y_top;		
 
 		float cutOff = 0; // for pre-interpolation of negative part (outside top
 							// of screen)

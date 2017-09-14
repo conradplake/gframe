@@ -123,7 +123,7 @@ public class Lightsource extends Point3D {
 	}
 	
 
-	public static final float AMBIENT_LIGHT_INTENSITY = 0.2f;
+	public static float AMBIENT_LIGHT_INTENSITY = 0.2f;
 	
 	public static final float MIN_INTENSITY = 0.01f;
 	public static final float NORM_INTENSITY = 0.66f;

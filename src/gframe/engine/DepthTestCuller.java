@@ -99,12 +99,11 @@ public class DepthTestCuller {
 												// most conservative here)
 
 		// perform depth test of frontside bbox against zBuffer
-		for (int x = bbox_minx; x <= bbox_maxx; x++) {
-			for (int y = bbox_miny; y >= bbox_maxy; y--) {
+		for (int y = bbox_miny; y >= bbox_maxy; y--) {
+			for (int x = bbox_minx; x <= bbox_maxx; x++) {			
 				if (zBuffer.getValue(x, y) > bbox_minz) {
 					return false;
 				}
-
 			}
 		}
 		// System.out.println("bbox completely covered");

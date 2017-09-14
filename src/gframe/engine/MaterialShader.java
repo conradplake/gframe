@@ -4,8 +4,6 @@ import gframe.engine.generator.TextureGenerator;
 
 public class MaterialShader extends TextureShader {
 
-	static final float iNormalNorm = 1 / 127f;
-
 	private Point3D camPosition;
 	private float lightPos_x;
 	private float lightPos_y;
@@ -54,7 +52,7 @@ public class MaterialShader extends TextureShader {
 	 * 
 	 */
 	public MaterialShader(Lightsource lightsource, ImageRaster normalMap) {
-		super(lightsource, normalMap);
+		super(lightsource, normalMap);		
 	}
 
 	/**
@@ -102,6 +100,8 @@ public class MaterialShader extends TextureShader {
 		Matrix3D inverseTangentSpace = renderFace.getInverseTangentSpace();
 
 		// overwrite the face normal with interpolated normal
+		// doing so will make tangent space not orthogonal by bending the z-axis along the face.
+		// however, it looks acceptably good.
 		inverseTangentSpace.setZAxis(normal_x, normal_y, normal_z);
 
 		Vector3D tangentLocalLightsourcePosition = inverseTangentSpace

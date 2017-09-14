@@ -11,6 +11,7 @@ public class FlatShader extends AbstractShader {
 	
 	@Override
 	public void preShade(RenderFace renderFace){
+		super.preShade(renderFace);
 		this.currentColor = renderFace.col.getRGB(); 
 	}
 	

@@ -5,13 +5,8 @@ import gframe.engine.generator.TextureGenerator;
 public class NormalMappedTextureShader extends TextureShader {
 
 	ImageRaster normalMap;
-
-	ImageRaster normalMapLOD0;
-	ImageRaster normalMapLOD1;
-	ImageRaster normalMapLOD2;
-	ImageRaster normalMapLOD3;
-
-	static final float iNormalNorm = 1 / 127f;
+	
+	ImageRaster[] normalMapLODs;
 	
 	private boolean specularityFromAlphaChannel;
 
@@ -79,14 +74,9 @@ public class NormalMappedTextureShader extends TextureShader {
 	public NormalMappedTextureShader(Lightsource lightsource, ImageRaster texture, ImageRaster normalMap,
 			boolean specularityFromAlphaChannel) {
 		super(lightsource, texture);
-		this.normalMap = normalMap;
-
+		this.normalMap = normalMap;		
+		this.normalMapLODs = TextureGenerator.mipmaps(normalMap, false);
 		this.specularityFromAlphaChannel = specularityFromAlphaChannel;
-
-		this.normalMapLOD0 = normalMap;
-		this.normalMapLOD1 = TextureGenerator.mipmap(normalMap);
-		this.normalMapLOD2 = TextureGenerator.mipmap(normalMapLOD1);
-		this.normalMapLOD3 = TextureGenerator.mipmap(normalMapLOD2);
 	}
 
 	/**
@@ -99,15 +89,10 @@ public class NormalMappedTextureShader extends TextureShader {
 
 		// specular map als alpha-channel in die normal map kopieren
 		TextureGenerator.copySpecularMapToAlphaChannel(specularMap, normalMap);
-		
-		this.specularityFromAlphaChannel = true;
-
+				
 		this.normalMap = normalMap;
-
-		this.normalMapLOD0 = normalMap;
-		this.normalMapLOD1 = TextureGenerator.mipmap(normalMap);
-		this.normalMapLOD2 = TextureGenerator.mipmap(normalMapLOD1);
-		this.normalMapLOD3 = TextureGenerator.mipmap(normalMapLOD2);
+		this.normalMapLODs = TextureGenerator.mipmaps(normalMap, false);
+		this.specularityFromAlphaChannel = true;
 	}
 
 	@Override
@@ -115,27 +100,13 @@ public class NormalMappedTextureShader extends TextureShader {
 
 		int lod = getLOD(renderFace);
 
-		// System.out.println("adjustLOD to "+lod);
-
-		ImageRaster lodTexture = textureLOD3;
-		ImageRaster lodNormal = normalMapLOD3;
-
-		if (lod == 0) {
-			lodTexture = textureLOD0;
-			lodNormal = normalMapLOD0;
-		} else if (lod == 1) {
-			lodTexture = textureLOD1;
-			lodNormal = normalMapLOD1;
-		} else if (lod == 2) {
-			lodTexture = textureLOD2;
-			lodNormal = normalMapLOD2;
-		}
-
-		this.texture = lodTexture;
-		this.textureWidth = lodTexture.getWidth();
-		this.textureHeight = lodTexture.getHeight();
+		ImageRaster lodTexture = textureLODs[lod];
+		ImageRaster lodNormal = normalMapLODs[lod];
 
 		this.normalMap = lodNormal;
+		this.texture = lodTexture;
+		this.textureWidth = lodTexture.getWidth();
+		this.textureHeight = lodTexture.getHeight();		
 	}
 
 	
@@ -149,10 +120,7 @@ public class NormalMappedTextureShader extends TextureShader {
 	@Override
 	void recomputeMipmaps() {
 		super.recomputeMipmaps();
-		this.normalMapLOD0 = normalMap;
-		this.normalMapLOD1 = TextureGenerator.mipmap(normalMap);
-		this.normalMapLOD2 = TextureGenerator.mipmap(normalMapLOD1);
-		this.normalMapLOD3 = TextureGenerator.mipmap(normalMapLOD2);
+		this.normalMapLODs = TextureGenerator.mipmaps(normalMapLODs[0], false);		
 	};
 	
 	
