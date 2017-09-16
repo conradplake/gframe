@@ -14,3 +14,9 @@ Features include:
 This project has a single dependency to lib/graph.jar, a library of graph algorithms I wrote during my time at university. It is only used for generating voroni textures. Simply don't use the corresponding method in TextureGenerator.class if you want no other dependency than standard Java.
 
 Feel free to do whatever you want with this code.
+
+
+
+Gallery:
+
+![Normal mapped walls](https://github.com/conradplake/gframe/tree/master/gallery/normal_mapped_walls.png)
