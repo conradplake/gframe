@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
 
 import gframe.DoubleBufferedFrame;
 import gframe.Space3D;
@@ -56,7 +57,10 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 //				TextureGenerator.generateTileTexture(160, 160, 20, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
 //				TextureGenerator.generateTileTextureNormalMap(160, 160, 20), true);
 		
-		NormalMappedMaterialShader shader = new NormalMappedMaterialShader(lightsource, TextureGenerator.generateMengerSpongeNormalMap(243));
+//		NormalMappedMaterialShader shader = new NormalMappedMaterialShader(lightsource, TextureGenerator.generateMengerSpongeNormalMap(243));
+		
+		TextureShader shader = new NormalMappedMaterialShader(engine.getLightsource(), TextureGenerator.getRGBRaster(new File("./textures/normal/wall_NM.jpg"), 1024, 1024));
+		
 		
 //		Shader shader = new TextureShader(lightsource, TextureShader.getRGBRaster(Color.CYAN, 256, 256));
 //		Shader shader = new PhongShader(lightsource);
@@ -77,7 +81,7 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 		room.scale(10, 10, 10);		
 		room = Model3DGenerator.facify(room);
 				
-		room.setMaterial(Material.RED_PLASTIC);
+		room.setMaterial(Material.COPPER);
 		engine.register(room);
 		
 		
