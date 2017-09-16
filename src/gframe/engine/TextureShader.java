@@ -17,6 +17,10 @@ public class TextureShader extends AbstractShader {
 	int textureWidth;
 	int textureHeight;
 
+	// texture normal coordinates
+	float u;
+	float v;
+	
 	boolean isBilinearFilteringEnabled = true;
 
 	boolean isDithering = false;
@@ -66,7 +70,7 @@ public class TextureShader extends AbstractShader {
 		this.originalTextureWidth = this.textureWidth;
 		this.originalTextureHeight = this.textureHeight;
 		
-		textureLODs = TextureGenerator.mipmaps(texture, true);		
+		textureLODs = TextureGenerator.mipmaps(texture);		
 	}
 
 	void setEffectPixel(int x, int y, int c) {
@@ -97,7 +101,7 @@ public class TextureShader extends AbstractShader {
 	}
 
 	void recomputeMipmaps() {
-		this.textureLODs = TextureGenerator.mipmaps(textureLODs[0], true);
+		this.textureLODs = TextureGenerator.mipmaps(textureLODs[0]);
 	}
 
 	public void setIsBilinearFiltering(boolean value) {
@@ -197,8 +201,8 @@ public class TextureShader extends AbstractShader {
 			dv = DITHER_KERNEL[x_index][y_index][1];
 		}
 				
-		float u = Toolbox.clamp(texel_u * (textureWidth) + du, 0, textureWidth - 1);
-		float v = Toolbox.clamp(texel_v * (textureHeight) + dv, 0, textureHeight - 1);
+		u = Toolbox.clamp(texel_u * (textureWidth) + du, 0, textureWidth - 1);
+		v = Toolbox.clamp(texel_v * (textureHeight) + dv, 0, textureHeight - 1);
 		return super.shade(getTexel(u, v), world_x, world_y, world_z, normal_x, normal_y, normal_z);
 	}
 

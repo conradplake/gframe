@@ -20,6 +20,8 @@ public enum Material {
 	RED_PLASTIC(0f, 0f, 0f, 0.5f, 0f, 0f, 0.7f, 0.6f, 0.6f, 32f);
 	
 	
+	
+	
 	Material(float ar, float ag, float ab, float dr, float dg, float db, float sr, float sg, float sb, float shininess){
 		this.ambientCoefficientRed = ar;
 		this.ambientCoefficientGreen = ag;

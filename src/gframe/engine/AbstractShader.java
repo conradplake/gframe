@@ -16,42 +16,47 @@ public abstract class AbstractShader implements Shader {
 
 	private Material material;
 	
-	private Point3D camPosition;
-	private float lightPos_x;
-	private float lightPos_y;
-	private float lightPos_z;
-	private float lightIntensity;
+	Point3D camPosition;
+	float lightPos_x;
+	float lightPos_y;
+	float lightPos_z;
+	float lightIntensity;
 
-	private Vector3D toLight;
+	Vector3D toLight;
+	Vector3D toCamera;
+	Vector3D reflection;
 
-	private float lightNormalProduct;
+	float lightNormalProduct;
 
-	private float ambientColor_red;
-	private float ambientColor_green;
-	private float ambientColor_blue;
+	float ambientColor_red;
+	float ambientColor_green;
+	float ambientColor_blue;
 
-	private float diffuseIntensity;
-	private float diffuse_red;
-	private float diffuse_green;
-	private float diffuse_blue;
+	float diffuseIntensity;
+	float diffuse_red;
+	float diffuse_green;
+	float diffuse_blue;
 
-	private float viewReflectionProduct;
+	float viewReflectionProduct;
 
-	private float specularIntensity;
-	private float specIntermediate;
-	private float specular_red;
-	private float specular_green;
-	private float specular_blue;
+	float specularIntensity;
+	float specIntermediate;
+	float specular_red;
+	float specular_green;
+	float specular_blue;
 
-	private int redColor;
-	private int greenColor;
-	private int blueColor;
+	int redColor;
+	int greenColor;
+	int blueColor;
 	
 	
 	
-
 	public AbstractShader(Lightsource lightsource) {
 		this.lightsource = lightsource;
+		
+		this.toLight = new Vector3D();
+		this.toCamera = new Vector3D();
+		this.reflection = new Vector3D();
 	}
 
 	public void setLightsource(Lightsource ls) {
@@ -81,7 +86,9 @@ public abstract class AbstractShader implements Shader {
 		this.lightIntensity = lightsource.getIntensity();
 		
 		if (lightsource.isDirectional()) {
-			toLight = lightsource.getZVector().copy().multiply(-1);
+			toLight.x = -lightsource.getZVector().x;
+			toLight.y = -lightsource.getZVector().y;
+			toLight.z = -lightsource.getZVector().z;
 		}
 		
 		this.camPosition = renderFace.getCameraPosition();
@@ -133,7 +140,9 @@ public abstract class AbstractShader implements Shader {
 			float normal_x, float normal_y, float normal_z) {
 
 		if (!lightsource.isDirectional()) {
-			toLight = new Vector3D(lightPos_x - world_x, lightPos_y - world_y, lightPos_z - world_z);
+			toLight.x = lightPos_x - world_x;
+			toLight.y = lightPos_y - world_y;
+			toLight.z = lightPos_z - world_z;
 			toLight.normalize();
 		}
 
@@ -162,16 +171,19 @@ public abstract class AbstractShader implements Shader {
 		specular_blue = 0;
 		if (addSpecularity && material!=null) {
 
-			Vector3D viewPosition = new Vector3D(camPosition.x - world_x, camPosition.y - world_y,
-					camPosition.z - world_z);
-			viewPosition.normalize();
+			toCamera.x = camPosition.x - world_x;
+			toCamera.y = camPosition.y - world_y;
+			toCamera.z = camPosition.z - world_z;
+			toCamera.normalize();
 
 			// an oberfläche reflekierten Lichtvektor berechnen
-			Vector3D reflection = new Vector3D(toLight.x - 2 * lightNormalProduct * normal_x,  toLight.y - 2 * lightNormalProduct * normal_y,  toLight.z - 2 * lightNormalProduct * normal_z);
+			reflection.x = toLight.x - 2 * lightNormalProduct * normal_x;
+			reflection.y = toLight.y - 2 * lightNormalProduct * normal_y;
+			reflection.z = toLight.z - 2 * lightNormalProduct * normal_z;
 
 			// wenn camera genau in den reflektierten lichtstrahl blickt, dann
 			// haben wir maximale spekularität (shininess)
-			viewReflectionProduct = viewPosition.dotProduct(reflection);
+			viewReflectionProduct = toCamera.dotProduct(reflection);
 
 			// viewReflectionProduct = (float) Math.pow(viewReflectionProduct,
 			// material.shininess);

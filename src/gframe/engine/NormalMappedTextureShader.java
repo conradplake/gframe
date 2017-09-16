@@ -4,62 +4,35 @@ import gframe.engine.generator.TextureGenerator;
 
 public class NormalMappedTextureShader extends TextureShader {
 
-	ImageRaster normalMap;
+	private ImageRaster normalMap;
 	
-	ImageRaster[] normalMapLODs;
+	private ImageRaster[] normalMapLODs;
 	
 	private boolean specularityFromAlphaChannel;
 
-	private Point3D camPosition;
-	private float lightPos_x;
-	private float lightPos_y;
-	private float lightPos_z;
-	
 	private int texel;
-	
-	// texture coordinates
-	private float u;
-	private float v;
 
 	// dither delta
 	private float du;
 	private float dv;
 	
-
 	private int texelNormal;
 	private float tNormal_x;
 	private float tNormal_y;
 	private float tNormal_z;
-	
-	private float lightNormalProduct;
+		
 	
 	private int diffuseAlpha;
 	private float diffuseRed;
 	private float diffuseGreen;
 	private float diffuseBlue;
-		
-	private float ambientColor_red;
-	private float ambientColor_green;
-	private float ambientColor_blue;
-		
-	private float diffuseIntensity;
-	private float diffuse_red;
-	private float diffuse_green;
-	private float diffuse_blue;
-	
-	private float viewReflectionProduct;
-	
-	private float specularIntensity;			
+						
 	private float specularCoefficient;
 
-	private float specIntermediate;			
-	private float specular_red;
-	private float specular_green;
-	private float specular_blue;
+	private Vector3D tangentLocalLightsourcePosition = new Vector3D();
+	private Vector3D tangentLocalViewPosition = new Vector3D();
 
-	private int redColor;
-	private int greenColor;
-	private int blueColor;
+	
 	
 	/**
 	 * Provide texture and normal map of equal dimensions!
@@ -75,7 +48,7 @@ public class NormalMappedTextureShader extends TextureShader {
 			boolean specularityFromAlphaChannel) {
 		super(lightsource, texture);
 		this.normalMap = normalMap;		
-		this.normalMapLODs = TextureGenerator.mipmaps(normalMap, false);
+		this.normalMapLODs = TextureGenerator.mipmaps(normalMap);
 		this.specularityFromAlphaChannel = specularityFromAlphaChannel;
 	}
 
@@ -91,7 +64,7 @@ public class NormalMappedTextureShader extends TextureShader {
 		TextureGenerator.copySpecularMapToAlphaChannel(specularMap, normalMap);
 				
 		this.normalMap = normalMap;
-		this.normalMapLODs = TextureGenerator.mipmaps(normalMap, false);
+		this.normalMapLODs = TextureGenerator.mipmaps(normalMap);
 		this.specularityFromAlphaChannel = true;
 	}
 
@@ -120,29 +93,9 @@ public class NormalMappedTextureShader extends TextureShader {
 	@Override
 	void recomputeMipmaps() {
 		super.recomputeMipmaps();
-		this.normalMapLODs = TextureGenerator.mipmaps(normalMapLODs[0], false);		
+		this.normalMapLODs = TextureGenerator.mipmaps(normalMapLODs[0]);		
 	};
 	
-	
-	@Override
-	public void preShade(RenderFace renderFace) {
-		
-		super.preShade(renderFace);						
-		
-		this.lightPos_x = lightsource.x;
-		this.lightPos_y = lightsource.y;
-		this.lightPos_z = lightsource.z;
-
-		if (specularityFromAlphaChannel) {
-			this.camPosition = renderFace.getCameraPosition();
-			// world_to_camera in den tangentenraum transformieren (farbe wird im tangentraum errechnet)
-			// this.tangentLocalViewPosition =
-			// renderFace.getInverseTangentSpace().transform(new
-			// Vector3D(camPosition.x - renderFace.centroid.x, camPosition.y -
-			// renderFace.centroid.y, camPosition.z - renderFace.centroid.z));
-			// tangentLocalViewPosition.normalize();
-		}
-	}
 	
 
 	@Override
@@ -181,9 +134,11 @@ public class NormalMappedTextureShader extends TextureShader {
 		// overwrite z-axis with interpolated normal vector
 		inverseTangentSpace.setZAxis(normal_x, normal_y, normal_z);
 		
-		//Vector3D tangentLocalLightsourcePosition = renderFace.getInverseTangentSpace()
-		Vector3D tangentLocalLightsourcePosition = inverseTangentSpace
-				.transform(new Vector3D(lightPos_x - world_x, lightPos_y - world_y, lightPos_z - world_z));
+		
+		tangentLocalLightsourcePosition.x = lightPos_x - world_x;
+		tangentLocalLightsourcePosition.y = lightPos_y - world_y;
+		tangentLocalLightsourcePosition.z = lightPos_z - world_z;
+		inverseTangentSpace.transform(tangentLocalLightsourcePosition);
 		tangentLocalLightsourcePosition.normalize();
 
 		lightNormalProduct = tangentLocalLightsourcePosition.dotProduct(tNormal_x, tNormal_y, tNormal_z);
@@ -201,15 +156,6 @@ public class NormalMappedTextureShader extends TextureShader {
 			diffuseGreen = ((texel >> 8) & 0xff) * iColorNorm;
 			diffuseBlue = ((texel >> 0) & 0xff) * iColorNorm;
 
-			// AMBIENT
-//			float ambientIntermediate = Lightsource.AMBIENT_LIGHT_INTENSITY * currentAmbientCoefficient;
-//			float ambientColor_red = ambientIntermediate * diffuseRed;
-//			float ambientColor_green = ambientIntermediate * diffuseGreen;
-//			float ambientColor_blue = ambientIntermediate * diffuseBlue;
-			ambientColor_red   = Lightsource.AMBIENT_LIGHT_INTENSITY * renderFace.material.ambientCoefficientRed   * diffuseRed;
-			ambientColor_green = Lightsource.AMBIENT_LIGHT_INTENSITY * renderFace.material.ambientCoefficientGreen * diffuseGreen;
-			ambientColor_blue  = Lightsource.AMBIENT_LIGHT_INTENSITY * renderFace.material.ambientCoefficientBlue  * diffuseBlue;
-
 			// DIFFUSE
 			diffuseIntensity = Math.max(lightNormalProduct, 0);
 			diffuse_red   = diffuseIntensity * renderFace.material.diffuseCoefficientRed   * diffuseRed;
@@ -223,21 +169,22 @@ public class NormalMappedTextureShader extends TextureShader {
 			if(addSpecularity){		
 				
 				// put vector world_position --> camera into tangent space
-				//Vector3D tangentLocalViewPosition = renderFace.getInverseTangentSpace()
-				Vector3D tangentLocalViewPosition = inverseTangentSpace
-						.transform(new Vector3D(camPosition.x - world_x, camPosition.y - world_y, camPosition.z - world_z));
-				tangentLocalViewPosition.normalize();
+				tangentLocalViewPosition.x = camPosition.x - world_x;
+				tangentLocalViewPosition.y = camPosition.y - world_y;
+				tangentLocalViewPosition.z = camPosition.z - world_z;			
+				tangentLocalViewPosition = inverseTangentSpace.transform(tangentLocalViewPosition);
+				tangentLocalViewPosition.normalize();			
 
 				// an oberfläche reflekierten Lichtvektor berechnen
 				// this overwrites the original vector so make sure it is not used
 				// for seomething els later on!
-				tangentLocalLightsourcePosition.x = tangentLocalLightsourcePosition.x - 2 * lightNormalProduct * tNormal_x;
-				tangentLocalLightsourcePosition.y = tangentLocalLightsourcePosition.y - 2 * lightNormalProduct * tNormal_y;
-				tangentLocalLightsourcePosition.z = tangentLocalLightsourcePosition.z - 2 * lightNormalProduct * tNormal_z;
+				reflection.x = tangentLocalLightsourcePosition.x - 2 * lightNormalProduct * tNormal_x;
+				reflection.y = tangentLocalLightsourcePosition.y - 2 * lightNormalProduct * tNormal_y;
+				reflection.z = tangentLocalLightsourcePosition.z - 2 * lightNormalProduct * tNormal_z;
 				
 				// wenn camera genau in den reflektierten lichtstrahl blickt, dann
 				// haben wir maximale spekularität (shininess)
-				viewReflectionProduct = tangentLocalViewPosition.dotProduct(tangentLocalLightsourcePosition);
+				viewReflectionProduct = tangentLocalViewPosition.dotProduct(reflection);
 
 				
 //				 viewReflectionProduct = (float) Math.pow(viewReflectionProduct, 16); // too expensive :(			
