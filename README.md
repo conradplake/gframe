@@ -1,5 +1,5 @@
 # gframe
-A Java 3D engine that comes with a software rasterizer plus some demo applications
+A Java 3D engine that comes with a software renderer plus some demo applications
 
 Features include:
  - pixel-perfect perspective correct texture mapping
