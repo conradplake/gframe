@@ -11,6 +11,6 @@ Features include:
  - importer for OBJ files
 
 
-This project has a single dependency to lib/graph.jar, a library of graph algorithms I wrote during my time at university. It is used for generating voroni textures. Simply don't call the corresponding method in TextureGenerator.class if you want no other dependency than standard Java.
+This project has a single dependency to lib/graph.jar, a library of graph algorithms I wrote during my time at university. It is used for generating Voroni textures. Simply don't call the corresponding method in TextureGenerator.class if you want no other dependency than standard Java.
 
 Feel free to do whatever you want with this code.
