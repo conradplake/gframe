@@ -2,20 +2,22 @@ package gframe.app;
 
 import java.awt.AWTEvent;
 import java.awt.Color;
+import java.awt.DisplayMode;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 
-import gframe.DoubleBufferedFrame;
 import gframe.Space3D;
 import gframe.engine.Engine3D;
 import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
-import gframe.engine.NormalMappedMaterialShader;
 import gframe.engine.Model3D;
+import gframe.engine.NormalMappedMaterialShader;
 import gframe.engine.Shader;
 import gframe.engine.TextureShader;
 import gframe.engine.camera.TripodCamera;
@@ -30,7 +32,8 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 		frame = new ImageRaster(SCREENX, SCREENY);
 	}
 
-	public void start() {
+	public void start() {		
+		
 		initEngine();
 		initWorld();
 		start(10);
@@ -131,9 +134,8 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 
 	
 	private void start(long millidelay) {
-		setSize(SCREENX, SCREENY);
-		setLocation(20, 0);
-		setBackground(Color.YELLOW);
+		setSize(SCREENX, SCREENY);		
+		setBackground(Color.black);
 		setForeground(Color.black);
 		setLayout(null);
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
@@ -277,8 +279,8 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 	public void paint(Graphics g) {				
 		long updateTime = System.currentTimeMillis();
 		
-		engine.drawShadowedScene(frame);
-//		engine.drawScene(frame);
+//		engine.drawShadowedScene(frame);
+		engine.drawScene(frame);
 		g.drawImage(frame.createImage(), 0, 0, frame.getWidth(), frame.getHeight(), null);		
 		
 		updateTime = System.currentTimeMillis() - updateTime;		

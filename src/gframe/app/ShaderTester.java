@@ -10,13 +10,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 
-import gframe.DoubleBufferedFrame;
 import gframe.engine.Engine3D;
 import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
-import gframe.engine.NormalMappedMaterialShader;
 import gframe.engine.Model3D;
+import gframe.engine.NormalMappedMaterialShader;
 import gframe.engine.NormalMappedTextureShader;
 import gframe.engine.Point3D;
 import gframe.engine.Shader;

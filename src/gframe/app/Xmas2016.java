@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import gframe.DoubleBufferedFrame;
 import gframe.Space3D;
 import gframe.engine.Engine3D;
 import gframe.engine.ImageRaster;
@@ -140,10 +139,12 @@ public class Xmas2016 extends DoubleBufferedFrame implements MouseMotionListener
 		
 		Color houseColor = new Color(210, 100, 0);
 		house = WavefrontObjParser.parseGeometry(new File("./models/buildings/house.obj"), houseColor);		
-		house = Model3DGenerator.split(house);
+		house = Model3DGenerator.split(house);		
 		Model3D window = (Model3D)house.getChildren().get(32);
-		Color windowColor = new Color(250, 230, 0);
+		//Color windowColor = new Color(250, 230, 0);
+		Color windowColor = Color.WHITE;
 		window.setColor(windowColor);
+//		window.setMaterial(Material.GOLD);	
 		
 		// color upper house white
 		for(int i=75;i<350;i++){
@@ -256,8 +257,8 @@ public class Xmas2016 extends DoubleBufferedFrame implements MouseMotionListener
 		events.add(new SparkTimedEvent(System.currentTimeMillis()+73000, new MusicFadeOut(mediaPlayer, 8000, true)));
 		events.add(new SparkTimedEvent(System.currentTimeMillis()+80000, new FadeOut(lightsource, 1000)));		
 				
-		lightsource.x = -70;
-		lightsource.y =  10;
+		lightsource.x = -60;
+		lightsource.y =  15;
 		lightsource.z = 260;
 		lightsource.setIntensity(0);
 		
@@ -428,7 +429,7 @@ public class Xmas2016 extends DoubleBufferedFrame implements MouseMotionListener
 					engine.recomputeShadowMaps();
 				}	
 				else if (keycode == KeyEvent.VK_O) {
-					engine.depthTestCuller.disabled = !engine.depthTestCuller.disabled;
+					engine.getDepthTestCuller().disabled = !engine.getDepthTestCuller().disabled;
 				}
 				else if (keycode == KeyEvent.VK_R) {
 //					startPart1();

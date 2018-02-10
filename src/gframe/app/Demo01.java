@@ -12,15 +12,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import gframe.DoubleBufferedFrame;
 import gframe.Space3D;
 import gframe.engine.Engine3D;
 import gframe.engine.ImageRaster;
 import gframe.engine.KeyPosition;
 import gframe.engine.Lightsource;
 import gframe.engine.Material;
-import gframe.engine.NormalMappedMaterialShader;
 import gframe.engine.Model3D;
+import gframe.engine.NormalMappedMaterialShader;
 import gframe.engine.NormalMappedTextureShader;
 import gframe.engine.PhongShader;
 import gframe.engine.Point3D;
@@ -89,10 +88,11 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				creditsRaster = TextureShader.getRGBRaster(new File("./textures/height/Credits.png"), 400, 200);
 				fingerRaster = TextureShader.getRGBRaster(new File("./textures/diffuse/finger_400x200.png"), 400, 200);
 				fingerRaster.inverse();				
-				berlinRaster = TextureShader.getRGBRaster(new File("./textures/diffuse/berlin.jpg"), 160, 160);
-				berlinRaster.inverse();
-				graffitiRaster = TextureShader.getRGBRaster(new File("./textures/diffuse/politics_160x160.png"), 160, 160);
-				graffitiRaster.inverse();							
+				
+//				berlinRaster = TextureShader.getRGBRaster(new File("./textures/diffuse/berlin.jpg"), 160, 160);
+//				berlinRaster.inverse();
+//				graffitiRaster = TextureShader.getRGBRaster(new File("./textures/diffuse/politics_160x160.png"), 160, 160);
+//				graffitiRaster.inverse();							
 				
 				isLoading = false; // done
 			}
@@ -1160,7 +1160,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 					engine.recomputeShadowMaps();
 				}	
 				else if (keycode == KeyEvent.VK_O) {
-					engine.depthTestCuller.disabled = !engine.depthTestCuller.disabled;
+					engine.getDepthTestCuller().disabled = !engine.getDepthTestCuller().disabled;
 				}
 				else if (keycode == KeyEvent.VK_C) {
 					Timer timer = Timer.getInstance();
@@ -1422,9 +1422,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 	Model3D masterMengerCube;	
 	ImageRaster oooohRaster;
 	ImageRaster creditsRaster;
-	ImageRaster fingerRaster;
-	ImageRaster berlinRaster;
-	ImageRaster graffitiRaster;
+	ImageRaster fingerRaster;	
 	
 	long fpsCounter;
 
