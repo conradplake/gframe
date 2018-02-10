@@ -14,13 +14,21 @@ import graph.Node;
 
 public class TextureGenerator {
 
-	/**
-	 * Returns a new texture scaled down by half the width and height of the
-	 * original texture. Each new pixel thus represents 4 original pixels by
-	 * averaging their values.
-	 */
-	public static ImageRaster mipmap(ImageRaster texture) {
-		return mipmap(texture, false);
+
+	public static ImageRaster[] mipmaps(ImageRaster texture){
+		int min = Math.min(texture.getWidth(), texture.getHeight());
+		int lods = 1 + (int)(Math.log(min) / Math.log(2));
+		
+		ImageRaster[] result = new ImageRaster[lods];
+		ImageRaster tmp = texture;
+		
+		result[0] = tmp;
+		for(int i=1;i<lods;i++){
+			tmp = mipmap(tmp);
+			result[i] = tmp;
+		}
+		
+		return result;
 	}
 
 	/**
@@ -28,7 +36,7 @@ public class TextureGenerator {
 	 * original texture. Each new pixel thus represents 4 original pixels by
 	 * averaging their values.
 	 */
-	public static ImageRaster mipmap(ImageRaster texture, boolean isDiffuse) {
+	public static ImageRaster mipmap(ImageRaster texture) {
 		ImageRaster mipmapped = new ImageRaster(texture.getWidth() / 2, texture.getHeight() / 2);
 
 		for (int x = 0; x < mipmapped.getWidth(); x++) {
@@ -63,20 +71,6 @@ public class TextureGenerator {
 				int c_blue = (pixel_c >> 0) & 0xff;
 				int d_blue = (pixel_d >> 0) & 0xff;
 				int new_blue = (a_blue + b_blue + c_blue + d_blue) / 4;
-
-				if (isDiffuse) {
-					float brighteningFactor = 0.03f;
-					new_red = (int) (new_red + (brighteningFactor * new_red));
-					new_green = (int) (new_green + (brighteningFactor * new_green));
-					new_blue = (int) (new_blue + (brighteningFactor * new_blue));
-
-					if (new_red > 255)
-						new_red = 255;
-					if (new_green > 255)
-						new_green = 255;
-					if (new_blue > 255)
-						new_blue = 255;
-				}
 
 				int pixel = ((new_alpha & 0xFF) << 24) | ((new_red & 0xFF) << 16) | ((new_green & 0xFF) << 8)
 						| ((new_blue & 0xFF) << 0);
