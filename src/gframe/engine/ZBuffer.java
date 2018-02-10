@@ -1,5 +1,7 @@
 package gframe.engine;
 
+import java.awt.Color;
+
 public class ZBuffer {
 
 	int w;
@@ -45,8 +47,8 @@ public class ZBuffer {
 	public float getValue(float x, float y, boolean doBilinearFiltering){
 		
 		if(!doBilinearFiltering){
-			int light_x = (int) Math.floor(x + 0.5f);
-			int light_y = (int) Math.floor(y + 0.5f);
+			int light_x = (int) x;
+			int light_y = (int) y;
 			return this.pixels[light_y*w + light_x];
 		}
 		else{
@@ -115,6 +117,27 @@ public class ZBuffer {
 
 	public int getYoffset() {
 		return yoffset;
+	}
+	
+	
+	/**
+	 * 
+	 * */
+	public ImageRaster createGrayscale(){
+		ImageRaster result = new ImageRaster(w, h);
+		for(int i=0;i<pixels.length;i++){
+			float z = pixels[i];
+			int c;
+			if(z>3000){
+				c = Color.white.getRGB();
+			}else{
+				c = (int)Toolbox.map(z, 0d, 3000d, 0d, 255d);
+			}
+					
+//			int c = (int)Toolbox.map(z, 0d, 10000d, 255d, 0d);
+			result.pixels[i] = ((255 & 0xFF) << 24) | ((c & 0xFF) << 16) | ((c & 0xFF) << 8) | ((c & 0xFF) << 0);
+		}
+		return result;
 	}
 
 

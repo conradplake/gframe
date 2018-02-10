@@ -36,6 +36,7 @@ public abstract class AbstractShader implements Shader {
 	float diffuse_red;
 	float diffuse_green;
 	float diffuse_blue;
+	int diffuseAlpha;
 
 	float viewReflectionProduct;
 
@@ -149,7 +150,7 @@ public abstract class AbstractShader implements Shader {
 		lightNormalProduct = toLight.dotProduct(normal_x, normal_y, normal_z);
 		
 		// DIFFUSE
-		int diffuseAlpha = (diffuseColor >> 24) & 0xff;
+		diffuseAlpha = (diffuseColor >> 24) & 0xff;
 		diffuse_red = ((diffuseColor >> 16) & 0xff) * iColorNorm;
 		diffuse_green = ((diffuseColor >> 8) & 0xff) * iColorNorm;
 		diffuse_blue = ((diffuseColor >> 0) & 0xff) * iColorNorm;

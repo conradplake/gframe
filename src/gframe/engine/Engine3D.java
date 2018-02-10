@@ -18,11 +18,11 @@ import gframe.engine.camera.Camera;
  * This class ties together the main ingredients needed for 3D software
  * rendering:
  * 
- * - a list of 3d models / objects that exist - a polygon heap that contains all
- * triangles/quads/etc. to be rendered to the screen - a z-Buffer for pixel
- * accurate depth tests - a rasterizer that "writes" polygons onto a color
- * buffer - a lightsource for shading and shadowing - a camera through which the
- * scenery is observed
+ * - a list of 3d models / objects that exist 
+ * - a polygon heap that contains all triangles/quads/etc. to be rendered to the screen 
+ * - a z-Buffer for pixel accurate depth tests 
+ * - a rasterizer that "writes" polygons onto a color buffer 
+ * - a lightsource for shading and shadowing - a camera through which the scenery is observed
  * 
  * @author conrad plake
  */
@@ -39,7 +39,7 @@ public class Engine3D {
 		this.rasterizer = new DefaultConvexPolygonRasterizer(screenx / 2, screeny / 2, screenx, screeny);
 		this.zBuffer = rasterizer.createZBuffer();
 		this.depthBuffer = rasterizer.createZBuffer();
-		this.depthTestCuller = new DepthTestCuller(zBuffer);
+		this.setDepthTestCuller(new DepthTestCuller(zBuffer));
 		this.camera = new Camera();
 		this.lightsource = DEFAULTLIGHTSOURCE;
 		this.defaultShader = new PhongShader(lightsource);
@@ -442,8 +442,8 @@ public class Engine3D {
 			}
 		}
 
-		for (Iterator it = model.getChildren().iterator(); it.hasNext();) {
-			Model3D subModel = (Model3D) it.next();
+		for (Iterator<Model3D> it = model.getChildren().iterator(); it.hasNext();) {
+			Model3D subModel = it.next();
 			if (subModel.isVisible){
 				fillPolyBuffers(subModel, modelOrigin, modelMatrix, camOrigin, cam_z, icammat, zSortPolyHeap);
 			}
@@ -486,31 +486,44 @@ public class Engine3D {
 		}
 	}
 
-	private final Lightsource DEFAULTLIGHTSOURCE = new Lightsource(0, 0, 0, Color.white, Lightsource.NORM_INTENSITY);
+	public DepthTestCuller getDepthTestCuller() {
+		return depthTestCuller;
+	}
 
-	protected int activeSegment = 0;
-
-	protected List<Model3D>[] segments;
-	protected Camera camera;
-
-	protected Lightsource lightsource;
-
-	// protected List<RenderFace> polyHeap;
-	protected PriorityQueue<RenderFace> polyHeap;
-	protected Collection<RenderFace> unsortedPolyHeap;
-
-	Rasterizer rasterizer;
-
-	ZBuffer zBuffer;
-	ZBuffer depthBuffer;
-
-	// takes advantage of frame coherence for occlusion culling
-	public DepthTestCuller depthTestCuller;
-
+	public void setDepthTestCuller(DepthTestCuller depthTestCuller) {
+		this.depthTestCuller = depthTestCuller;
+	}
+	
+	
 	public boolean filterDepthBuffer = false;
 	public boolean shadingEnabled = true;
+	
+	
+	
 
-	protected Shader defaultShader;
+	private final Lightsource DEFAULTLIGHTSOURCE = new Lightsource(0, 0, 0, Color.white, Lightsource.NORM_INTENSITY);
 
-	Map<Model3D, Shader> modelShaders;
+	private int activeSegment = 0;
+
+	private List<Model3D>[] segments;
+	private Camera camera;
+
+	private Lightsource lightsource;
+
+	// protected List<RenderFace> polyHeap;
+	private PriorityQueue<RenderFace> polyHeap;
+	private Collection<RenderFace> unsortedPolyHeap;
+
+	private Rasterizer rasterizer;
+
+	private ZBuffer zBuffer;
+	private ZBuffer depthBuffer;
+
+	// takes advantage of frame coherence for occlusion culling
+	private DepthTestCuller depthTestCuller;
+	
+
+	private Shader defaultShader;
+
+	private Map<Model3D, Shader> modelShaders;
 }

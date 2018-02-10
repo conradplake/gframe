@@ -106,7 +106,7 @@ public class DepthTestCuller {
 				}
 			}
 		}
-		// System.out.println("bbox completely covered");
+//		 System.out.println("bbox completely covered");
 
 		// bbox is completely covered
 		return true;

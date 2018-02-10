@@ -179,7 +179,7 @@ public class Object3D {
 	private Point3D origin;
 	private Matrix3D matrix;
 
-	private List children;
+	private List<Object3D> children;
 
 	private Object3D parent;
 }

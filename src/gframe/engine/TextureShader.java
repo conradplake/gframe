@@ -201,8 +201,8 @@ public class TextureShader extends AbstractShader {
 			dv = DITHER_KERNEL[x_index][y_index][1];
 		}
 				
-		u = Toolbox.clamp(texel_u * (textureWidth) + du, 0, textureWidth - 1);
-		v = Toolbox.clamp(texel_v * (textureHeight) + dv, 0, textureHeight - 1);
+		u = Toolbox.clamp(texel_u * textureWidth + du, 0, textureWidth - 1);
+		v = Toolbox.clamp(texel_v * textureHeight + dv, 0, textureHeight - 1);
 		return super.shade(getTexel(u, v), world_x, world_y, world_z, normal_x, normal_y, normal_z);
 	}
 

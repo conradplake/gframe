@@ -25,6 +25,10 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 	final int shadowColorRGB = Color.black.getRGB();
 
+	boolean interlacedMode = false;
+	
+	
+	
 	public DefaultConvexPolygonRasterizer(int frameX, int frameY) {
 		this(frameX / 2, frameY / 2, frameX, frameY);
 	}
@@ -257,14 +261,14 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		ZBuffer shadowMap = shadowsEnabled ? lightsource.getDepthMap() : null;
 
 		for (int draw_y = minY; draw_y <= maxY; draw_y++) {
-
+					
 			EdgeTableEntry edgeTableEntry = edgeTable[draw_y]; // each
 																// entry
 																// represents
 																// one
 																// scan
 																// line
-
+					
 			if (!edgeTableEntry.visited) {
 				continue;
 			}
@@ -342,6 +346,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			}
 
 			// here we go across the scan line..
+			boolean shadeScanline = true;
 			for (int draw_x = startX; draw_x <= endX; draw_x++) {
 
 				float zfa = edgeTableEntry.min_zFactor;
@@ -356,7 +361,9 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 				if (zBuffer.update(draw_x, draw_y, draw_z)) {
 
-					if (!doOnlyZPass) {
+					
+					shadeScanline = interlacedMode==false || (draw_y&1)==0;
+					if (!doOnlyZPass && shadeScanline) {
 
 						if (shader != null && shader.isPerPixelShader()) {
 
@@ -395,10 +402,12 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 							if (shadowMap != null) {
 								float[] lightCoords = inverseLightMatrix.transform(pcorr_world_x - lightsource.x,
 										pcorr_world_y - lightsource.y, pcorr_world_z - lightsource.z);
+//								float[] lightCoords = inverseLightMatrix.transform(lightsource.x-pcorr_world_x,
+//										lightsource.y-pcorr_world_y, lightsource.z-pcorr_world_z);
 
-								// perspektiven korrektur innerhalb des light
-								// space
-								float zf = Engine3D.zFactor(lightCoords[2]);
+								// perspektiven korrektur innerhalb des light space
+								float zf = Engine3D.zFactor(lightCoords[2]);								
+								//float zf = 1;
 								lightCoords[0] = lightCoords[0] * zf;
 								lightCoords[1] = lightCoords[1] * zf;
 
@@ -416,7 +425,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 									}
 								} else {
 									if (shadowMap.getValue(light_x, light_y, true) < lightCoords[2]
-											- /* bias gegen schatten akne= */2) {
+											- /* bias gegen schatten akne= */0) {
 										insideShadow = true;
 									}
 								}

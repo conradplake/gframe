@@ -114,8 +114,8 @@ public class NormalMappedTextureShader extends TextureShader {
 			dv = DITHER_KERNEL[x_index][y_index][1];
 		}
 
-		u = Toolbox.clamp(texel_u * (textureWidth) + du, 0, textureWidth - 1);
-		v = Toolbox.clamp(texel_v * (textureHeight) + dv, 0, textureHeight - 1);
+		u = Toolbox.clamp(texel_u * textureWidth + du, 0, textureWidth - 1);
+		v = Toolbox.clamp(texel_v * textureHeight + dv, 0, textureHeight - 1);
 		
 		texel = super.getTexel(u, v);
 		

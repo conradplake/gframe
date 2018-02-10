@@ -83,6 +83,16 @@ public class Lightsource extends Point3D {
 		recomputeDepthMap = true;
 	}
 	
+	public void setMatrix(Matrix3D m) {
+		matrix.setXAxis(m.getXVector());
+		matrix.setYAxis(m.getYVector());
+		matrix.setZAxis(m.getZVector());
+		
+		inverseMatrix = matrix.getInverse();
+		light_z = matrix.getZVector();
+		recomputeDepthMap = true;
+	}
+	
 	public boolean isRecomputeDepthMap(){
 		return this.recomputeDepthMap;
 	}
