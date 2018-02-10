@@ -137,12 +137,13 @@ public class WavefrontObjParser {
 
 	}
 
-	public static Model3D parseOldstyle(File objFile, Color col) {
+	
+	/**
+	 * Builds just a mesh without vertex normal and u,v mapping
+	 * */
+	public static Model3D parseGeometry(File objFile, Color col) {
 
 		Model3D model = new Model3D();
-
-		Map<Integer, Float[]> textureIndex2UVMapping = new Hashtable<Integer, Float[]>();
-		int currentTextureIndex = 1;
 
 		BufferedReader reader = null;
 		try {
@@ -160,12 +161,6 @@ public class WavefrontObjParser {
 					model.addVertex(x, y, z);
 
 					// vertexCount++;
-				} else if (line.startsWith("vt ")) {
-					String[] fields = line.split("\\s+");
-					float u = Float.parseFloat(fields[1]);
-					float v = Float.parseFloat(fields[2]);
-					textureIndex2UVMapping.put(currentTextureIndex, new Float[] { u, v });
-					currentTextureIndex++;
 				} else if (line.startsWith("f ")) {
 					String[] fields = line.split("\\s+");
 					int[] vertices = new int[fields.length - 1];
@@ -183,22 +178,11 @@ public class WavefrontObjParser {
 							vertexIndexInFile--; // index count starts from 1
 						}
 						vertices[i - 1] = vertexIndexInFile;
-
-						// texture mapping
-						if (subFields.length >= 2 && subFields[1].length() > 0) {
-							Integer textureIndex = Integer.parseInt(subFields[1]);
-							Float[] uvs = textureIndex2UVMapping.get(textureIndex);
-							Point3D vertex = model.getVertex(vertexIndexInFile);
-							vertex.u = uvs[0];
-							vertex.v = uvs[1];
-						}
 					}
 					model.stretchFace(vertices, col);
 				}
 			}
-
-			// System.out.println("# vert: "+vertexCount);
-			// System.out.println("# text: "+textureCount);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
