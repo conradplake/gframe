@@ -22,7 +22,8 @@ import gframe.engine.camera.Camera;
  * - a polygon heap that contains all triangles/quads/etc. to be rendered to the screen 
  * - a z-Buffer for pixel accurate depth tests 
  * - a rasterizer that "writes" polygons onto a color buffer 
- * - a lightsource for shading and shadowing - a camera through which the scenery is observed
+ * - a lightsource for shading and shadowing 
+ * - a camera through which the scenery is observed
  * 
  * @author conrad plake
  */
