@@ -3,7 +3,8 @@ package gframe.engine;
 import java.awt.Color;
 
 /**
- * Can rasterize any convex n-gon (triangles, quads, etc.)
+ * Can rasterize any convex n-gon. Rasterization is done on instances of
+ * ImageRaster (32-bit pixel buffer).
  */
 public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
@@ -14,32 +15,36 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 	public final static int SCREEN_EDGE_NEAR = 5;
 	public final static int SCREEN_EDGE_FAR = 6;
 
-	protected int xoffset;
-	protected int yoffset;
-	protected int frameX;
-	protected int frameY;
+	private int xoffset;
+	private int yoffset;
+	private int frameX;
+	private int frameY;
 
-	protected EdgeTableEntry[] edgeTable;
-
-	float[] edgeDeltas;
-
-	final int shadowColorRGB = Color.black.getRGB();
-
-	boolean interlacedMode = false;
 	
-	
+	// array of length frameY. Stores values of certain variables in that screen line at minimum and maximum x position.
+	private EdgeTableEntry[] edgeTable;
+
+	// stores deltas of all variables for polygon edge interpolation
+	private final float[] edgeDeltas;
+
+	private final int shadowColorRGB = Color.black.getRGB();
+
+	// only draws every second screen line
+	public boolean interlacedMode = false;
+
 	
 	public DefaultConvexPolygonRasterizer(int frameX, int frameY) {
 		this(frameX / 2, frameY / 2, frameX, frameY);
 	}
 
+	
 	public DefaultConvexPolygonRasterizer(int xoffset, int yoffset, int frameX, int frameY) {
 		this.xoffset = xoffset;
 		this.yoffset = yoffset;
 		this.frameX = frameX;
 		this.frameY = frameY;
 
-		this.edgeDeltas = new float[11];
+		this.edgeDeltas = new float[10];
 
 		edgeTable = new EdgeTableEntry[frameY];
 		for (int i = 0; i < edgeTable.length; i++) {
@@ -77,15 +82,15 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 	 */
 	@Override
 	public void rasterize(RenderFace renderFace, ImageRaster colorBuffer, ZBuffer zBuffer, Shader shader) {
+		// doOnlyZPass: just write into the zBuffer
 		boolean doOnlyZPass = colorBuffer == null && zBuffer != null;
 		int[] minMaxY = interpolateEdges(renderFace, doOnlyZPass);
 		interpolateScanlines(renderFace, colorBuffer, zBuffer, shader, minMaxY[0], minMaxY[1], doOnlyZPass);
 	}
-	
 
-	public int[] interpolateEdges(RenderFace renderFace, boolean onlyZPass) {
+	public int[] interpolateEdges(final RenderFace renderFace, boolean onlyZPass) {
 
-		// Determine bounding y-line
+		// determine bounding y-line
 		int minY = Integer.MAX_VALUE;
 		int maxY = 0;
 
@@ -96,13 +101,11 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			if (next == renderFace.vertices.length)
 				next = 0;
 
-			int[] minYmaxY = interpolateEdge(renderFace, i, next, onlyZPass); // current
-																				// edge:
-																				// i
-																				// ->
-																				// next
+			// current edge: i ->  next
+			int[] minYmaxY = interpolateEdge(renderFace, i, next, onlyZPass); 
 
-			if (minYmaxY != null) { // EDGE GOT CLIPPED?
+			// if null then edge is clipped entirely (edge is completely outside of screen)
+			if (minYmaxY != null) {
 				if (minYmaxY[0] < minY)
 					minY = minYmaxY[0];
 
@@ -116,10 +119,10 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 	}
 
 	/**
-	 * Interpolate along edge and fill edgeTable.
+	 * Interpolates along edge i0 -> i1 and fills edgeTable as it goes.
 	 */
-	public int[] interpolateEdge(RenderFace renderFace, int vertex_i0, int vertex_i1, boolean onlyZPass) {
-
+	public int[] interpolateEdge(final RenderFace renderFace, int vertex_i0, int vertex_i1, final boolean onlyZPass) {		
+		
 		int topVertex = vertex_i0;
 		int botVertex = vertex_i1;
 
@@ -128,8 +131,8 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			botVertex = vertex_i0;
 		}
 
-		float screen_y_top = yoffset - renderFace.cam_Y[topVertex];
-		float screen_y_bot = yoffset - renderFace.cam_Y[botVertex];
+		final float screen_y_top = yoffset - renderFace.cam_Y[topVertex];
+		final float screen_y_bot = yoffset - renderFace.cam_Y[botVertex];
 
 		// CLIP EDGE
 		if (screen_y_bot < 0 || screen_y_top > frameY) {
@@ -137,138 +140,231 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		}
 		// ----------
 
-		float lineHeight = screen_y_bot - screen_y_top;
-
+		final float lineHeight = screen_y_bot - screen_y_top;
+		
 		// sub pixel height
-		float subPix = (int) screen_y_top - screen_y_top;		
+		final float subPix = ((int)screen_y_top - screen_y_top);		
+		
+		// for pre-interpolation of negative part (outside top of screen)
+		final float cutOff = screen_y_top < 0? -screen_y_top : 0;		
 
-		float cutOff = 0; // for pre-interpolation of negative part (outside top
-							// of screen)
-		if (screen_y_top < 0) {
-			cutOff = -screen_y_top;
-		}
+		// the scanline indices
+		int top = clipY((int) (screen_y_top));
+		int bot = clipY((int) (screen_y_bot));	
+//		int top = clipY( (int)(Math.ceil(screen_y_top)) );
+//		int bot = clipY( (int)(Math.ceil(screen_y_bot)) );
 
-		float inverseHeight = 0;
-		if (lineHeight > 1) {
-			inverseHeight = 1f / lineHeight;
+		int int_height = bot - top;
+		   
+		// line spans 2 or more scan lines
+		float inverseHeight = 0f;
+		if(lineHeight>1f){
+			inverseHeight = 1f / (float) lineHeight;
+			inverseHeight = Math.min( 1f/(float)lineHeight, 1f );
+			inverseHeight = Math.max(inverseHeight, 0f);
 		}
+			
 
 		// compute relative deltas
 		edgeDeltas[0] = (renderFace.cam_X[botVertex] - renderFace.cam_X[topVertex]) * inverseHeight;
-		edgeDeltas[1] = (renderFace.cam_Z[botVertex] - renderFace.cam_Z[topVertex]) * inverseHeight;
+		edgeDeltas[1] = (renderFace.zFactors[botVertex] - renderFace.zFactors[topVertex]) * inverseHeight;
 
-		edgeDeltas[2] = (renderFace.zFactors[botVertex] - renderFace.zFactors[topVertex]) * inverseHeight;
+		// adjust all start variables with cutoff
+		float cam_x = xoffset + renderFace.cam_X[topVertex] + (cutOff * edgeDeltas[0]);
+		float zf = renderFace.zFactors[topVertex] + (cutOff * edgeDeltas[1]);
+		
+		float u = 0;
+		float v = 0;
 
-		edgeDeltas[3] = (renderFace.texel_U[botVertex] - renderFace.texel_U[topVertex]) * inverseHeight;
-		edgeDeltas[4] = (renderFace.texel_V[botVertex] - renderFace.texel_V[topVertex]) * inverseHeight;
+		float nx = 0;
+		float ny = 0;
+		float nz = 0;
+		
+		float wx = 0;
+		float wy = 0;
+		float wz = 0;
 
-		edgeDeltas[5] = (renderFace.vertices[botVertex].normal_x - renderFace.vertices[topVertex].normal_x)
-				* inverseHeight;
-		edgeDeltas[6] = (renderFace.vertices[botVertex].normal_y - renderFace.vertices[topVertex].normal_y)
-				* inverseHeight;
-		edgeDeltas[7] = (renderFace.vertices[botVertex].normal_z - renderFace.vertices[topVertex].normal_z)
-				* inverseHeight;
+		if (!onlyZPass) {
+			// we need more deltas for u, v, nx, ny, nz, pwx, pwy, pwz
+			edgeDeltas[2] = (renderFace.texel_U[botVertex] - renderFace.texel_U[topVertex]) * inverseHeight;
+			edgeDeltas[3] = (renderFace.texel_V[botVertex] - renderFace.texel_V[topVertex]) * inverseHeight;
 
-		edgeDeltas[8] = (renderFace.pcorrectedWorld_X[botVertex] - renderFace.pcorrectedWorld_X[topVertex])
-				* inverseHeight;
-		edgeDeltas[9] = (renderFace.pcorrectedWorld_Y[botVertex] - renderFace.pcorrectedWorld_Y[topVertex])
-				* inverseHeight;
-		edgeDeltas[10] = (renderFace.pcorrectedWorld_Z[botVertex] - renderFace.pcorrectedWorld_Z[topVertex])
-				* inverseHeight;
+			edgeDeltas[4] = (renderFace.vertices[botVertex].normal_x - renderFace.vertices[topVertex].normal_x)
+					* inverseHeight;
+			edgeDeltas[5] = (renderFace.vertices[botVertex].normal_y - renderFace.vertices[topVertex].normal_y)
+					* inverseHeight;
+			edgeDeltas[6] = (renderFace.vertices[botVertex].normal_z - renderFace.vertices[topVertex].normal_z)
+					* inverseHeight;
 
-		int top = clipY((int) (screen_y_top));
-		int bot = clipY((int) (screen_y_bot));
-		// int top = clipY( (int)(Math.ceil(screen_y_top)) );
-		// int bot = clipY( (int)(Math.ceil(screen_y_bot)) );
+			edgeDeltas[7] = (renderFace.pcorrectedWorld_X[botVertex] - renderFace.pcorrectedWorld_X[topVertex])
+					* inverseHeight;
+			edgeDeltas[8] = (renderFace.pcorrectedWorld_Y[botVertex] - renderFace.pcorrectedWorld_Y[topVertex])
+					* inverseHeight;
+			edgeDeltas[9] = (renderFace.pcorrectedWorld_Z[botVertex] - renderFace.pcorrectedWorld_Z[topVertex])
+					* inverseHeight;
 
-		int height = bot - top;
-
-		fillEdgeTableEntry(edgeTable[top], renderFace, topVertex, onlyZPass, cutOff, 0, edgeDeltas);
-		for (int h = 1; h < height; h++) {
-			fillEdgeTableEntry(edgeTable[top + h], renderFace, topVertex, onlyZPass, cutOff + h, subPix, edgeDeltas);
+			u = renderFace.texel_U[topVertex] + (cutOff * edgeDeltas[2]);
+			v = renderFace.texel_V[topVertex] + (cutOff * edgeDeltas[3]);
+			
+			nx = renderFace.vertices[topVertex].normal_x + (cutOff * edgeDeltas[4]);
+			ny = renderFace.vertices[topVertex].normal_y + (cutOff * edgeDeltas[5]);
+			nz = renderFace.vertices[topVertex].normal_z + (cutOff * edgeDeltas[6]);
+			
+			wx = renderFace.pcorrectedWorld_X[topVertex] + (cutOff * edgeDeltas[7]);
+			wy = renderFace.pcorrectedWorld_Y[topVertex] + (cutOff * edgeDeltas[8]);
+			wz = renderFace.pcorrectedWorld_Z[topVertex] + (cutOff * edgeDeltas[9]);
 		}
-		fillEdgeTableEntry(edgeTable[bot], renderFace, topVertex, onlyZPass, lineHeight, 0, edgeDeltas);
+		
+		for (int h = 0; h <= int_height; h++) {
+			// update edge table
+			EdgeTableEntry edgeTableEntry = edgeTable[top + h];
+			
+			if (!edgeTableEntry.visited || cam_x < edgeTableEntry.min_draw_x) {
+				edgeTableEntry.min_draw_x = cam_x;
+				edgeTableEntry.min_zFactor = zf;
+
+				if (!onlyZPass) {
+					edgeTableEntry.min_texel_u = u;
+					edgeTableEntry.min_texel_v = v;
+					edgeTableEntry.min_normal_x = nx;
+					edgeTableEntry.min_normal_y = ny;
+					edgeTableEntry.min_normal_z = nz;
+					edgeTableEntry.min_pcorrectedWorld_x = wx;
+					edgeTableEntry.min_pcorrectedWorld_y = wy;
+					edgeTableEntry.min_pcorrectedWorld_z = wz;
+				}
+			}
+			if (!edgeTableEntry.visited || cam_x > edgeTableEntry.max_draw_x) {
+				edgeTableEntry.max_draw_x = cam_x;
+				edgeTableEntry.max_zFactor = zf;
+
+				if (!onlyZPass) {
+					edgeTableEntry.max_texel_u = u;
+					edgeTableEntry.max_texel_v = v;
+					edgeTableEntry.max_normal_x = nx;
+					edgeTableEntry.max_normal_y = ny;
+					edgeTableEntry.max_normal_z = nz;
+					edgeTableEntry.max_pcorrectedWorld_x = wx;
+					edgeTableEntry.max_pcorrectedWorld_y = wy;
+					edgeTableEntry.max_pcorrectedWorld_z = wz;
+				}
+			}
+
+			edgeTableEntry.visited = true;
+
+			// lerp variables
+			cam_x += edgeDeltas[0];						
+			zf += edgeDeltas[1];
+
+			if (!onlyZPass) {
+				u += edgeDeltas[2];
+				v += edgeDeltas[3];
+
+				nx += edgeDeltas[4];
+				ny += edgeDeltas[5];
+				nz += edgeDeltas[6];
+
+				wx += edgeDeltas[7];
+				wy += edgeDeltas[8];
+				wz += edgeDeltas[9];
+			}
+			
+			
+			// add sub-pixel correction
+			if(h==0){
+				cam_x += (subPix * edgeDeltas[0]);
+				zf += (subPix * edgeDeltas[1]);
+				if(!onlyZPass){
+					u += (subPix * edgeDeltas[2]);	
+					v += (subPix * edgeDeltas[3]);
+					nx += (subPix * edgeDeltas[4]);
+					ny += (subPix * edgeDeltas[5]);
+					nz += (subPix * edgeDeltas[6]);
+					wx += (subPix * edgeDeltas[7]);
+					wy += (subPix * edgeDeltas[8]);
+					wz += (subPix * edgeDeltas[9]);
+				}
+				
+			}
+			
+		}
+		
+//		if(int_height==0){
+//			
+//			EdgeTableEntry edgeTableEntry = edgeTable[bot];			
+//			
+//			cam_x = xoffset + renderFace.cam_X[botVertex] + (subPix * edgeDeltas[0]);
+//			zf    = renderFace.zFactors[botVertex] + (subPix * edgeDeltas[1]);
+//			
+//			if (!edgeTableEntry.visited || cam_x < edgeTableEntry.min_draw_x) {	
+//				edgeTableEntry.min_draw_x = cam_x;
+//				edgeTableEntry.min_zFactor = zf;
+//				
+//				if (!onlyZPass) {
+//					edgeTableEntry.min_texel_u = renderFace.texel_U[botVertex] + (subPix * edgeDeltas[2]); 
+//					edgeTableEntry.min_texel_v = renderFace.texel_V[botVertex] + (subPix * edgeDeltas[3]); 
+//					edgeTableEntry.min_normal_x = renderFace.vertices[botVertex].normal_x + (subPix * edgeDeltas[4]);
+//					edgeTableEntry.min_normal_y = renderFace.vertices[botVertex].normal_y + (subPix * edgeDeltas[5]);
+//					edgeTableEntry.min_normal_z = renderFace.vertices[botVertex].normal_z + (subPix * edgeDeltas[6]);
+//					edgeTableEntry.min_pcorrectedWorld_x = renderFace.pcorrectedWorld_X[botVertex] + (subPix * edgeDeltas[7]);
+//					edgeTableEntry.min_pcorrectedWorld_y = renderFace.pcorrectedWorld_Y[botVertex] + (subPix * edgeDeltas[8]);
+//					edgeTableEntry.min_pcorrectedWorld_z = renderFace.pcorrectedWorld_Z[botVertex] + (subPix * edgeDeltas[9]);
+////					edgeTableEntry.min_texel_u = u;
+////					edgeTableEntry.min_texel_v = v;
+////					edgeTableEntry.min_normal_x = nx;
+////					edgeTableEntry.min_normal_y = ny;
+////					edgeTableEntry.min_normal_z = nz;
+////					edgeTableEntry.min_pcorrectedWorld_x = wx;
+////					edgeTableEntry.min_pcorrectedWorld_y = wy;
+////					edgeTableEntry.min_pcorrectedWorld_z = wz;
+//				}							
+//			}
+//			if (!edgeTableEntry.visited || cam_x > edgeTableEntry.max_draw_x) {
+//				edgeTableEntry.max_draw_x = cam_x;
+//				edgeTableEntry.max_zFactor = zf;
+//				
+//				if (!onlyZPass) {
+//					edgeTableEntry.max_texel_u = renderFace.texel_U[botVertex] + (subPix * edgeDeltas[2]); 
+//					edgeTableEntry.max_texel_v = renderFace.texel_V[botVertex] + (subPix * edgeDeltas[3]); 
+//					edgeTableEntry.max_normal_x = renderFace.vertices[botVertex].normal_x + (subPix * edgeDeltas[4]);
+//					edgeTableEntry.max_normal_y = renderFace.vertices[botVertex].normal_y + (subPix * edgeDeltas[5]);
+//					edgeTableEntry.max_normal_z = renderFace.vertices[botVertex].normal_z + (subPix * edgeDeltas[6]);
+//					edgeTableEntry.max_pcorrectedWorld_x = renderFace.pcorrectedWorld_X[botVertex] + (subPix * edgeDeltas[7]);
+//					edgeTableEntry.max_pcorrectedWorld_y = renderFace.pcorrectedWorld_Y[botVertex] + (subPix * edgeDeltas[8]);
+//					edgeTableEntry.max_pcorrectedWorld_z = renderFace.pcorrectedWorld_Z[botVertex] + (subPix * edgeDeltas[9]);
+////					edgeTableEntry.max_texel_u = u;
+////					edgeTableEntry.max_texel_v = v;
+////					edgeTableEntry.max_normal_x = nx;
+////					edgeTableEntry.max_normal_y = ny;
+////					edgeTableEntry.max_normal_z = nz;
+////					edgeTableEntry.max_pcorrectedWorld_x = wx;
+////					edgeTableEntry.max_pcorrectedWorld_y = wy;
+////					edgeTableEntry.max_pcorrectedWorld_z = wz;
+//				}
+//			}				
+//			edgeTableEntry.visited = true;					
+//		}
 
 		return new int[] { top, bot };
 	}
 
-	private void fillEdgeTableEntry(EdgeTableEntry edgeTableEntry, RenderFace renderFace, int startVertex,
-			boolean onlyZPass, float height, float subPix, float[] deltas) {
+	
 
-		float draw_x = xoffset + renderFace.cam_X[startVertex] + height * deltas[0] + subPix * deltas[0];
-		if (draw_x < edgeTableEntry.min_draw_x || !edgeTableEntry.visited) {
-
-			edgeTableEntry.min_draw_x = draw_x;
-			edgeTableEntry.min_zFactor = renderFace.zFactors[startVertex] + height * deltas[2] + subPix * deltas[2];
-
-			if (!onlyZPass) {
-				edgeTableEntry.min_texel_u = renderFace.texel_U[startVertex] + height * deltas[3] + subPix * deltas[3];
-				edgeTableEntry.min_texel_v = renderFace.texel_V[startVertex] + height * deltas[4] + subPix * deltas[4];
-
-				edgeTableEntry.min_normal_x = renderFace.vertices[startVertex].normal_x + height * deltas[5]
-						+ subPix * deltas[5];
-				edgeTableEntry.min_normal_y = renderFace.vertices[startVertex].normal_y + height * deltas[6]
-						+ subPix * deltas[6];
-				edgeTableEntry.min_normal_z = renderFace.vertices[startVertex].normal_z + height * deltas[7]
-						+ subPix * deltas[7];
-
-				edgeTableEntry.min_pcorrectedWorld_x = renderFace.pcorrectedWorld_X[startVertex] + height * deltas[8]
-						+ subPix * deltas[8];
-				edgeTableEntry.min_pcorrectedWorld_y = renderFace.pcorrectedWorld_Y[startVertex] + height * deltas[9]
-						+ subPix * deltas[9];
-				edgeTableEntry.min_pcorrectedWorld_z = renderFace.pcorrectedWorld_Z[startVertex] + height * deltas[10]
-						+ subPix * deltas[10];
-			}
-		}
-		if (draw_x > edgeTableEntry.max_draw_x || !edgeTableEntry.visited) {
-
-			edgeTableEntry.max_draw_x = draw_x;
-			edgeTableEntry.max_zFactor = renderFace.zFactors[startVertex] + height * deltas[2] + subPix * deltas[2];
-
-			if (!onlyZPass) {
-				edgeTableEntry.max_texel_u = renderFace.texel_U[startVertex] + height * deltas[3] + subPix * deltas[3];
-				edgeTableEntry.max_texel_v = renderFace.texel_V[startVertex] + height * deltas[4] + subPix * deltas[4];
-
-				edgeTableEntry.max_normal_x = renderFace.vertices[startVertex].normal_x + height * deltas[5]
-						+ subPix * deltas[5];
-				edgeTableEntry.max_normal_y = renderFace.vertices[startVertex].normal_y + height * deltas[6]
-						+ subPix * deltas[6];
-				edgeTableEntry.max_normal_z = renderFace.vertices[startVertex].normal_z + height * deltas[7]
-						+ subPix * deltas[7];
-
-				edgeTableEntry.max_pcorrectedWorld_x = renderFace.pcorrectedWorld_X[startVertex] + height * deltas[8]
-						+ subPix * deltas[8];
-				edgeTableEntry.max_pcorrectedWorld_y = renderFace.pcorrectedWorld_Y[startVertex] + height * deltas[9]
-						+ subPix * deltas[9];
-				edgeTableEntry.max_pcorrectedWorld_z = renderFace.pcorrectedWorld_Z[startVertex] + height * deltas[10]
-						+ subPix * deltas[10];
-			}
-
-		}
-
-		edgeTableEntry.visited = true;
-	}
-
-
-	public void interpolateScanlines(RenderFace renderFace, ImageRaster colorBuffer, ZBuffer zBuffer, Shader shader,
-			int minY, int maxY, boolean doOnlyZPass) {
+	public void interpolateScanlines(final RenderFace renderFace, final ImageRaster colorBuffer, final ZBuffer zBuffer, final Shader shader,
+			final int minY, final int maxY, final boolean doOnlyZPass) {
 
 		int rgb = shader == null ? renderFace.col.getRGB() : shader.shade(renderFace);
 
-		Lightsource lightsource = shader != null ? shader.getLightsource() : null;
-		boolean shadowsEnabled = lightsource != null ? lightsource.isShadowsEnabled() : false;
-		Matrix3D inverseLightMatrix = shadowsEnabled ? lightsource.getInverseMatrix() : null;
-		ZBuffer shadowMap = shadowsEnabled ? lightsource.getDepthMap() : null;
+		final Lightsource lightsource = shader != null ? shader.getLightsource() : null;
+		final boolean shadowsEnabled = lightsource != null ? lightsource.isShadowsEnabled() : false;
+		final Matrix3D inverseLightMatrix = shadowsEnabled ? lightsource.getInverseMatrix() : null;
+		final ZBuffer shadowMap = shadowsEnabled ? lightsource.getDepthMap() : null;
 
 		for (int draw_y = minY; draw_y <= maxY; draw_y++) {
-					
-			EdgeTableEntry edgeTableEntry = edgeTable[draw_y]; // each
-																// entry
-																// represents
-																// one
-																// scan
-																// line
-					
+
+			// one entry per scan line
+			final EdgeTableEntry edgeTableEntry = edgeTable[draw_y];
+
 			if (!edgeTableEntry.visited) {
 				continue;
 			}
@@ -276,21 +372,14 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			final float iScanlineLength = 1f / (edgeTableEntry.max_draw_x - edgeTableEntry.min_draw_x + 1);
 
 			// compute deltas
-			final float pcorr_world_dx_stepfactor = (edgeTableEntry.max_pcorrectedWorld_x
-					- edgeTableEntry.min_pcorrectedWorld_x) * iScanlineLength;
-			final float pcorr_world_dy_stepfactor = (edgeTableEntry.max_pcorrectedWorld_y
-					- edgeTableEntry.min_pcorrectedWorld_y) * iScanlineLength;
-			final float pcorr_world_dz_stepfactor = (edgeTableEntry.max_pcorrectedWorld_z
-					- edgeTableEntry.min_pcorrectedWorld_z) * iScanlineLength;
-
+			final float zfactor_stepfactor = (edgeTableEntry.max_zFactor - edgeTableEntry.min_zFactor)
+					* iScanlineLength;
+						
 			final float texel_du_stepfactor = (edgeTableEntry.max_texel_u - edgeTableEntry.min_texel_u)
 					* iScanlineLength;
 			final float texel_dv_stepfactor = (edgeTableEntry.max_texel_v - edgeTableEntry.min_texel_v)
 					* iScanlineLength;
-
-			final float zfactor_stepfactor = (edgeTableEntry.max_zFactor - edgeTableEntry.min_zFactor)
-					* iScanlineLength;
-
+			
 			final float vn_dx_stepfactor = (edgeTableEntry.max_normal_x - edgeTableEntry.min_normal_x)
 					* iScanlineLength;
 			final float vn_dy_stepfactor = (edgeTableEntry.max_normal_y - edgeTableEntry.min_normal_y)
@@ -298,51 +387,45 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			final float vn_dz_stepfactor = (edgeTableEntry.max_normal_z - edgeTableEntry.min_normal_z)
 					* iScanlineLength;
 
+			final float pcorr_world_dx_stepfactor = (edgeTableEntry.max_pcorrectedWorld_x
+					- edgeTableEntry.min_pcorrectedWorld_x) * iScanlineLength;
+			final float pcorr_world_dy_stepfactor = (edgeTableEntry.max_pcorrectedWorld_y
+					- edgeTableEntry.min_pcorrectedWorld_y) * iScanlineLength;
+			final float pcorr_world_dz_stepfactor = (edgeTableEntry.max_pcorrectedWorld_z
+					- edgeTableEntry.min_pcorrectedWorld_z) * iScanlineLength;
+			
 			// scanline begin and end
 			int startX = (int) edgeTableEntry.min_draw_x;
 			float endX = edgeTableEntry.max_draw_x;
-
-			// sub-tex accuracy adjustments
-			final float subTex = ((float) startX) - edgeTableEntry.min_draw_x;
-
-			edgeTableEntry.min_pcorrectedWorld_x += subTex * pcorr_world_dx_stepfactor;
-			edgeTableEntry.min_pcorrectedWorld_y += subTex * pcorr_world_dy_stepfactor;
-			edgeTableEntry.min_pcorrectedWorld_z += subTex * pcorr_world_dz_stepfactor;
-
-			edgeTableEntry.min_texel_u += subTex * texel_du_stepfactor;
-			edgeTableEntry.min_texel_v += subTex * texel_dv_stepfactor;
-
-			edgeTableEntry.min_zFactor += subTex * zfactor_stepfactor;
-
-			edgeTableEntry.min_normal_x += subTex * vn_dx_stepfactor;
-			edgeTableEntry.min_normal_y += subTex * vn_dy_stepfactor;
-			edgeTableEntry.min_normal_z += subTex * vn_dz_stepfactor;
 
 			// clip against left side of screen
 			if (edgeTableEntry.min_draw_x < 0) {
 				// das abgeschnittene ende auf alle min-werte drauf
 				// interpolieren
-
-				edgeTableEntry.min_pcorrectedWorld_x += -edgeTableEntry.min_draw_x * pcorr_world_dx_stepfactor;
-				edgeTableEntry.min_pcorrectedWorld_y += -edgeTableEntry.min_draw_x * pcorr_world_dy_stepfactor;
-				edgeTableEntry.min_pcorrectedWorld_z += -edgeTableEntry.min_draw_x * pcorr_world_dz_stepfactor;
-
-				// texel
-				edgeTableEntry.min_texel_u += -edgeTableEntry.min_draw_x * texel_du_stepfactor;
-				edgeTableEntry.min_texel_v += -edgeTableEntry.min_draw_x * texel_dv_stepfactor;
+				
 				edgeTableEntry.min_zFactor += -edgeTableEntry.min_draw_x * zfactor_stepfactor;
+				
+				if(!doOnlyZPass){
+					// texel
+					edgeTableEntry.min_texel_u += -edgeTableEntry.min_draw_x * texel_du_stepfactor;
+					edgeTableEntry.min_texel_v += -edgeTableEntry.min_draw_x * texel_dv_stepfactor;
 
-				// vertex normals
-				edgeTableEntry.min_normal_x += -edgeTableEntry.min_draw_x * vn_dx_stepfactor;
-				edgeTableEntry.min_normal_y += -edgeTableEntry.min_draw_x * vn_dy_stepfactor;
-				edgeTableEntry.min_normal_z += -edgeTableEntry.min_draw_x * vn_dz_stepfactor;
-
+					// vertex normals
+					edgeTableEntry.min_normal_x += -edgeTableEntry.min_draw_x * vn_dx_stepfactor;
+					edgeTableEntry.min_normal_y += -edgeTableEntry.min_draw_x * vn_dy_stepfactor;
+					edgeTableEntry.min_normal_z += -edgeTableEntry.min_draw_x * vn_dz_stepfactor;
+					
+					// world coordinates
+					edgeTableEntry.min_pcorrectedWorld_x += -edgeTableEntry.min_draw_x * pcorr_world_dx_stepfactor;
+					edgeTableEntry.min_pcorrectedWorld_y += -edgeTableEntry.min_draw_x * pcorr_world_dy_stepfactor;
+					edgeTableEntry.min_pcorrectedWorld_z += -edgeTableEntry.min_draw_x * pcorr_world_dz_stepfactor;	
+				}
+				
 				edgeTableEntry.min_draw_x = 0;
 				startX = 0;
 			}
 			if (edgeTableEntry.max_draw_x >= frameX) {
-				edgeTableEntry.max_draw_x = frameX - 1;
-				endX = edgeTableEntry.max_draw_x;
+				endX = frameX - 1;
 			}
 
 			// here we go across the scan line..
@@ -361,8 +444,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 				if (zBuffer.update(draw_x, draw_y, draw_z)) {
 
-					
-					shadeScanline = interlacedMode==false || (draw_y&1)==0;
+					shadeScanline = interlacedMode == false || (draw_y & 1) == 0;
 					if (!doOnlyZPass && shadeScanline) {
 
 						if (shader != null && shader.isPerPixelShader()) {
@@ -392,9 +474,9 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 							pcorr_world_y *= inverseZfactor;
 							pcorr_world_z *= inverseZfactor;
 
-//							 vn_x *= inverseZfactor;
-//							 vn_y *= inverseZfactor;
-//							 vn_z *= inverseZfactor;
+							// vn_x *= inverseZfactor;
+							// vn_y *= inverseZfactor;
+							// vn_z *= inverseZfactor;
 
 							// Shadow mapping: anhand der world space
 							// coordinaten
@@ -402,12 +484,15 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 							if (shadowMap != null) {
 								float[] lightCoords = inverseLightMatrix.transform(pcorr_world_x - lightsource.x,
 										pcorr_world_y - lightsource.y, pcorr_world_z - lightsource.z);
-//								float[] lightCoords = inverseLightMatrix.transform(lightsource.x-pcorr_world_x,
-//										lightsource.y-pcorr_world_y, lightsource.z-pcorr_world_z);
+								// float[] lightCoords =
+								// inverseLightMatrix.transform(lightsource.x-pcorr_world_x,
+								// lightsource.y-pcorr_world_y,
+								// lightsource.z-pcorr_world_z);
 
-								// perspektiven korrektur innerhalb des light space
-								float zf = Engine3D.zFactor(lightCoords[2]);								
-								//float zf = 1;
+								// perspektiven korrektur innerhalb des light
+								// space
+								float zf = Engine3D.zFactor(lightCoords[2]);
+								// float zf = 1;
 								lightCoords[0] = lightCoords[0] * zf;
 								lightCoords[1] = lightCoords[1] * zf;
 
@@ -425,7 +510,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 									}
 								} else {
 									if (shadowMap.getValue(light_x, light_y, true) < lightCoords[2]
-											- /* bias gegen schatten akne= */0) {
+											- /* bias gegen schatten akne= */ 2) {
 										insideShadow = true;
 									}
 								}
@@ -456,6 +541,25 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 				edgeTableEntry.min_normal_x += vn_dx_stepfactor;
 				edgeTableEntry.min_normal_y += vn_dy_stepfactor;
 				edgeTableEntry.min_normal_z += vn_dz_stepfactor;
+				
+				if(draw_x == startX){
+					// sub-tex accuracy adjustments
+					final float subTex = ((float) startX) - edgeTableEntry.min_draw_x;
+					edgeTableEntry.min_zFactor += subTex * zfactor_stepfactor;
+					if(!doOnlyZPass){
+						edgeTableEntry.min_texel_u += subTex * texel_du_stepfactor;
+						edgeTableEntry.min_texel_v += subTex * texel_dv_stepfactor;
+						
+						edgeTableEntry.min_normal_x += subTex * vn_dx_stepfactor;
+						edgeTableEntry.min_normal_y += subTex * vn_dy_stepfactor;
+						edgeTableEntry.min_normal_z += subTex * vn_dz_stepfactor;
+						
+						edgeTableEntry.min_pcorrectedWorld_x += subTex * pcorr_world_dx_stepfactor;
+						edgeTableEntry.min_pcorrectedWorld_y += subTex * pcorr_world_dy_stepfactor;
+						edgeTableEntry.min_pcorrectedWorld_z += subTex * pcorr_world_dz_stepfactor;	
+					}
+				}
+				
 
 			} // draw_x
 
@@ -463,8 +567,6 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 		} // draw_y
 	}
-	
-
 
 	public boolean isOutsideScreen(RenderFace renderFace) {
 		if (renderFace.maxX() < -xoffset) {
@@ -546,7 +648,6 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		return y;
 	}
 
-
 	@Override
 	public int getXOffset() {
 		return xoffset;
@@ -557,8 +658,6 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		return yoffset;
 	}
 
-	
-	
 	protected class EdgeTableEntry {
 
 		boolean visited;
