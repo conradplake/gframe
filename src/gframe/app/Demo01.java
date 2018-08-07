@@ -72,8 +72,8 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				
 				// audio
 				try{
-				  cassius_i_love_you_so = new Media((new File("audio/Cassius-ILoveYouSoHq.mp3")).toURI().toString());
-				  silent_shout = new Media((new File("audio/Silent_shout.mp3")).toURI().toString());
+				  cassius_i_love_you_so = new Media((new File("audio/demo01_part2.mp3")).toURI().toString());
+				  silent_shout = new Media((new File("audio/demo01_part1.mp3")).toURI().toString());
 				}
 				catch(MediaException me){
 					System.out.println("Audio files missing?");
@@ -863,7 +863,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				nextPosition.updatePosition(lastTime, currentTime, lightsource);
 				nextPosition.updatePosition(lastTime, currentTime, lightsource.getMatrix());
 								
-				// TODO: alle änderungen über eine generelle schnittstelle bekannt machen
+				// TODO: alle Ã¤nderungen Ã¼ber eine generelle schnittstelle bekannt machen
 				lightsource.recomputeLightZ();				
 				lightsource.recomputeInverse(); 
 				
@@ -938,7 +938,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				nextPosition.updatePosition(lastTime, currentTime, lightsource);
 				nextPosition.updatePosition(lastTime, currentTime, lightsource.getMatrix());
 				
-				lightsource.recomputeInverse(); // TODO: alle änderungen über eine generelle schnittstelle bekannt machen								
+				lightsource.recomputeInverse(); // TODO: alle Ã¤nderungen Ã¼ber eine generelle schnittstelle bekannt machen								
 				engine.recomputeShadowMaps();
 				
 				if (currentTime >= nextPosition.getTimestamp()) {
