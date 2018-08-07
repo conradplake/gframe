@@ -44,7 +44,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		this.frameX = frameX;
 		this.frameY = frameY;
 
-		this.edgeDeltas = new float[10];
+		this.edgeDeltas = new float[11];
 
 		edgeTable = new EdgeTableEntry[frameY];
 		for (int i = 0; i < edgeTable.length; i++) {
@@ -151,8 +151,6 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		// the scanline indices
 		int top = clipY((int) (screen_y_top));
 		int bot = clipY((int) (screen_y_bot));	
-//		int top = clipY( (int)(Math.ceil(screen_y_top)) );
-//		int bot = clipY( (int)(Math.ceil(screen_y_bot)) );
 
 		int int_height = bot - top;
 		   
@@ -165,13 +163,13 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		}
 			
 
-		// compute relative deltas
+		// compute relative deltas..
 		edgeDeltas[0] = (renderFace.cam_X[botVertex] - renderFace.cam_X[topVertex]) * inverseHeight;
-		edgeDeltas[1] = (renderFace.zFactors[botVertex] - renderFace.zFactors[topVertex]) * inverseHeight;
-
-		// adjust all start variables with cutoff
+		// .. and adjust all start variables with cutoff
 		float cam_x = xoffset + renderFace.cam_X[topVertex] + (cutOff * edgeDeltas[0]);
-		float zf = renderFace.zFactors[topVertex] + (cutOff * edgeDeltas[1]);
+		
+		float zf = 0;
+		float z = 0;;
 		
 		float u = 0;
 		float v = 0;
@@ -183,36 +181,44 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 		float wx = 0;
 		float wy = 0;
 		float wz = 0;
-
+		
 		if (!onlyZPass) {
-			// we need more deltas for u, v, nx, ny, nz, pwx, pwy, pwz
-			edgeDeltas[2] = (renderFace.texel_U[botVertex] - renderFace.texel_U[topVertex]) * inverseHeight;
-			edgeDeltas[3] = (renderFace.texel_V[botVertex] - renderFace.texel_V[topVertex]) * inverseHeight;
-
-			edgeDeltas[4] = (renderFace.vertices[botVertex].normal_x - renderFace.vertices[topVertex].normal_x)
-					* inverseHeight;
-			edgeDeltas[5] = (renderFace.vertices[botVertex].normal_y - renderFace.vertices[topVertex].normal_y)
-					* inverseHeight;
-			edgeDeltas[6] = (renderFace.vertices[botVertex].normal_z - renderFace.vertices[topVertex].normal_z)
-					* inverseHeight;
-
-			edgeDeltas[7] = (renderFace.pcorrectedWorld_X[botVertex] - renderFace.pcorrectedWorld_X[topVertex])
-					* inverseHeight;
-			edgeDeltas[8] = (renderFace.pcorrectedWorld_Y[botVertex] - renderFace.pcorrectedWorld_Y[topVertex])
-					* inverseHeight;
-			edgeDeltas[9] = (renderFace.pcorrectedWorld_Z[botVertex] - renderFace.pcorrectedWorld_Z[topVertex])
-					* inverseHeight;
-
-			u = renderFace.texel_U[topVertex] + (cutOff * edgeDeltas[2]);
-			v = renderFace.texel_V[topVertex] + (cutOff * edgeDeltas[3]);
+			// we need more deltas for zf, u, v, nx, ny, nz, wx, wy, wz
+			edgeDeltas[1] = (renderFace.zFactors[botVertex] - renderFace.zFactors[topVertex]) * inverseHeight;
 			
-			nx = renderFace.vertices[topVertex].normal_x + (cutOff * edgeDeltas[4]);
-			ny = renderFace.vertices[topVertex].normal_y + (cutOff * edgeDeltas[5]);
-			nz = renderFace.vertices[topVertex].normal_z + (cutOff * edgeDeltas[6]);
+			edgeDeltas[3] = (renderFace.texel_U[botVertex] - renderFace.texel_U[topVertex]) * inverseHeight;
+			edgeDeltas[4] = (renderFace.texel_V[botVertex] - renderFace.texel_V[topVertex]) * inverseHeight;
+
+			edgeDeltas[5] = (renderFace.vertices[botVertex].normal_x - renderFace.vertices[topVertex].normal_x)
+					* inverseHeight;
+			edgeDeltas[6] = (renderFace.vertices[botVertex].normal_y - renderFace.vertices[topVertex].normal_y)
+					* inverseHeight;
+			edgeDeltas[7] = (renderFace.vertices[botVertex].normal_z - renderFace.vertices[topVertex].normal_z)
+					* inverseHeight;
+
+			edgeDeltas[8] = (renderFace.pcorrectedWorld_X[botVertex] - renderFace.pcorrectedWorld_X[topVertex])
+					* inverseHeight;
+			edgeDeltas[9] = (renderFace.pcorrectedWorld_Y[botVertex] - renderFace.pcorrectedWorld_Y[topVertex])
+					* inverseHeight;
+			edgeDeltas[10] = (renderFace.pcorrectedWorld_Z[botVertex] - renderFace.pcorrectedWorld_Z[topVertex])
+					* inverseHeight;
 			
-			wx = renderFace.pcorrectedWorld_X[topVertex] + (cutOff * edgeDeltas[7]);
-			wy = renderFace.pcorrectedWorld_Y[topVertex] + (cutOff * edgeDeltas[8]);
-			wz = renderFace.pcorrectedWorld_Z[topVertex] + (cutOff * edgeDeltas[9]);
+			zf = renderFace.zFactors[topVertex] + (cutOff * edgeDeltas[1]);
+
+			u = renderFace.texel_U[topVertex] + (cutOff * edgeDeltas[3]);
+			v = renderFace.texel_V[topVertex] + (cutOff * edgeDeltas[4]);
+			
+			nx = renderFace.vertices[topVertex].normal_x + (cutOff * edgeDeltas[5]);
+			ny = renderFace.vertices[topVertex].normal_y + (cutOff * edgeDeltas[6]);
+			nz = renderFace.vertices[topVertex].normal_z + (cutOff * edgeDeltas[7]);
+			
+			wx = renderFace.pcorrectedWorld_X[topVertex] + (cutOff * edgeDeltas[8]);
+			wy = renderFace.pcorrectedWorld_Y[topVertex] + (cutOff * edgeDeltas[9]);
+			wz = renderFace.pcorrectedWorld_Z[topVertex] + (cutOff * edgeDeltas[10]);
+		}else{
+			// we only need a delta for z
+			edgeDeltas[2] = (renderFace.cam_Z[botVertex] - renderFace.cam_Z[topVertex]) * inverseHeight;
+			 z = renderFace.cam_Z[topVertex] + (cutOff * edgeDeltas[2]);
 		}
 		
 		for (int h = 0; h <= int_height; h++) {
@@ -221,9 +227,9 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			
 			if (!edgeTableEntry.visited || cam_x < edgeTableEntry.min_draw_x) {
 				edgeTableEntry.min_draw_x = cam_x;
-				edgeTableEntry.min_zFactor = zf;
-
+								
 				if (!onlyZPass) {
+					edgeTableEntry.min_zFactor = zf;
 					edgeTableEntry.min_texel_u = u;
 					edgeTableEntry.min_texel_v = v;
 					edgeTableEntry.min_normal_x = nx;
@@ -232,13 +238,15 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 					edgeTableEntry.min_pcorrectedWorld_x = wx;
 					edgeTableEntry.min_pcorrectedWorld_y = wy;
 					edgeTableEntry.min_pcorrectedWorld_z = wz;
+				}else{
+					edgeTableEntry.min_z = z;
 				}
 			}
 			if (!edgeTableEntry.visited || cam_x > edgeTableEntry.max_draw_x) {
 				edgeTableEntry.max_draw_x = cam_x;
-				edgeTableEntry.max_zFactor = zf;
-
+								
 				if (!onlyZPass) {
+					edgeTableEntry.max_zFactor = zf;
 					edgeTableEntry.max_texel_u = u;
 					edgeTableEntry.max_texel_v = v;
 					edgeTableEntry.max_normal_x = nx;
@@ -247,6 +255,8 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 					edgeTableEntry.max_pcorrectedWorld_x = wx;
 					edgeTableEntry.max_pcorrectedWorld_y = wy;
 					edgeTableEntry.max_pcorrectedWorld_z = wz;
+				}else{
+					edgeTableEntry.max_z = z;
 				}
 			}
 
@@ -254,39 +264,43 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 			// lerp variables
 			cam_x += edgeDeltas[0];						
-			zf += edgeDeltas[1];
-
+						
 			if (!onlyZPass) {
-				u += edgeDeltas[2];
-				v += edgeDeltas[3];
+				zf += edgeDeltas[1];
+				
+				u += edgeDeltas[3];
+				v += edgeDeltas[4];
 
-				nx += edgeDeltas[4];
-				ny += edgeDeltas[5];
-				nz += edgeDeltas[6];
+				nx += edgeDeltas[5];
+				ny += edgeDeltas[6];
+				nz += edgeDeltas[7];
 
-				wx += edgeDeltas[7];
-				wy += edgeDeltas[8];
-				wz += edgeDeltas[9];
+				wx += edgeDeltas[8];
+				wy += edgeDeltas[9];
+				wz += edgeDeltas[10];
+			}else{
+				z += edgeDeltas[2];
 			}
 			
 			
 			// add sub-pixel correction
 			if(h==0){
 				cam_x += (subPix * edgeDeltas[0]);
-				zf += (subPix * edgeDeltas[1]);
+								
 				if(!onlyZPass){
-					u += (subPix * edgeDeltas[2]);	
-					v += (subPix * edgeDeltas[3]);
-					nx += (subPix * edgeDeltas[4]);
-					ny += (subPix * edgeDeltas[5]);
-					nz += (subPix * edgeDeltas[6]);
-					wx += (subPix * edgeDeltas[7]);
-					wy += (subPix * edgeDeltas[8]);
-					wz += (subPix * edgeDeltas[9]);
+					zf += (subPix * edgeDeltas[1]);
+					u  += (subPix * edgeDeltas[3]);	
+					v  += (subPix * edgeDeltas[4]);
+					nx += (subPix * edgeDeltas[5]);
+					ny += (subPix * edgeDeltas[6]);
+					nz += (subPix * edgeDeltas[7]);
+					wx += (subPix * edgeDeltas[8]);
+					wy += (subPix * edgeDeltas[9]);
+					wz += (subPix * edgeDeltas[10]);
+				}else{
+					z  += (subPix * edgeDeltas[2]);	
 				}
-				
 			}
-			
 		}
 		
 //		if(int_height==0){
@@ -372,9 +386,8 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			final float iScanlineLength = 1f / (edgeTableEntry.max_draw_x - edgeTableEntry.min_draw_x + 1);
 
 			// compute deltas
-			final float zfactor_stepfactor = (edgeTableEntry.max_zFactor - edgeTableEntry.min_zFactor)
-					* iScanlineLength;
-						
+			float z_stepfactor = 0;
+			float zfactor_stepfactor = 0;
 			float texel_du_stepfactor = 0;
 			float texel_dv_stepfactor = 0;
 			float vn_dx_stepfactor = 0;
@@ -385,6 +398,9 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			float pcorr_world_dz_stepfactor = 0;
 			
 			if(!doOnlyZPass){
+				zfactor_stepfactor = (edgeTableEntry.max_zFactor - edgeTableEntry.min_zFactor)
+						* iScanlineLength;
+				
 				texel_du_stepfactor = (edgeTableEntry.max_texel_u - edgeTableEntry.min_texel_u)
 						* iScanlineLength;
 				texel_dv_stepfactor = (edgeTableEntry.max_texel_v - edgeTableEntry.min_texel_v)
@@ -402,8 +418,10 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 				pcorr_world_dy_stepfactor = (edgeTableEntry.max_pcorrectedWorld_y
 						- edgeTableEntry.min_pcorrectedWorld_y) * iScanlineLength;
 				pcorr_world_dz_stepfactor = (edgeTableEntry.max_pcorrectedWorld_z
-						- edgeTableEntry.min_pcorrectedWorld_z) * iScanlineLength;	
-			}			
+						- edgeTableEntry.min_pcorrectedWorld_z) * iScanlineLength;
+			}else{
+				z_stepfactor = (edgeTableEntry.max_z - edgeTableEntry.min_z) * iScanlineLength; 
+			}
 			
 			// scanline begin and end
 			int startX = (int) edgeTableEntry.min_draw_x;
@@ -412,11 +430,10 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			// clip against left side of screen
 			if (edgeTableEntry.min_draw_x < 0) {
 				// das abgeschnittene ende auf alle min-werte drauf
-				// interpolieren
-				
-				edgeTableEntry.min_zFactor += -edgeTableEntry.min_draw_x * zfactor_stepfactor;
-				
+				// interpolieren								
 				if(!doOnlyZPass){
+					edgeTableEntry.min_zFactor += -edgeTableEntry.min_draw_x * zfactor_stepfactor;
+					
 					// texel
 					edgeTableEntry.min_texel_u += -edgeTableEntry.min_draw_x * texel_du_stepfactor;
 					edgeTableEntry.min_texel_v += -edgeTableEntry.min_draw_x * texel_dv_stepfactor;
@@ -429,7 +446,9 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 					// world coordinates
 					edgeTableEntry.min_pcorrectedWorld_x += -edgeTableEntry.min_draw_x * pcorr_world_dx_stepfactor;
 					edgeTableEntry.min_pcorrectedWorld_y += -edgeTableEntry.min_draw_x * pcorr_world_dy_stepfactor;
-					edgeTableEntry.min_pcorrectedWorld_z += -edgeTableEntry.min_draw_x * pcorr_world_dz_stepfactor;	
+					edgeTableEntry.min_pcorrectedWorld_z += -edgeTableEntry.min_draw_x * pcorr_world_dz_stepfactor;
+				}else{
+					edgeTableEntry.min_z += -edgeTableEntry.min_draw_x * z_stepfactor;
 				}
 				
 				edgeTableEntry.min_draw_x = 0;
@@ -443,15 +462,22 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			boolean shadeScanline = true;
 			for (int draw_x = startX; draw_x <= endX; draw_x++) {
 
-				float zfa = edgeTableEntry.min_zFactor;
-				float inverseZfactor = 1 / zfa; // this is the pixel divide
-												// for accurate perspective
-												// correct texture mapping.
-												// since we linearly
-												// interpolated 1/z we now have
-												// to transform back to z.
-
-				float draw_z = Engine3D.inverseZFactor(zfa, inverseZfactor);
+				float inverseZfactor;
+				float draw_z;				
+				if(doOnlyZPass){
+					inverseZfactor = 0;
+					draw_z = edgeTableEntry.min_z;
+				}else{
+					// compute perspective correct z-value;
+					// this is the pixel divide
+					// for perspective
+					// correction.
+					// since we linearly
+					// interpolated 1/z we now have
+					// to transform back to z.
+					inverseZfactor = 1 / edgeTableEntry.min_zFactor;
+					draw_z = Engine3D.inverseZFactor(edgeTableEntry.min_zFactor, inverseZfactor);
+				}
 
 				if (zBuffer.update(draw_x, draw_y, draw_z)) {
 
@@ -462,32 +488,12 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 							boolean insideShadow = false;
 
-							float pcorr_world_x = edgeTableEntry.min_pcorrectedWorld_x;
-							float pcorr_world_y = edgeTableEntry.min_pcorrectedWorld_y;
-							float pcorr_world_z = edgeTableEntry.min_pcorrectedWorld_z;
-
-							float texel_u = edgeTableEntry.min_texel_u;
-							float texel_v = edgeTableEntry.min_texel_v;
-
-							// vertex normals
-							float vn_x = edgeTableEntry.min_normal_x;
-							float vn_y = edgeTableEntry.min_normal_y;
-							float vn_z = edgeTableEntry.min_normal_z;
-
-							// perspektiven korrektur
-							texel_u *= inverseZfactor;
-							texel_v *= inverseZfactor;
-
 							// perspektivenkorrektur der weltkoordinaten aus
 							// kamera
 							// sicht
-							pcorr_world_x *= inverseZfactor;
-							pcorr_world_y *= inverseZfactor;
-							pcorr_world_z *= inverseZfactor;
-
-							// vn_x *= inverseZfactor;
-							// vn_y *= inverseZfactor;
-							// vn_z *= inverseZfactor;
+							float pcorr_world_x = edgeTableEntry.min_pcorrectedWorld_x * inverseZfactor;
+							float pcorr_world_y = edgeTableEntry.min_pcorrectedWorld_y * inverseZfactor;
+							float pcorr_world_z = edgeTableEntry.min_pcorrectedWorld_z * inverseZfactor;
 
 							// Shadow mapping: anhand der world space
 							// coordinaten
@@ -496,43 +502,33 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 								
 								// all this shadow-mapping stuff should go somewhere else!
 								
-								float[] lightCoords = inverseLightMatrix.transform(pcorr_world_x - lightsource.x,
-										pcorr_world_y - lightsource.y, pcorr_world_z - lightsource.z);
-								// float[] lightCoords =
-								// inverseLightMatrix.transform(lightsource.x-pcorr_world_x,
-								// lightsource.y-pcorr_world_y,
-								// lightsource.z-pcorr_world_z);
+								float[] lightCoords = inverseLightMatrix.transform(pcorr_world_x + (0.5f * edgeTableEntry.min_normal_x) - lightsource.x,
+										pcorr_world_y + (0.5f * edgeTableEntry.min_normal_y) - lightsource.y, pcorr_world_z + (0.5f * edgeTableEntry.min_normal_z) - lightsource.z);
 
 								// perspektiven korrektur innerhalb des light-space
 								float zf = Engine3D.zFactor(lightCoords[2]);
 								lightCoords[0] *= zf;
 								lightCoords[1] *= zf;
 
-								// to "screenspace" (da auf diese weise
-								// auch
-								// die werte beim eintragen in die shadow map
-								// berechnet wurden)
-								float light_x = shadowMap.xoffset + lightCoords[0];
-								float light_y = shadowMap.yoffset - lightCoords[1];
-
+								// to "screenspace" da auf diese weise
+								// auch die werte beim eintragen in die 
+								// shadow map/depth map berechnet wurden								
+								float light_x = shadowMap.xoffset + lightCoords[0] + 0.5f;
+								float light_y = shadowMap.yoffset - lightCoords[1] + 0.5f;
+								
 								if (light_x < 0 || light_x >= shadowMap.w || light_y < 0 || light_y >= shadowMap.h) {
-									
-									if (lightsource.isSpotLight()) {
-										insideShadow = true;
-									}
-								} else {
-									if (shadowMap.getValue(light_x, light_y, false) < lightCoords[2]
-											- /* bias gegen schatten akne= */ 0) {
-										insideShadow = true;
-									}
+									// outside shadow map
+									insideShadow = true;									
+								} else if (shadowMap.getValue(light_x, light_y, false) < lightCoords[2]) {
+									insideShadow = true;
 								}
 							}
 
 							if (insideShadow) {
 								rgb = shadowColorRGB;
 							} else {
-								rgb = shader.shade(renderFace, pcorr_world_x, pcorr_world_y, pcorr_world_z, vn_x, vn_y,
-										vn_z, texel_u, texel_v, draw_x, draw_y);
+								rgb = shader.shade(renderFace, pcorr_world_x, pcorr_world_y, pcorr_world_z, edgeTableEntry.min_normal_x, edgeTableEntry.min_normal_y,
+										edgeTableEntry.min_normal_z, edgeTableEntry.min_texel_u*inverseZfactor, edgeTableEntry.min_texel_v*inverseZfactor, draw_x, draw_y);
 							}
 						}
 
@@ -540,9 +536,10 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 					}
 				}
 
-				// lerp..
-				edgeTableEntry.min_zFactor += zfactor_stepfactor;
+				// lerp..						
 				if(!doOnlyZPass){
+					edgeTableEntry.min_zFactor += zfactor_stepfactor;
+					
 					edgeTableEntry.min_texel_u += texel_du_stepfactor;
 					edgeTableEntry.min_texel_v += texel_dv_stepfactor;
 
@@ -552,14 +549,17 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 					
 					edgeTableEntry.min_pcorrectedWorld_x += pcorr_world_dx_stepfactor;
 					edgeTableEntry.min_pcorrectedWorld_y += pcorr_world_dy_stepfactor;
-					edgeTableEntry.min_pcorrectedWorld_z += pcorr_world_dz_stepfactor;	
+					edgeTableEntry.min_pcorrectedWorld_z += pcorr_world_dz_stepfactor;
+				}else{
+					edgeTableEntry.min_z += z_stepfactor;
 				}
 				
 				if(draw_x == startX){
 					// sub-tex accuracy adjustments
 					final float subTex = ((float) startX) - edgeTableEntry.min_draw_x;
-					edgeTableEntry.min_zFactor += subTex * zfactor_stepfactor;
 					if(!doOnlyZPass){
+						edgeTableEntry.min_zFactor += subTex * zfactor_stepfactor;
+						
 						edgeTableEntry.min_texel_u += subTex * texel_du_stepfactor;
 						edgeTableEntry.min_texel_v += subTex * texel_dv_stepfactor;
 						
@@ -569,10 +569,11 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 						
 						edgeTableEntry.min_pcorrectedWorld_x += subTex * pcorr_world_dx_stepfactor;
 						edgeTableEntry.min_pcorrectedWorld_y += subTex * pcorr_world_dy_stepfactor;
-						edgeTableEntry.min_pcorrectedWorld_z += subTex * pcorr_world_dz_stepfactor;	
+						edgeTableEntry.min_pcorrectedWorld_z += subTex * pcorr_world_dz_stepfactor;
+					}else{
+						edgeTableEntry.min_z += subTex * z_stepfactor;
 					}
 				}
-				
 
 			} // draw_x
 
@@ -580,6 +581,7 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 		} // draw_y
 	}
+	
 
 	public boolean isOutsideScreen(RenderFace renderFace) {
 		if (renderFace.maxX() < -xoffset) {
@@ -677,13 +679,20 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 
 		float min_draw_x;
 		float max_draw_x;
-
+			
+		float min_z;
+		float max_z;
+		
+		// represents 1/z
+		float min_zFactor;
+		float max_zFactor;
+		
+		
 		float min_texel_u;
 		float min_texel_v;
 		float max_texel_u;
 		float max_texel_v;
-		float min_zFactor;
-		float max_zFactor;
+				
 
 		float min_normal_x;
 		float min_normal_y;
@@ -704,19 +713,23 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 			min_draw_x = 0;
 			max_draw_x = 0;
 
+			min_zFactor = 0;
+			max_zFactor = 0;
+			
+			min_z = max_z = 0;
+			
 			min_texel_u = 0;
 			min_texel_v = 0;
 			max_texel_u = 0;
 			max_texel_v = 0;
-			min_zFactor = 0;
-			max_zFactor = 0;
+			
 
 			min_normal_x = min_normal_y = min_normal_z = 0;
 			max_normal_x = max_normal_y = max_normal_z = 0;
 
 			min_pcorrectedWorld_x = min_pcorrectedWorld_y = min_pcorrectedWorld_z = 0;
 			max_pcorrectedWorld_x = max_pcorrectedWorld_y = max_pcorrectedWorld_z = 0;
-
+			
 			visited = false;
 		}
 
