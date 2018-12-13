@@ -25,17 +25,31 @@ public class Lightsource extends Point3D {
 		this.matrix = new Matrix3D();
 		this.inverseMatrix = matrix.getInverse();
 		this.light_z = matrix.getZVector();
-	}
-
+	}	
 
 	public float getIntensity() {
 		return intensity;
+	}
+	
+	
+	public float getIntensity(float world_x, float world_y, float world_z) {
+		return intensity * (addAttenuation? computeLightAttenuation(world_x, world_y, world_z) : 1f);
 	}
 
 	public void setIntensity(float i) {
 		intensity = i;
 	}
 
+	
+	public float getLightAttenuationFalloffFactor() {
+		return lightAttenuationFalloffFactor;
+	}
+
+	public void setLightAttenuationFalloffFactor(float lightAttenuationFalloffFactor) {
+		this.lightAttenuationFalloffFactor = lightAttenuationFalloffFactor;
+	}
+	
+	
 	public Color getColor() {
 		return col;
 	}
@@ -114,6 +128,15 @@ public class Lightsource extends Point3D {
 		this.light_z= matrix.getZVector();
 	}	
 	
+	public float computeLightAttenuation(float world_x, float world_y, float world_z){
+		if(isDirectional==false){
+			float d2 = distanceSquared(world_x, world_y, world_z);
+			return Toolbox.clamp(1/(lightAttenuationFalloffFactor*d2), 0f, 1f);
+		}else{
+			return 1f;
+		}
+	}
+	
 	
 	public boolean isDirectional(){
 		return isDirectional;
@@ -132,16 +155,28 @@ public class Lightsource extends Point3D {
 		this.isSpotLight = value;
 	}
 	
+	public boolean isAddAttenuation() {
+		return addAttenuation;
+	}
+
+	public void setAddAttenuation(boolean addAttenuation) {
+		this.addAttenuation = addAttenuation;
+	}
+	
 
 	public static float AMBIENT_LIGHT_INTENSITY = 0.2f;
 	
 	public static final float MIN_INTENSITY = 0.01f;
 	public static final float NORM_INTENSITY = 0.66f;
 	public static final float MAX_INTENSITY = 1f;
-
-	float intensity;
-	Color col;
-	float[] rgbComponents;
+	
+	private boolean addAttenuation = false;
+	private float lightAttenuationFalloffFactor = 0.000001f;
+	
+	private float intensity;
+	private Color col;
+	
+	protected float[] rgbComponents;
 	
 	
 	private Matrix3D matrix;

@@ -200,8 +200,8 @@ public class Toolbox {
 		return modelGraph;
 	}
 
-	public static List toCurve(Point3D[] pArr, int steps) {
-		List curve = new LinkedList();
+	public static List<Point3D> toCurve(Point3D[] pArr, int steps) {
+		List<Point3D> curve = new LinkedList<Point3D>();
 		float t, t2, t3, k1, k2, k3, bsp_x, bsp_y, bsp_z;
 		float reziSteps = 1 / (float) steps;
 

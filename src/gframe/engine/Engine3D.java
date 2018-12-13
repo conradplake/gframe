@@ -403,11 +403,10 @@ public class Engine3D {
 		Matrix3D modelMatrix = parentMatrix.getTransformed(model.getMatrix());
 		Shader modelShader = modelShaders.get(model);
 
-		Point3D camPosInObjectSpace = null;
-		Vector3D camZInObjectSapce = null;
+		
 		Matrix3D modelInverse = modelMatrix.getInverse();
-		camPosInObjectSpace = modelInverse.transform(camOrigin.copy().subtract(modelOrigin));
-		camZInObjectSapce = modelInverse.transform(cam_z.copy());
+		Point3D camPosInObjectSpace = modelInverse.transform(camOrigin.copy().subtract(modelOrigin));
+		Vector3D camZInObjectSapce =  modelInverse.transform(cam_z.copy());
 
 		for (Iterator<Face> it = model.getFaces().iterator(); it.hasNext();) {
 
@@ -418,7 +417,7 @@ public class Engine3D {
 			// needs to change along the pipeline (createRenderFace etc)
 			face = Clipper3D.clip(face, camPosInObjectSpace, camZInObjectSapce);
 			if (face == null) {
-				continue; // face is out of view
+				continue; // face is out of view or backfaced
 			}
 
 			RenderFace renderFace = face.createRenderFace(model.getMaterial());

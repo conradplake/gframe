@@ -40,11 +40,15 @@ public class Point3D {
 	}
 
 	public float distanceSquared(Point3D p) {
-		return ((p.x - x) * (p.x - x) + (p.y - y) * (p.y - y) + (p.z - z) * (p.z - z));
+		return (p.x - x) * (p.x - x) + (p.y - y) * (p.y - y) + (p.z - z) * (p.z - z);
 	}
 
 	public float distance(float px, float py, float pz) {
 		return (float) Math.sqrt((px - x) * (px - x) + (py - y) * (py - y) + (pz - z) * (pz - z));
+	}
+	
+	public float distanceSquared(float px, float py, float pz) {
+		return (px - x) * (px - x) + (py - y) * (py - y) + (pz - z) * (pz - z);
 	}
 
 	public Point3D move(float dx, float dy, float dz) {

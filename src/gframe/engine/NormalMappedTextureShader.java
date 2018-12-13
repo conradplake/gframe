@@ -143,21 +143,40 @@ public class NormalMappedTextureShader extends TextureShader {
 
 		lightNormalProduct = tangentLocalLightsourcePosition.dotProduct(tNormal_x, tNormal_y, tNormal_z);
 
+		// object color
+		diffuseAlpha = (texel >> 24) & 0xff;
+		diffuseRed = ((texel >> 16) & 0xff) * iColorNorm;
+		diffuseGreen = ((texel >> 8) & 0xff) * iColorNorm;
+		diffuseBlue = ((texel >> 0) & 0xff) * iColorNorm;
+		
+		diffuseIntensity = Math.max(lightNormalProduct, 0) * lightsource.getIntensity(world_x, world_y, world_z);
+		
 		if (!specularityFromAlphaChannel) {
 			// return diffuse color
-			return super.shadeDiffuse(texel, 1f, Math.max(lightNormalProduct, 0));
+			
+			diffuse_red   = diffuseIntensity * lightsource.rgbComponents[0] * diffuseRed;
+			diffuse_green = diffuseIntensity * lightsource.rgbComponents[1] * diffuseGreen;
+			diffuse_blue  = diffuseIntensity * lightsource.rgbComponents[2] * diffuseBlue;
+			
+			redColor = (int) ((ambientColor_red + diffuse_red) * 255);
+			greenColor = (int) ((ambientColor_green + diffuse_green) * 255);
+			blueColor = (int) ((ambientColor_blue + diffuse_blue) * 255);
+
+			// clamp colors
+			if (redColor > 255)
+				redColor = 255;
+			if (greenColor > 255)
+				greenColor = 255;
+			if (blueColor > 255)
+				blueColor = 255;
+			
+			return ((diffuseAlpha & 0xFF) << 24) | ((redColor & 0xFF) << 16) | ((greenColor & 0xFF) << 8)
+					| ((blueColor & 0xFF) << 0);					
 		} 
 		else {
-			// here we do phong lighting in tangent space		
-
-			// object color
-			diffuseAlpha = (texel >> 24) & 0xff;
-			diffuseRed = ((texel >> 16) & 0xff) * iColorNorm;
-			diffuseGreen = ((texel >> 8) & 0xff) * iColorNorm;
-			diffuseBlue = ((texel >> 0) & 0xff) * iColorNorm;
+			// here we do phong lighting in tangent space
 
 			// DIFFUSE
-			diffuseIntensity = Math.max(lightNormalProduct, 0);
 			diffuse_red   = diffuseIntensity * renderFace.material.diffuseCoefficientRed   * diffuseRed;
 			diffuse_green = diffuseIntensity * renderFace.material.diffuseCoefficientGreen * diffuseGreen;
 			diffuse_blue  = diffuseIntensity * renderFace.material.diffuseCoefficientBlue  * diffuseBlue;

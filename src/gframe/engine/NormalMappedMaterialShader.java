@@ -61,7 +61,7 @@ public class NormalMappedMaterialShader extends TextureShader {
 
 		// DIFFUSE
 		lightNormalProduct = tangentLocalLightsourcePosition.dotProduct(tNormal_x, tNormal_y, tNormal_z);
-		diffuseIntensity = Math.max(lightNormalProduct, 0);
+		diffuseIntensity = Math.max(lightNormalProduct, 0) *  lightsource.getIntensity(world_x, world_y, world_z);
 		diffuse_red = diffuseIntensity * renderFace.material.diffuseCoefficientRed ;
 		diffuse_green = diffuseIntensity * renderFace.material.diffuseCoefficientGreen;
 		diffuse_blue = diffuseIntensity * renderFace.material.diffuseCoefficientBlue;
