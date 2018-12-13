@@ -114,12 +114,11 @@ public class Xmas2016 extends DoubleBufferedFrame implements MouseMotionListener
 		Color zenithColor = new Color(30, 50, 70);
 		Color horizonColor = new Color(0, 0, 100);
 		Model3D skydome = Model3DGenerator.buildSkydome(1000, lightskyblue);
-		SkyShader skydomeShader = new SkyShader(engine.getLightsource(), skydome, horizonColor, zenithColor);							
+		SkyShader skydomeShader = new SkyShader(engine.getLightsource(), skydome, horizonColor, zenithColor, 1000);
 		engine.register(skydome, skydomeShader);				
-					
-		engine.setDefaultShader(null);
-		
+									
 		// SNOW		
+		engine.setDefaultShader(null);
 		for(int i=0;i<NUMBER_OF_SNOWFLAKES;i++){
 			float x = -500 + (float)(Math.random()* 1000);
 			float y = -500 + (float)(Math.random()* 1000);

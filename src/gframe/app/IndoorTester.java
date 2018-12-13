@@ -2,10 +2,7 @@ package gframe.app;
 
 import java.awt.AWTEvent;
 import java.awt.Color;
-import java.awt.DisplayMode;
 import java.awt.Graphics;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -51,11 +48,10 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 		// LIGHT SETTINGS
 		lightsource = new Lightsource(0, 0, 0, Color.white, Lightsource.MAX_INTENSITY);
 //		lightsource.setShadowsEnabled(true);
+		lightsource.setAddAttenuation(true);
 		engine.setLightsource(lightsource);
-									
-//		Shader shader = new TextureShader(lightsource);
-		
-		Color floorTileColor = new Color(118, 206, 235);
+											
+//		Color floorTileColor = new Color(118, 206, 235);
 //		TextureShader shader = new NormalMappedTextureShader(lightsource,
 //				TextureGenerator.generateTileTexture(160, 160, 20, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
 //				TextureGenerator.generateTileTextureNormalMap(160, 160, 20), true);
@@ -63,8 +59,7 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 //		NormalMappedMaterialShader shader = new NormalMappedMaterialShader(lightsource, TextureGenerator.generateMengerSpongeNormalMap(243));
 		
 		TextureShader shader = new NormalMappedMaterialShader(engine.getLightsource(), TextureGenerator.getRGBRaster(new File("./textures/normal/wall_NM.jpg"), 1024, 1024));
-		
-		
+
 //		Shader shader = new TextureShader(lightsource, TextureShader.getRGBRaster(Color.CYAN, 256, 256));
 //		Shader shader = new PhongShader(lightsource);
 //		Shader shader = new FlatShader(lightsource);
@@ -72,9 +67,7 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 		
 		engine.setDefaultShader(shader);		
 	}
-	
 
-	
 	
 	private void initWorld() {	
 		
@@ -87,49 +80,9 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 		room.setMaterial(Material.COPPER);
 		engine.register(room);
 		
-		
-//		int tileSize = 40;		
-//		
-//		Model3D floor = Model3DGenerator.buildPlane(100, new Point3D(), Color.BLUE);
-//		floor.rotate(-180, 0, 0);
-//		floor.setMaterial(Material.RED_PLASTIC);
-//		engine.register(floor);			
-//		
-//		Model3D ceiling = Model3DGenerator.buildTiledFloor(4, 4, tileSize, Color.BLUE);			
-//		ceiling.move(0, 2*tileSize, 4*tileSize);
-//		ceiling.rotate(180, 0, 0);	
-//		ceiling.setMaterial(Material.RED_PLASTIC);
-//		engine.register(ceiling);
-//		
-//		Model3D backwall = Model3DGenerator.buildTiledFloor(4, 2, tileSize, Color.BLUE);
-//		backwall.move(0, 0, 4*tileSize);
-//		backwall.rotate(90, 0, 0);
-//		backwall.setMaterial(Material.RED_PLASTIC);
-//		engine.register(backwall);
-//		
-//		Model3D rightwall = Model3DGenerator.buildTiledFloor(4, 2, tileSize, Color.BLUE);		
-//		rightwall.move(4*tileSize, 0, 4*tileSize);
-//		rightwall.rotate(90, 0, 90);
-//		rightwall.setMaterial(Material.RED_PLASTIC);
-//		engine.register(rightwall);
-//		
-//		Model3D leftwall = Model3DGenerator.buildTiledFloor(4, 2, tileSize, Color.BLUE);		
-//		leftwall.move(0, 0, 0);
-//		leftwall.rotate(90, 0, -90);
-//		leftwall.setMaterial(Material.RED_PLASTIC);
-//		engine.register(leftwall);
-		
-		
-		
 		// CAMERA SETTINGS	
 		camera = new TripodCamera();
-//		camera.move(0, 200, -1200);
-		engine.setCamera(camera);				
-		
-		
-		// LIGHT SETTNGS
-//		lightsource.move(0, 400, -1000);
-//		lightsource.rotate(-20, 0, 0);
+		engine.setCamera(camera);		
 	}
 
 	
@@ -150,12 +103,7 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 					Thread.sleep(millidelay);
 				} catch (InterruptedException ie_ignore) {
 				}
-			}
-			
-//			List<Model3D> modelList = engine.getActiveModels();
-//			for (Model3D model3d : modelList) {
-//				model3d.rotate(new Point3D(), 0, 0, 0.01f);	
-//			}					
+			}				
 		}
 	}
 

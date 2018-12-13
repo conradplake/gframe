@@ -492,7 +492,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		
 		
 		Model3D skydome = Model3DGenerator.buildSkydome(70000, Color.BLUE);		
-		Shader skydomeShader = new SkyShader(lightsource, skydome);
+		Shader skydomeShader = new SkyShader(lightsource, skydome, 70000);
 		engine.register(skydome, skydomeShader);		
 			
 		Shader terrainShader = new PhongShader(lightsource);//				
@@ -863,7 +863,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				nextPosition.updatePosition(lastTime, currentTime, lightsource);
 				nextPosition.updatePosition(lastTime, currentTime, lightsource.getMatrix());
 								
-				// TODO: alle Ã¤nderungen Ã¼ber eine generelle schnittstelle bekannt machen
+				// TODO: alle änderungen über eine generelle schnittstelle bekannt machen
 				lightsource.recomputeLightZ();				
 				lightsource.recomputeInverse(); 
 				
@@ -938,7 +938,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				nextPosition.updatePosition(lastTime, currentTime, lightsource);
 				nextPosition.updatePosition(lastTime, currentTime, lightsource.getMatrix());
 				
-				lightsource.recomputeInverse(); // TODO: alle Ã¤nderungen Ã¼ber eine generelle schnittstelle bekannt machen								
+				lightsource.recomputeInverse(); // TODO: alle änderungen über eine generelle schnittstelle bekannt machen								
 				engine.recomputeShadowMaps();
 				
 				if (currentTime >= nextPosition.getTimestamp()) {
