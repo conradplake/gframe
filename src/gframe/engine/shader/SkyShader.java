@@ -20,14 +20,21 @@ public class SkyShader extends AbstractShader {
 	private int zenith_green;
 	private int zenith_blue;
 	
-	public SkyShader(Lightsource lightsource, Model3D skydome) {		
-		this(lightsource, skydome, new Color(135, 206, 250), new Color(0, 0, 140)); // default sky: lightblue -> darkblue 
+	public SkyShader(Lightsource lightsource, Model3D skydome, int height) {		
+		this(lightsource, skydome, new Color(135, 206, 250), new Color(0, 0, 140), height); // default sky: lightblue -> darkblue 
 	}
 	
-	public SkyShader(Lightsource lightsource, Model3D skydome, Color horizonColor, Color zenithColor) {
+	public SkyShader(Lightsource lightsource, Model3D skydome, Color horizonColor, Color zenithColor, int height) {
 		super(lightsource);
-		float[] skydomebbox = skydome.getBBox();		
-		this.iMaxY = 1f/skydomebbox[3];
+		
+//		float[] skydomebbox = skydome.getBBox();					
+//		System.out.println("Skydome x_max: "+skydomebbox[1]);
+//		System.out.println("Skydome x_min: "+skydomebbox[0]);
+//		System.out.println("Skydome y_max: "+skydomebbox[3]);
+//		System.out.println("Skydome y_min: "+skydomebbox[2]);
+//		System.out.println("Skydome origin.y: "+skydome.getOrigin().y);
+		
+		this.iMaxY = 1f/height;
 		
 		this.horizontal_red = horizonColor.getRed();
 		this.horizontal_green = horizonColor.getGreen();
@@ -45,7 +52,7 @@ public class SkyShader extends AbstractShader {
 		
 		// anhand von world_y die farbe bestimmen via interpolation zwischen horizont color (y=0) und zenith-color (y=skydome.maxY)		
 						
-		float relativeHeight = world_y * iMaxY;		
+		float relativeHeight = world_y * iMaxY;
 		
 		int r = Toolbox.lerp(horizontal_red, zenith_red, relativeHeight);
 		int g = Toolbox.lerp(horizontal_green, zenith_green, relativeHeight);
