@@ -16,35 +16,16 @@ import gframe.engine.Model3D;
 import gframe.engine.Point3D;
 import gframe.engine.Toolbox;
 import gframe.engine.Vector3D;
-import gframe.parser.WavefrontObjParser;
 import graph.Graph;
 import graph.Node;
 
 public class Model3DGenerator {
 	
 	
-	public static Model3D buildSkydome(float radius, Color color){
-		Model3D result = WavefrontObjParser.parse(new File("models/structures/sphere.obj"), color);							
+	public static Model3D buildSkydome(float radius, Color color){		
+		Model3D result = buildSphere(radius, 32, true, color);	
+		result.rotate(90, 0, 0);
 		invertFaces(result);
-		float scalefactor = radius / result.getBoundingSphereRadius();
-		result.scale(scalefactor, scalefactor, scalefactor);
-		
-		
-		// alle flächen unterhalb von 0 (negative höhe) löschen -> half sphere!
-		Collection<Face> toDelete = new HashSet<Face>();
-		for(Face face : result.getFaces()){
-			for(Point3D vertex : face.getVertices()){
-				if(vertex.y < 0){
-					toDelete.add(face);
-				}
-			}
-		}
-		for (Face face : toDelete) {
-			result.deleteFace(face);
-		}
-		
-		result.scale(1, 0.5f, 1); // flatten the dome
-		
 		return result;
 	}
 	
@@ -73,38 +54,6 @@ public class Model3DGenerator {
 	}
 	
 	
-	public static Model3D loadBrickWall(Color color, int type){		
-		Model3D walls = WavefrontObjParser.parse(new File("models/outdoor/walls.obj"), color);
-		
-		List<Model3D> parts = Model3DGenerator.splitToParts(walls);
-		
-		Model3D result = new Model3D();
-		
-		if(type==0){ // extra small
-			for(int i=0;i<16;i++){
-				result.addChild(parts.get(i));
-			}	
-		}
-		else if(type==1){ // small
-			for(int i=16;i<76;i++){
-				result.addChild(parts.get(i));
-			}
-		}		
-		else if(type==2){ // medium
-			for(int i=76;i<190;i++){
-				result.addChild(parts.get(i));
-			}
-		}		
-		else if(type==3){ // large
-			for(int i=190;i<402;i++){
-				result.addChild(parts.get(i));
-			}
-		}		
-		
-		return result;
-	}
-	
-	
 	public static Model3D buildTerrainMeshFromHeightMap(File heightmapFile, int w, int h, Color color){
 		
 		ImageRaster heightMap = TextureGenerator.getRGBRaster(heightmapFile, w, h);
@@ -124,26 +73,7 @@ public class Model3DGenerator {
 		
 		return mesh;	
 	}
-	
-	
-	public static Model3D buildCityFromHeightMap(File heightmapFile, int w, int h, Color color){
-		
-		Model3D result = new Model3D();
-		
-		ImageRaster heightMap = TextureGenerator.getRGBRaster(heightmapFile, w, h);
-				
-			
-		for(int y=0;y<h;y++){
-			for(int x=0;x<w;x++){									
-				int rgb = heightMap.getPixel(x, y);																	
-				int grayValue = Toolbox.toGray(rgb);															
-					
-			}
-		}				
-		
-		return result;	
-	}
-	
+
 	
 	public static void colorTerrainMesh(Model3D mesh){					
 		for(Face face : mesh.getFaces()){			
@@ -226,19 +156,22 @@ public class Model3DGenerator {
 	}
 	
 	
-	public static Model3D buildSphere(float radius, Color color){
+	public static Model3D buildSphere(float radius, int bands, Color color){
+		return buildSphere(radius, bands, false, color);
+	}
+	
+	public static Model3D buildSphere(float radius, int bands, boolean halfSphere, Color color){
 		Model3D result = new Model3D();
 		
-		int total = 10;
-
-		for(int i=0;i<=total;i++){						
+		int latitudeBands = halfSphere? bands/2 : bands;
+		
+		for(int i=0;i<=latitudeBands;i++){						
 			// map i from 0 to PI
-			float latitude = (float)Toolbox.map(i, 0, total, 0, Math.PI);			
-			for(int j=0;j<=total;j++){
+			float latitude = (float)Toolbox.map(i, 0, bands, 0, Math.PI);			
+			for(int j=0;j<bands;j++){
 				// map j from 0 to 2xPI
-				float longitude = (float)Toolbox.map(j, 0, total, 0, 2*Math.PI);
+				float longitude = (float)Toolbox.map(j, 0, bands, 0, 2*Math.PI);
 				
-				//float x = radius * (float)Math.cos(latitude) * (float)Math.sin(longitude);
 				float x = radius * (float)Math.cos(longitude) * (float)Math.sin(latitude);				
 				float y = radius * (float)Math.sin(latitude)  * (float)Math.sin(longitude);								
 				float z = radius * (float)Math.cos(latitude);
@@ -248,53 +181,79 @@ public class Model3DGenerator {
 			}	
 		}
 		
-		
-		System.out.println("# vertices: "+result.getVertices().size());
-		
-//		// final vertex
-//		float x = radius * (float)Math.cos(2*Math.PI) * (float)Math.sin(Math.PI);		
-//		float y = radius * (float)Math.sin(Math.PI) * (float)Math.sin(2*Math.PI);						
-//		float z = radius * (float)Math.cos(Math.PI);		
-//		Point3D vertex = new Point3D(x, y, z);
-//		result.addVertex(vertex);
-		
+//		System.out.println("# vertices: "+result.getVertices().size());
 		
 		// make triangle strips
-		for(int i=0;i<total;i++){										
+		for(int i=0;i<latitudeBands;i++){										
 			int next_i = i+1;
-//			if(next_i==total+1){
-//				next_i=0;
-//			}
-			for(int j=0;j<total;j++){
+			
+			for(int j=0;j<bands;j++){
 				int next_j = j+1;
-//				if(next_j==total+1){
-//					next_j=0;
-//				}
+				if(next_j==bands){
+					next_j=0;
+				}
 				
-//				if(i==0 || j==0 || i==total-1 || j==total-1){
-//					continue;
-//				}
+				int nodeId1 = i*bands+j;
+				int nodeId2 = (next_i)*bands+j;
+				int nodeId3 = (next_i)*bands+next_j;
+				int nodeId4 = i*bands+next_j;
 				
-				int nodeId1 = i*total+j;
-				int nodeId2 = (next_i)*total+j;
-				int nodeId3 = (next_i)*total+next_j;
-				int nodeId4 = i*total+next_j;
 				
-				if(j%2==0){
+				if(i==0){
+					result.stretchFace(nodeId1, nodeId2, nodeId3, color);
+//					if(j%2==0){
+//						result.stretchFace(nodeId1, nodeId2, nodeId3, color);
+//						//result.stretchFace(nodeId1, nodeId3, nodeId4, color);
+//					}else{
+//						result.stretchFace(nodeId1, nodeId2, nodeId3, Color.RED);
+//						//result.stretchFace(nodeId1, nodeId3, nodeId4, Color.RED);
+//					}
+				}
+				else if(i==bands-1){
+					result.stretchFace(nodeId1, nodeId3, nodeId4, color);
+					
+//					if(j%2==0){
+//						//result.stretchFace(nodeId1, nodeId2, nodeId3, color);
+//						result.stretchFace(nodeId1, nodeId3, nodeId4, color);
+//					}else{
+//						//result.stretchFace(nodeId1, nodeId2, nodeId3, Color.RED);
+//						result.stretchFace(nodeId1, nodeId3, nodeId4, Color.RED);
+//					}
+				}
+				else{
 					result.stretchFace(nodeId1, nodeId2, nodeId3, color);
 					result.stretchFace(nodeId1, nodeId3, nodeId4, color);
-				}else{
-					result.stretchFace(nodeId1, nodeId2, nodeId3, Color.RED);
-					result.stretchFace(nodeId1, nodeId3, nodeId4, Color.RED);
-				}
-							
-				
+//					if(j%2==0){
+//						result.stretchFace(nodeId1, nodeId2, nodeId3, color);
+//						result.stretchFace(nodeId1, nodeId3, nodeId4, color);
+//					}else{
+//						result.stretchFace(nodeId1, nodeId2, nodeId3, Color.RED);
+//						result.stretchFace(nodeId1, nodeId3, nodeId4, Color.RED);
+//					}	
+				}							
 			}	
 		}
+		
+//		System.out.println("# faces: "+result.getFaces().size());
 		
 		return result;
 	}	
 
+	
+	
+	/**
+	 * Sets u,v coordinates of vertices in mesh to span given texture
+	 * */
+	public static void applyTexture(Model3D mesh, int meshWidth, int meshHeight, ImageRaster texture){
+		for(int y=0;y<meshHeight;y++){
+			for(int x=0;x<meshWidth;x++){
+				int nodeId1 = y*meshWidth+x;
+				Point3D vertex = mesh.getVertex(nodeId1);
+				vertex.u = (float)x/(float)meshWidth;
+				vertex.v = (float)y/(float)meshHeight;
+			}
+		}
+	}
 
 
 	public static Model3D buildFlatMesh(int w, int h, Color color){
@@ -307,7 +266,29 @@ public class Model3DGenerator {
 	}
 	
 	
-	public static Model3D buildFlatMesh(Model3D startMesh, int w, int h, int tilesize, Color color){			
+	public static Model3D buildFlatMesh(Model3D startMesh, int w, int h, int tilesize, Color color){
+		int nodeIdOffset = startMesh.numberOfVertices();
+		
+//		for(int y=0;y<=h;y++){
+//			for(int x=0;x<=w;x++){													
+//				Point3D vertex = new Point3D(x*tilesize, 0, y*tilesize); // y --> z because we want our terrain aligend with the x,z-plane											
+//				startMesh.addVertex(vertex); 														
+//			}
+//		}
+//				
+//		for(int y=0;y<h;y++){
+//			for(int x=0;x<w;x++){					
+//				int nodeId1 = nodeIdOffset + (y*(w+1)+x);
+//				int nodeId2 = nodeIdOffset + ((y+1)*(w+1)+x);
+//				int nodeId3 = nodeIdOffset + ((y+1)*(w+1)+x+1);
+//				int nodeId4 = nodeIdOffset + (y*(w+1)+x+1);
+//				
+//				// one tile = two triangles											
+//				startMesh.stretchFace(nodeId1, nodeId2, nodeId3, color);				
+//				startMesh.stretchFace(nodeId1, nodeId3, nodeId4, color);
+//			}	
+//		}
+		
 		for(int y=0;y<h;y++){
 			for(int x=0;x<w;x++){													
 				Point3D vertex = new Point3D(x*tilesize, 0, y*tilesize); // y --> z because we want our terrain aligend with the x,z-plane											
@@ -316,20 +297,20 @@ public class Model3DGenerator {
 		}
 				
 		for(int y=0;y<h;y++){
-			for(int x=0;x<w;x++){					
+			for(int x=0;x<w;x++){	
+				
 				if(y==0 || x==0 || y==h-1 || x==w-1){
 					continue;
 				}
 				
-				int nodeId1 = y*w+x;
-				int nodeId2 = (y+1)*w+x;
-				int nodeId3 = (y+1)*w+x+1;
-				int nodeId4 = y*w+x+1;
+				int nodeId1 = nodeIdOffset + (y*w+x);
+				int nodeId2 = nodeIdOffset + ((y+1)*w+x);
+				int nodeId3 = nodeIdOffset + ((y+1)*w+x+1);
+				int nodeId4 = nodeIdOffset + (y*w+x+1);
 				
 				// one tile = two triangles											
 				startMesh.stretchFace(nodeId1, nodeId2, nodeId3, color);				
 				startMesh.stretchFace(nodeId1, nodeId3, nodeId4, color);
-//				mesh.stretchFace(nodeId1, nodeId3, nodeId4, Color.RED);
 			}	
 		}
 		
@@ -337,31 +318,51 @@ public class Model3DGenerator {
 	}
 	
 	
+	public static Model3D toCircledMesh(Model3D mesh, int radius){
+		
+		float[] bbox = mesh.getBBox();
+		
+		float origin_x = (bbox[1]-bbox[0])/2;
+		float origin_y = (bbox[3]-bbox[2])/2;
+		float origin_z = (bbox[5]-bbox[4])/2;
+		Point3D origin = new Point3D(origin_x, origin_y, origin_z);
+		
+		// remove faces outside radius
+		List<Face> faces = new ArrayList<Face>(mesh.getFaces());
+		for (Face face : faces) {
+			if(face.getCentroid().distance(origin) > radius){
+				mesh.deleteFace(face);
+			}
+		}
+		
+		return mesh;				
+	}
+	
+	
 	public static Model3D buildQuadBasedMesh(int w, int h, int tilesize, Color color){
 		
 		Model3D mesh = new Model3D();
 		
-		for(int y=0;y<h;y++){
-			for(int x=0;x<w;x++){													
-				Point3D vertex = new Point3D(x*tilesize, 0, y*tilesize); // y --> z because we want our terrain aligend with the x,z-plane											
+		for(int y=0;y<=h;y++){
+			for(int x=0;x<=w;x++){													
+				Point3D vertex = new Point3D(x*tilesize, 0, y*tilesize); // y --> z because we want our terrain aligned with the x,z-plane											
 				mesh.addVertex(vertex); 														
 			}
 		}
+		
+//		System.out.println("# nodes: "+mesh.getVertices().size());
 				
 		for(int y=0;y<h;y++){
-			for(int x=0;x<w;x++){					
-				if(y==0 || x==0 || y==h-1 || x==w-1){
-					continue;
-				}
-				
-				int nodeId1 = y*w+x;
-				int nodeId2 = (y+1)*w+x;
-				int nodeId3 = (y+1)*w+x+1;
-				int nodeId4 = y*w+x+1;
-						
+			for(int x=0;x<w;x++){				
+				int nodeId1 = (y*(w+1))+x;
+				int nodeId2 = ((y+1)*(w+1))+x;
+				int nodeId3 = ((y+1)*(w+1))+x+1;
+				int nodeId4 = (y*(w+1))+x+1;
 				mesh.stretchFace(nodeId1, nodeId2, nodeId3, nodeId4, color);				
 			}	
 		}
+		
+//		System.out.println("# faces: "+mesh.getFaces().size());
 		
 		return mesh;				
 	}

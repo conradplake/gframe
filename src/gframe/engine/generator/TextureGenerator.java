@@ -28,7 +28,7 @@ public class TextureGenerator {
 			result[i] = tmp;
 		}
 		
-		return result;
+		return result;		
 	}
 
 	/**
@@ -671,39 +671,28 @@ public class TextureGenerator {
 		return normalMap;
 	}
 
-	public static ImageRaster generateRandomSpecularMap(int width, int height) {
-		ImageRaster specularMap = new ImageRaster(width, height);
-
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-
-				float value = (float) Math.random();
-
-				// if(value>0.5f){
-				// value = 1;
-				// }else{
-				// value = 0.1f;
-				// }
-
-				Color c = Color.getHSBColor(value, 1, 1);
-				specularMap.setPixel(x, y, c.getRGB());
-			}
+	
+	public static ImageRaster generateNoiseTexture(float xoffset, float yoffset, int width, int height) {
+		ImageRaster texture = new ImageRaster(width, height);
+		
+		float xinc = 0.0025f;
+		float yinc = 0.0025f;
+		
+		float xoff = xinc*xoffset;
+		for(int y=0;y<height;y++){
+			float yoff = yinc*yoffset;
+			for(int x=0;x<width;x++){
+				float noise = (float)Toolbox.map(NoiseGenerator.improvedPerlinNoise(xoff, yoff), -1, 1, 0, 1);
+				//float noise = (float)Toolbox.map(NoiseGenerator.improvedPerlinNoise(yoff, xoff), -1, 1, 0, 1);
+				Color c = Color.getHSBColor(noise, 1, 1);
+				texture.setPixel(x, y, c.getRGB());
+				
+				yoff += yinc;
+			}	
+			xoff +=xinc;
+			
 		}
-
-		return specularMap;
-	}
-
-	public static ImageRaster generateSpecularMap(int width, int height, Color color) {
-		ImageRaster specularMap = new ImageRaster(width, height);
-
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-
-				specularMap.setPixel(x, y, color.getRGB());
-			}
-		}
-
-		return specularMap;
+		return texture;
 	}
 
 	public static void copySpecularMapToAlphaChannel(ImageRaster specularMap, ImageRaster target) {
