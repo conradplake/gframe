@@ -84,16 +84,11 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 				masterMengerCube = Model3DGenerator.buildMengerSponge(3, 6561, Color.blue);
 				engine.register(masterMengerCube, 1);
 
-				oooohRaster = TextureShader.getRGBRaster(new File("./textures/height/Ooooh.png"), 400, 200);
-				creditsRaster = TextureShader.getRGBRaster(new File("./textures/height/Credits.png"), 400, 200);
+				oooohRaster = TextureGenerator.getTextAsBitmap("Ooooh", 30, 30, 30, 30);
+				creditsRaster = TextureGenerator.getTextAsBitmap("CODE: COP", 30, 30, 30, 30);
 				fingerRaster = TextureShader.getRGBRaster(new File("./textures/diffuse/finger_400x200.png"), 400, 200);
 				fingerRaster.inverse();				
-				
-//				berlinRaster = TextureShader.getRGBRaster(new File("./textures/diffuse/berlin.jpg"), 160, 160);
-//				berlinRaster.inverse();
-//				graffitiRaster = TextureShader.getRGBRaster(new File("./textures/diffuse/politics_160x160.png"), 160, 160);
-//				graffitiRaster.inverse();							
-				
+								
 				isLoading = false; // done
 			}
 			
