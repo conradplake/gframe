@@ -1046,5 +1046,4 @@ public class Model3DGenerator {
 			face.recompute();
 		}
 	}
-
 }

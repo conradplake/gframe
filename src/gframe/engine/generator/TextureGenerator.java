@@ -735,4 +735,69 @@ public class TextureGenerator {
 		return col;
 	}
 
+	
+	public static ImageRaster getCharacterAsBitmap(char c){
+		
+		ImageRaster result = null;
+		
+		ImageRaster characterSet = TextureGenerator.getRGBRaster(new File("textures/courier_character_set_1024x1024.jpg"), 1024, 1024);
+		
+		int characterWidth  = 55;
+		int characterHeight = 60;
+	
+		
+		int xoff = 0;
+		int yoff = 0;
+		
+		switch(c){
+		case 'A': xoff =  18; yoff = 102; break;
+		case 'B': xoff =  78; yoff = 102; break;		
+		case 'C': xoff = 136; yoff = 102; break;				
+		case 'D': xoff = 193; yoff = 102; break;		
+		case 'E': xoff = 251; yoff = 102; break;
+		case 'h': xoff = 425; yoff = 430; break;
+		case 'O': xoff = 832; yoff = 102; break;
+		case 'o': xoff = 832; yoff = 432; break;
+		case 'P': xoff = 890; yoff = 102; break;		
+		case ':': xoff = 658; yoff = 550; break;
+		}
+		
+		result = new ImageRaster(characterWidth, characterHeight);
+		
+		for(int x=0;x<characterWidth;x++){
+			for(int y=0;y<characterHeight;y++){			
+				//result.setPixel(x, characterHeight-y-1, characterSet.getPixel(xoff+x, yoff+y));
+				result.setPixel(x, y, characterSet.getPixel(xoff+x, yoff+y));
+			}	
+		}
+		
+		return result;	
+	}
+	
+	public static ImageRaster getTextAsBitmap(String text, int paddingLeft, int paddingRight, int paddingTop, int paddingBottom){
+		
+		ImageRaster result = null;
+		
+		char[] characters = text.toCharArray();
+		result = new ImageRaster(paddingLeft + (55*characters.length) + paddingRight, paddingTop + 60 + paddingBottom);
+		
+		for(int x=0;x<result.getWidth();x++){
+			for(int y=0;y<result.getHeight();y++){
+				result.setPixel(x, y, Color.WHITE.getRGB());
+			}	
+		}
+		
+		for(int i=0;i<characters.length;i++){
+			ImageRaster characterImage = getCharacterAsBitmap(text.charAt(i));
+			for(int x=0;x<characterImage.getWidth();x++){
+				for(int y=0;y<characterImage.getHeight();y++){
+					result.setPixel(paddingLeft + (i*55) + x, paddingBottom + y, characterImage.getPixel(x, y));
+				}
+			}
+		}			
+		
+		result.inverse();
+		
+		return result;	
+	}
 }
