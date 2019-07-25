@@ -17,9 +17,9 @@ public class Model3DParser {
 
 		fw.write("[Points]\n");
 
-		Iterator it = model.getVertices().iterator();
+		Iterator<Point3D> it = model.getVertices().iterator();
 		while (it.hasNext()) {
-			Point3D p = (Point3D) it.next();
+			Point3D p = it.next();
 			fw.write(p.x + ", " + p.y + ", " + p.z + "\n");
 		}
 
@@ -47,7 +47,7 @@ public class Model3DParser {
 		model.clearGeometry();
 		InputStream is = new BufferedInputStream(new FileInputStream(filename));
 		float x = 0, y = 0, z = 0;
-		int r = 0, g = 0, b = 0, p1 = 0, p2 = 0, p3 = 0, p4 = 0, rad = 0, state = 0;
+		int r = 0, g = 0, b = 0, p1 = 0, p2 = 0, p3 = 0, p4 = 0, state = 0;
 
 		while (state != 100) {
 			String token = nextToken(is);
