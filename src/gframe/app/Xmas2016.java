@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import gframe.Space3D;
+import gframe.engine.Camera;
 import gframe.engine.Engine3D;
 import gframe.engine.ImageRaster;
 import gframe.engine.KeyPosition;
@@ -26,9 +26,9 @@ import gframe.engine.Model3D;
 import gframe.engine.Particle;
 import gframe.engine.PhongShader;
 import gframe.engine.Point3D;
+import gframe.engine.Space3D;
 import gframe.engine.Toolbox;
 import gframe.engine.Vector3D;
-import gframe.engine.camera.Camera;
 import gframe.engine.camera.TripodCamera;
 import gframe.engine.generator.Model3DGenerator;
 import gframe.engine.generator.NoiseGenerator;
@@ -139,7 +139,7 @@ public class Xmas2016 extends DoubleBufferedFrame implements MouseMotionListener
 		Color houseColor = new Color(210, 100, 0);
 		house = WavefrontObjParser.parseGeometry(new File("./models/buildings/house.obj"), houseColor);		
 		house = Model3DGenerator.split(house);		
-		Model3D window = (Model3D)house.getChildren().get(32);
+		Model3D window = (Model3D)house.getSubModels().get(32);
 		//Color windowColor = new Color(250, 230, 0);
 		Color windowColor = Color.WHITE;
 		window.setColor(windowColor);
@@ -147,73 +147,73 @@ public class Xmas2016 extends DoubleBufferedFrame implements MouseMotionListener
 		
 		// color upper house white
 		for(int i=75;i<350;i++){
-			Model3D part = (Model3D)house.getChildren().get(i);			
+			Model3D part = (Model3D)house.getSubModels().get(i);			
 			part.setColor(Color.WHITE);
 		}
 		for(int i=360;i<487;i++){
-			Model3D part = (Model3D)house.getChildren().get(i);			
+			Model3D part = (Model3D)house.getSubModels().get(i);			
 			part.setColor(Color.WHITE);
 		}
 		for(int i=9;i<14;i++){
-			Model3D part = (Model3D)house.getChildren().get(i);			
+			Model3D part = (Model3D)house.getSubModels().get(i);			
 			part.setColor(Color.WHITE);
 		}
-		Model3D roofPart = (Model3D)house.getChildren().get(494);			
+		Model3D roofPart = (Model3D)house.getSubModels().get(494);			
 		roofPart.setColor(Color.WHITE);
-		roofPart = (Model3D)house.getChildren().get(2);			
+		roofPart = (Model3D)house.getSubModels().get(2);			
 		roofPart.setColor(Color.WHITE);
-		roofPart = (Model3D)house.getChildren().get(3);			
+		roofPart = (Model3D)house.getSubModels().get(3);			
 		roofPart.setColor(Color.WHITE);
-		roofPart = (Model3D)house.getChildren().get(19);			
+		roofPart = (Model3D)house.getSubModels().get(19);			
 		roofPart.setColor(Color.WHITE);
 		
-		Model3D doorPart = (Model3D)house.getChildren().get(24);			
+		Model3D doorPart = (Model3D)house.getSubModels().get(24);			
 		doorPart.setColor(Color.WHITE);
-		doorPart = (Model3D)house.getChildren().get(25);
+		doorPart = (Model3D)house.getSubModels().get(25);
 		doorPart.setColor(Color.WHITE);
 		
-		Model3D part = (Model3D)house.getChildren().get(23);			
+		Model3D part = (Model3D)house.getSubModels().get(23);			
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(21);
+		part = (Model3D)house.getSubModels().get(21);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(22);
+		part = (Model3D)house.getSubModels().get(22);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(27);
+		part = (Model3D)house.getSubModels().get(27);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(34);
+		part = (Model3D)house.getSubModels().get(34);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(35);
+		part = (Model3D)house.getSubModels().get(35);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(36);		
+		part = (Model3D)house.getSubModels().get(36);		
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(37);		
+		part = (Model3D)house.getSubModels().get(37);		
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(38);		
+		part = (Model3D)house.getSubModels().get(38);		
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(39);		
+		part = (Model3D)house.getSubModels().get(39);		
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(17);
+		part = (Model3D)house.getSubModels().get(17);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(18);
+		part = (Model3D)house.getSubModels().get(18);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(0);
+		part = (Model3D)house.getSubModels().get(0);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(1);
+		part = (Model3D)house.getSubModels().get(1);
 		part.setColor(Color.WHITE);
 		
-		part = (Model3D)house.getChildren().get(72);
+		part = (Model3D)house.getSubModels().get(72);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(73);
+		part = (Model3D)house.getSubModels().get(73);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(74);
+		part = (Model3D)house.getSubModels().get(74);
 		part.setColor(Color.WHITE);		
-		part = (Model3D)house.getChildren().get(65);
+		part = (Model3D)house.getSubModels().get(65);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(66);
+		part = (Model3D)house.getSubModels().get(66);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(69);
+		part = (Model3D)house.getSubModels().get(69);
 		part.setColor(Color.WHITE);
-		part = (Model3D)house.getChildren().get(70);
+		part = (Model3D)house.getSubModels().get(70);
 		part.setColor(Color.WHITE);
 		
 		

@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 
-import gframe.Space3D;
 import gframe.engine.Engine3D;
 import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
@@ -16,10 +15,10 @@ import gframe.engine.Material;
 import gframe.engine.Model3D;
 import gframe.engine.NormalMappedMaterialShader;
 import gframe.engine.Shader;
+import gframe.engine.Space3D;
 import gframe.engine.TextureShader;
 import gframe.engine.camera.TripodCamera;
 import gframe.engine.generator.Model3DGenerator;
-import gframe.engine.generator.TextureGenerator;
 
 public class IndoorTester extends DoubleBufferedFrame implements MouseMotionListener {
 
@@ -58,7 +57,7 @@ public class IndoorTester extends DoubleBufferedFrame implements MouseMotionList
 		
 //		NormalMappedMaterialShader shader = new NormalMappedMaterialShader(lightsource, TextureGenerator.generateMengerSpongeNormalMap(243));
 		
-		TextureShader shader = new NormalMappedMaterialShader(engine.getLightsource(), TextureGenerator.getRGBRaster(new File("./textures/normal/wall_NM.jpg"), 1024, 1024));
+		TextureShader shader = new NormalMappedMaterialShader(engine.getLightsource(), TextureShader.getRGBRaster(new File("./textures/normal/wall_NM.jpg"), 1024, 1024));
 
 //		Shader shader = new TextureShader(lightsource, TextureShader.getRGBRaster(Color.CYAN, 256, 256));
 //		Shader shader = new PhongShader(lightsource);

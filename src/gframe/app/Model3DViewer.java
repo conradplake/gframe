@@ -15,14 +15,13 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Properties;
 
+import gframe.engine.Camera;
 import gframe.engine.Engine3D;
 import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Model3D;
 import gframe.engine.Point3D;
-import gframe.engine.camera.Camera;
 import gframe.engine.camera.TripodCamera;
-import gframe.engine.camera.ViewCone;
 import gframe.engine.generator.Model3DGenerator;
 import gframe.parser.Model3DParser;
 import gframe.parser.WavefrontObjParser;
@@ -107,8 +106,8 @@ public class Model3DViewer extends DoubleBufferedFrame implements MouseMotionLis
 //		engine.setDefaultShader(shader);
 		
 		
-		ViewCone viewCone = new ViewCone(40, 100, 4000);
-		engine.getCamera().setViewCone(viewCone);
+//		ViewCone viewCone = new ViewCone(40, 100, 4000);
+//		engine.getCamera().setViewCone(viewCone);
 		
 		
 //		engine.occlusionCullingEnabled = false;

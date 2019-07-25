@@ -2,7 +2,10 @@ package gframe.app;
 
 import java.awt.AWTEvent;
 import java.awt.Color;
+import java.awt.DisplayMode;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
@@ -12,7 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import gframe.Space3D;
+import gframe.engine.Camera;
 import gframe.engine.Engine3D;
 import gframe.engine.ImageRaster;
 import gframe.engine.KeyPosition;
@@ -24,9 +27,9 @@ import gframe.engine.NormalMappedTextureShader;
 import gframe.engine.PhongShader;
 import gframe.engine.Point3D;
 import gframe.engine.Shader;
+import gframe.engine.Space3D;
 import gframe.engine.TextureShader;
 import gframe.engine.Toolbox;
-import gframe.engine.camera.Camera;
 import gframe.engine.camera.TripodCamera;
 import gframe.engine.generator.Model3DGenerator;
 import gframe.engine.generator.NoiseGenerator;
@@ -125,7 +128,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		showLoadingScreen();
 		
 		// test sequence 
-		//startPart0();		
+		startPart0();		
 		
 		// tiled wall
 		startPart1();
