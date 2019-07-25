@@ -1,7 +1,7 @@
 package gframe.engine.timing;
 
+import gframe.engine.Camera;
 import gframe.engine.Point3D;
-import gframe.engine.camera.Camera;
 import gframe.engine.generator.NoiseGenerator;
 
 /**

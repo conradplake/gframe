@@ -1,6 +1,6 @@
 package gframe.engine.timing;
 
-import gframe.engine.camera.Camera;
+import gframe.engine.Camera;
 
 /**
  * Effekt: reinzoomen, wieder rauszoomen durch bewegung des cam origin's in blickrichtung

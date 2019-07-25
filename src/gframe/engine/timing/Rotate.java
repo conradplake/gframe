@@ -36,6 +36,8 @@ public class Rotate implements Timed{
 			model.rotate(0, degrees, 0);
 		if(axis==AXIS_Z)
 			model.rotate(0, 0, degrees);
+		
+		rotateTimeInMillis-=millis;
 	}
 
 	@Override
