@@ -1,5 +1,6 @@
 package gframe.engine.camera;
 
+import gframe.engine.Camera;
 import gframe.engine.Point3D;
 
 public class TripodCamera extends Camera{	 
