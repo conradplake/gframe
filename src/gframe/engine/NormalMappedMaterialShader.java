@@ -1,7 +1,5 @@
 package gframe.engine;
 
-import gframe.engine.generator.TextureGenerator;
-
 public class NormalMappedMaterialShader extends TextureShader {
 
 	private int texelNormal;
@@ -29,7 +27,7 @@ public class NormalMappedMaterialShader extends TextureShader {
 	 */
 	public NormalMappedMaterialShader(Lightsource lightsource, ImageRaster normalMap, ImageRaster specularMap) {
 		super(lightsource, normalMap);
-		TextureGenerator.copySpecularMapToAlphaChannel(specularMap, normalMap);
+		copySpecularMapToAlphaChannel(specularMap, normalMap);
 		super.recomputeMipmaps();
 	}
 

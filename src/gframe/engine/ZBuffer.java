@@ -47,9 +47,9 @@ public class ZBuffer {
 	public float getValue(float x, float y, boolean doBilinearFiltering){
 		
 		if(!doBilinearFiltering){
-			int light_x = (int) x;
-			int light_y = (int) y;
-			return this.pixels[light_y*w + light_x];
+			int int_x = (int) x;
+			int int_y = (int) y;
+			return this.pixels[int_y*w + int_x];
 		}
 		else{
 			int x_int = (int)x;
@@ -83,7 +83,7 @@ public class ZBuffer {
 	 * Runs the given matrix over the grid of pixels.
 	 *
 	 *
-	 * Possible filter matrices: see e.g. imaging.ImageHelper.TPFILTER33
+	 * Possible filter matrices: see e.g. gframe.engine.Toolbox.TPFILTER33
 	 * */
 	public void filter(float[][] filterMtx) {
 		

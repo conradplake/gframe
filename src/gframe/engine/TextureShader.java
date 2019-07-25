@@ -1,9 +1,10 @@
 package gframe.engine;
 
 import java.awt.Color;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.File;
-
-import gframe.engine.generator.TextureGenerator;
+import java.io.IOException;
 
 public class TextureShader extends AbstractShader {
 
@@ -11,8 +12,8 @@ public class TextureShader extends AbstractShader {
 
 	ImageRaster[] textureLODs;
 
-	int originalTextureWidth;
-	int originalTextureHeight;
+	final int originalTextureWidth;
+	final int originalTextureHeight;
 
 	int textureWidth;
 	int textureHeight;
@@ -70,7 +71,7 @@ public class TextureShader extends AbstractShader {
 		this.originalTextureWidth = this.textureWidth;
 		this.originalTextureHeight = this.textureHeight;
 		
-		textureLODs = TextureGenerator.mipmaps(texture);		
+		textureLODs = mipmaps(texture);		
 	}
 
 	void setEffectPixel(int x, int y, int c) {
@@ -101,7 +102,7 @@ public class TextureShader extends AbstractShader {
 	}
 
 	void recomputeMipmaps() {
-		this.textureLODs = TextureGenerator.mipmaps(textureLODs[0]);
+		this.textureLODs = mipmaps(textureLODs[0]);
 	}
 
 	public void setIsBilinearFiltering(boolean value) {
@@ -207,8 +208,24 @@ public class TextureShader extends AbstractShader {
 	}
 
 	public static ImageRaster getRGBRaster(File imagefile, int w, int h) {
-		return TextureGenerator.getRGBRaster(imagefile, w, h);
+
+		if (!imagefile.canRead()) {
+			throw new RuntimeException("Cannot read from file: " + imagefile.getAbsolutePath());
+		}
+
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		Image img = null;
+		try {
+			img = tk.getImage(imagefile.toURI().toURL());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+
+		return Toolbox.getImageRaster(img, 0, 0, w, h);
 	}
+
 
 	public static ImageRaster getRGBRaster(Color c, int w, int h) {
 		ImageRaster raster = new ImageRaster(w, h);
@@ -250,13 +267,13 @@ public class TextureShader extends AbstractShader {
 	 * 
 	 */
 	public int getLOD(RenderFace renderFace) {
-
-		// return 0;
-
+		
 		float areaScreen = 0;
 		float areaTexture = 0;
+		boolean computeTextureArea = renderFace.getTextureArea() == null;		
+		
 
-		// Shoelace formula
+		// Shoe lace formula
 		for (int i = 0; i < renderFace.vertices.length; i++) {
 
 			int next = i + 1;
@@ -268,17 +285,25 @@ public class TextureShader extends AbstractShader {
 			float x_i1 = renderFace.cam_X[next];
 			float y_i1 = renderFace.cam_Y[next];
 
-			float u_i0 = renderFace.vertices[i].u * originalTextureWidth;
-			float v_i0 = renderFace.vertices[i].v * originalTextureHeight;
-			float u_i1 = renderFace.vertices[next].u * originalTextureWidth;
-			float v_i1 = renderFace.vertices[next].v * originalTextureHeight;
-
 			areaScreen += ((x_i0 * y_i1) - (y_i0 * x_i1));
-			areaTexture += ((u_i0 * v_i1) - (v_i0 * u_i1));
+			
+			if(computeTextureArea){
+				float u_i0 = renderFace.vertices[i].u * originalTextureWidth;
+				float v_i0 = renderFace.vertices[i].v * originalTextureHeight;
+				float u_i1 = renderFace.vertices[next].u * originalTextureWidth;
+				float v_i1 = renderFace.vertices[next].v * originalTextureHeight;
+				areaTexture += ((u_i0 * v_i1) - (v_i0 * u_i1));
+			}
 		}
 
 		areaScreen = 0.5f * Math.abs(areaScreen);
-		areaTexture = 0.5f * Math.abs(areaTexture);
+		if(computeTextureArea){
+			areaTexture = 0.5f * Math.abs(areaTexture);	
+			renderFace.setTextureArea(areaTexture);
+		}else{
+			areaTexture = renderFace.getTextureArea();
+		}
+		
 
 		float mmFactor = areaTexture / areaScreen;
 		
@@ -291,9 +316,87 @@ public class TextureShader extends AbstractShader {
 			lod = textureLODs.length-1;
 		}
 
-//		System.out.println("LOD="+lod);
+//		System.out.println("TextureShader.getLOD(): LOD="+lod);
 
 		return lod;
 	}
 
+	
+	public static ImageRaster[] mipmaps(ImageRaster texture){
+		int min = Math.min(texture.getWidth(), texture.getHeight());
+		int lods = 1 + (int)(Math.log(min) / Math.log(2));
+		
+		ImageRaster[] result = new ImageRaster[lods];
+		ImageRaster tmp = texture;
+		
+		result[0] = tmp;
+		for(int i=1;i<lods;i++){
+			tmp = mipmap(tmp);
+			result[i] = tmp;
+		}
+		
+		return result;		
+	}
+
+	/**
+	 * Returns a new texture scaled down by half the width and height of the
+	 * original texture. Each new pixel thus represents 4 original pixels by
+	 * averaging their values.
+	 */
+	public static ImageRaster mipmap(ImageRaster texture) {
+		ImageRaster mipmapped = new ImageRaster(texture.getWidth() / 2, texture.getHeight() / 2);
+
+		for (int x = 0; x < mipmapped.getWidth(); x++) {
+			for (int y = 0; y < mipmapped.getHeight(); y++) {
+
+				// pixel = avg über alle 4 nachbarn im original
+				int pixel_a = texture.getPixel(x * 2, y * 2);
+				int pixel_b = texture.getPixel(x * 2 + 1, y * 2);
+				int pixel_c = texture.getPixel(x * 2, y * 2 + 1);
+				int pixel_d = texture.getPixel(x * 2 + 1, y * 2 + 1);
+
+				int a_alpha = (pixel_a >> 24) & 0xff;
+				int b_alpha = (pixel_b >> 24) & 0xff;
+				int c_alpha = (pixel_c >> 24) & 0xff;
+				int d_alpha = (pixel_d >> 24) & 0xff;
+				int new_alpha = (a_alpha + b_alpha + c_alpha + d_alpha) / 4;
+
+				int a_red = (pixel_a >> 16) & 0xff;
+				int b_red = (pixel_b >> 16) & 0xff;
+				int c_red = (pixel_c >> 16) & 0xff;
+				int d_red = (pixel_d >> 16) & 0xff;
+				int new_red = (a_red + b_red + c_red + d_red) / 4;
+
+				int a_green = (pixel_a >> 8) & 0xff;
+				int b_green = (pixel_b >> 8) & 0xff;
+				int c_green = (pixel_c >> 8) & 0xff;
+				int d_green = (pixel_d >> 8) & 0xff;
+				int new_green = (a_green + b_green + c_green + d_green) / 4;
+
+				int a_blue = (pixel_a >> 0) & 0xff;
+				int b_blue = (pixel_b >> 0) & 0xff;
+				int c_blue = (pixel_c >> 0) & 0xff;
+				int d_blue = (pixel_d >> 0) & 0xff;
+				int new_blue = (a_blue + b_blue + c_blue + d_blue) / 4;
+
+				int pixel = ((new_alpha & 0xFF) << 24) | ((new_red & 0xFF) << 16) | ((new_green & 0xFF) << 8)
+						| ((new_blue & 0xFF) << 0);
+
+				mipmapped.setPixel(x, y, pixel);
+			}
+		}
+
+		return mipmapped;
+	}
+	
+	public static void copySpecularMapToAlphaChannel(ImageRaster specularMap, ImageRaster target) {
+		// specular map als alpha-channel in die normal map kopieren
+		for (int x = 0; x < specularMap.getWidth(); x++) {
+			for (int y = 0; y < specularMap.getHeight(); y++) {
+				int specRgb = specularMap.getPixel(x, y);
+				int grayValue = Toolbox.toGray(specRgb);
+				target.setAlpha(x, y, grayValue);
+			}
+		}
+	}
 }

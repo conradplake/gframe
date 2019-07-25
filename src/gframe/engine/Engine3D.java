@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import gframe.engine.camera.Camera;
-
 /**
  * 
  * This class ties together the main ingredients needed for 3D software
@@ -108,14 +106,14 @@ public class Engine3D {
 
 	public void setModelShader(Model3D model, Shader shader) {
 		modelShaders.put(model, shader);
-		for (Object object : model.getChildren()) {
+		for (Object object : model.getSubModels()) {
 			setModelShader((Model3D) object, shader);
 		}
 	}
 
 	public void removeModelShader(Model3D model) {
 		modelShaders.remove(model);
-		for (Object object : model.getChildren()) {
+		for (Object object : model.getSubModels()) {
 			removeModelShader((Model3D) object);
 		}
 	}
@@ -442,7 +440,7 @@ public class Engine3D {
 			}
 		}
 
-		for (Iterator<Model3D> it = model.getChildren().iterator(); it.hasNext();) {
+		for (Iterator<Model3D> it = model.getSubModels().iterator(); it.hasNext();) {
 			Model3D subModel = it.next();
 			if (subModel.isVisible){
 				fillPolyBuffers(subModel, modelOrigin, modelMatrix, camOrigin, cam_z, icammat, zSortPolyHeap);

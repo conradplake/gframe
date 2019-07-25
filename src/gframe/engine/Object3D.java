@@ -1,20 +1,15 @@
 package gframe.engine;
 
-import java.util.LinkedList;
-import java.util.List;
-
 public class Object3D {
 
 	public Object3D() {
 		origin = new Point3D(0, 0, 0);
 		matrix = new Matrix3D();
-		children = new LinkedList();
 	}
 
 	public Object3D(Point3D origin) {
 		this.origin = origin;
 		matrix = new Matrix3D();
-		children = new LinkedList();
 	}
 
 	public void setOrigin(Point3D origin) {
@@ -45,12 +40,11 @@ public class Object3D {
 		Vector3D z = matrix.getZVector(); // move along z axis
 		origin.move(z.x * units, z.y * units, z.z * units);
 	}
-	
-	
+
 	/**
 	 * Only moves the origin along x and z direction relative to object space.
 	 * Useful for FPS-Walking mechanics :)
-	 * */
+	 */
 	public void moveXZ(float units) {
 		Vector3D z = getMatrix().getZVector(); // move along z axis
 		getOrigin().move(z.x * units, 0, z.z * units);
@@ -145,41 +139,7 @@ public class Object3D {
 		return matrix.getZVector();
 	}
 
-	public boolean hasChildren() {
-		return (children.size() > 0);
-	}
-
-	public boolean hasParent() {
-		return (parent != null);
-	}
-
-	public void setParent(Object3D parent) {
-		this.parent = parent;
-	}
-
-	public Object3D getParent() {
-		return parent;
-	}
-
-	public void addChild(Object3D obj) {
-		children.add(obj);
-		obj.setParent(this);
-	}
-
-	public void removeChild(Object3D obj) {
-		if (children.remove(obj)) {
-			obj.setParent(null);
-		}
-	}
-
-	public List getChildren() {
-		return children;
-	}
-
 	private Point3D origin;
 	private Matrix3D matrix;
 
-	private List<Object3D> children;
-
-	private Object3D parent;
 }

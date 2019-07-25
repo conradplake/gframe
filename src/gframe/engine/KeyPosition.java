@@ -9,8 +9,8 @@ package gframe.engine;
  * */
 public class KeyPosition {
 
-	long timestamp;
-	Object3D position; // origin and orientation
+	private long timestamp;
+	private Object3D position; // origin and orientation
 	
 	public KeyPosition(long timestamp, Object3D position) {
 		this.timestamp = timestamp;

@@ -2,8 +2,6 @@ package gframe.engine;
 
 import java.awt.Color;
 
-import gframe.OIS3D;
-
 
 /**
  * Implements OIS3D to apply physics (see Space3D.simulate)

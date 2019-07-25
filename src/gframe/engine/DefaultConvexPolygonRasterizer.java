@@ -502,10 +502,11 @@ public class DefaultConvexPolygonRasterizer implements Rasterizer {
 								
 								// all this shadow-mapping stuff should go somewhere else!
 								
+								// add a bit of normal vector as offset to avoid shadow acne 
 								float[] lightCoords = inverseLightMatrix.transform(pcorr_world_x + (0.5f * edgeTableEntry.min_normal_x) - lightsource.x,
 										pcorr_world_y + (0.5f * edgeTableEntry.min_normal_y) - lightsource.y, pcorr_world_z + (0.5f * edgeTableEntry.min_normal_z) - lightsource.z);
-
-								// perspektiven korrektur innerhalb des light-space
+								
+								// perspektiven korrektur innerhalb des light-space (depth map render pass was done with perspective projection, so here we need to do the same)
 								float zf = Engine3D.zFactor(lightCoords[2]);
 								lightCoords[0] *= zf;
 								lightCoords[1] *= zf;

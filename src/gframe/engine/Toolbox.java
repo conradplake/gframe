@@ -338,7 +338,7 @@ public class Toolbox {
 	}
 
 	/**
-	 * Even-odd Algorithmus
+	 * Even/odd-algorithm
 	 */
 	public static boolean isInside(int x, int y, int[] X, int[] Y) {
 		boolean result = false;

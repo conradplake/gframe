@@ -38,7 +38,10 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 
 	// relative texture coordinates
 	float[] texel_U;
-	float[] texel_V;
+	float[] texel_V;	
+	
+	// size of the texture spanning this renderFace
+	private Float textureArea = null;
 
 	Material material;
 
@@ -64,7 +67,7 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 		texel_U = new float[length];
 		texel_V = new float[length];
 
-		zFactors = new float[length];
+		zFactors = new float[length];			
 	}
 
 	public void setShader(Shader shader) {
@@ -109,11 +112,7 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 
 			cam_Z[i] = camCoords[2];
 
-			float zf = 1f;
-			if (perspectiveCorrect) {
-				zf = Engine3D.zFactor(cam_Z[i]);
-				// zf = (float)Toolbox.map(zf, 0, 10000, 0, 800);
-			}
+			final float zf = perspectiveCorrect ? Engine3D.zFactor(cam_Z[i]) : 1f;			
 
 			zFactors[i] = zf;
 			cam_X[i] = camCoords[0] * zf;
@@ -122,10 +121,6 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 			pcorrectedWorld_X[i] = vertices[i].x * zf;
 			pcorrectedWorld_Y[i] = vertices[i].y * zf;
 			pcorrectedWorld_Z[i] = vertices[i].z * zf;
-
-			// vertices[i].normal_x *= zf;
-			// vertices[i].normal_y *= zf;
-			// vertices[i].normal_z *= zf;
 
 			texel_U[i] = vertices[i].u * zf;
 			texel_V[i] = vertices[i].v * zf;
@@ -331,5 +326,13 @@ public class RenderFace extends Face implements Comparable<RenderFace> {
 
 	public void setMaterial(Material material) {
 		this.material = material;
+	}
+	
+	public void setTextureArea(float textureArea){
+		this.textureArea = new Float(textureArea);
+	}
+	
+	public Float getTextureArea(){
+		return this.textureArea;
 	}
 }

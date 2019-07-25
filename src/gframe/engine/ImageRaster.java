@@ -13,11 +13,11 @@ import java.awt.image.MemoryImageSource;
 
 public class ImageRaster {
 
-	int w;
-	int h;
+	private int w;
+	private int h;
 	protected int[] pixels;
 
-	ImageProducer producer;
+	private ImageProducer producer;
 
 	public ImageRaster(int w, int h) {
 		this.w = w;
