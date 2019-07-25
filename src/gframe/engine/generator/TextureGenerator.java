@@ -1,12 +1,11 @@
 package gframe.engine.generator;
 
 import java.awt.Color;
-import java.awt.Image;
 import java.awt.Polygon;
-import java.awt.Toolkit;
 import java.io.File;
 
 import gframe.engine.ImageRaster;
+import gframe.engine.TextureShader;
 import gframe.engine.Toolbox;
 import gframe.engine.Vector3D;
 import graph.Graph;
@@ -14,73 +13,9 @@ import graph.Node;
 
 public class TextureGenerator {
 
+	
+	private static final int TILE_GAP_SIZE = 2;
 
-	public static ImageRaster[] mipmaps(ImageRaster texture){
-		int min = Math.min(texture.getWidth(), texture.getHeight());
-		int lods = 1 + (int)(Math.log(min) / Math.log(2));
-		
-		ImageRaster[] result = new ImageRaster[lods];
-		ImageRaster tmp = texture;
-		
-		result[0] = tmp;
-		for(int i=1;i<lods;i++){
-			tmp = mipmap(tmp);
-			result[i] = tmp;
-		}
-		
-		return result;		
-	}
-
-	/**
-	 * Returns a new texture scaled down by half the width and height of the
-	 * original texture. Each new pixel thus represents 4 original pixels by
-	 * averaging their values.
-	 */
-	public static ImageRaster mipmap(ImageRaster texture) {
-		ImageRaster mipmapped = new ImageRaster(texture.getWidth() / 2, texture.getHeight() / 2);
-
-		for (int x = 0; x < mipmapped.getWidth(); x++) {
-			for (int y = 0; y < mipmapped.getHeight(); y++) {
-
-				// pixel = avg über alle 4 nachbarn im original
-				int pixel_a = texture.getPixel(x * 2, y * 2);
-				int pixel_b = texture.getPixel(x * 2 + 1, y * 2);
-				int pixel_c = texture.getPixel(x * 2, y * 2 + 1);
-				int pixel_d = texture.getPixel(x * 2 + 1, y * 2 + 1);
-
-				int a_alpha = (pixel_a >> 24) & 0xff;
-				int b_alpha = (pixel_b >> 24) & 0xff;
-				int c_alpha = (pixel_c >> 24) & 0xff;
-				int d_alpha = (pixel_d >> 24) & 0xff;
-				int new_alpha = (a_alpha + b_alpha + c_alpha + d_alpha) / 4;
-
-				int a_red = (pixel_a >> 16) & 0xff;
-				int b_red = (pixel_b >> 16) & 0xff;
-				int c_red = (pixel_c >> 16) & 0xff;
-				int d_red = (pixel_d >> 16) & 0xff;
-				int new_red = (a_red + b_red + c_red + d_red) / 4;
-
-				int a_green = (pixel_a >> 8) & 0xff;
-				int b_green = (pixel_b >> 8) & 0xff;
-				int c_green = (pixel_c >> 8) & 0xff;
-				int d_green = (pixel_d >> 8) & 0xff;
-				int new_green = (a_green + b_green + c_green + d_green) / 4;
-
-				int a_blue = (pixel_a >> 0) & 0xff;
-				int b_blue = (pixel_b >> 0) & 0xff;
-				int c_blue = (pixel_c >> 0) & 0xff;
-				int d_blue = (pixel_d >> 0) & 0xff;
-				int new_blue = (a_blue + b_blue + c_blue + d_blue) / 4;
-
-				int pixel = ((new_alpha & 0xFF) << 24) | ((new_red & 0xFF) << 16) | ((new_green & 0xFF) << 8)
-						| ((new_blue & 0xFF) << 0);
-
-				mipmapped.setPixel(x, y, pixel);
-			}
-		}
-
-		return mipmapped;
-	}
 
 	public static ImageRaster generateMengerSpongeTexture(ImageRaster raster, int pos_x, int pos_y, int width,
 			int cubeColor, int gapColor) {
@@ -380,21 +315,19 @@ public class TextureGenerator {
 						// if(Math.random()<0.0005){ // flecken :)
 						// col = fugenColor.getRGB();
 						// }
-
-						if (x == tile_size - 1 || x == tile_size - 2) { // rechter rand
-							col = fugenColor;
-						} 
-						if (x == 0 || x == 1) { // linker rand
+								
+						if (x > tile_size - TILE_GAP_SIZE) {
 							col = fugenColor;
 						}
-
-						if (y == tile_size - 1 || y == tile_size - 2) { // unterer rand
-							col = fugenColor;
-						} 
-						if (y == 0 || y == 1) { // oberer rand
+						else if(x < TILE_GAP_SIZE){
 							col = fugenColor;
 						}
-
+						if (y > tile_size - TILE_GAP_SIZE) { // unterer rand
+							col = fugenColor;							
+						} else if (y < TILE_GAP_SIZE) { // oberer rand
+							col = fugenColor;
+						}
+						
 						// if(x%tile_size==0 || y%tile_size==0 || x==tile_size-1
 						// || y==tile_size-1){ // fugen weiß
 						// if(x%tile_size==0 || y%tile_size==0){ // fugen weiß
@@ -423,55 +356,7 @@ public class TextureGenerator {
 		return result;
 
 	}
-
-	public static ImageRaster generateTileTexture(int w, int h, int tilesize, int tileColor1, int tileColor2,
-			int fugenColor) {
-
-		ImageRaster result = new ImageRaster(w, h);
-
-		int tile_size = tilesize;
-
-		int numberOfRows = h / tile_size;
-		int tilesPerRow = w / tile_size;
-
-		for (int r = 0; r < numberOfRows; r++) {
-
-			for (int t = 0; t < tilesPerRow; t++) {
-
-				int tileColor = Math.random() > 0.5d ? tileColor1 : tileColor2;
-
-				int currentColor;
-				for (int y = 0; y < tile_size; y++) {
-					for (int x = 0; x < tile_size; x++) {
-
-						// if(Math.random()<0.0005){ // flecken :)
-						// col = fugenColor.getRGB();
-						// }
-						currentColor = tileColor;
-
-						if (x == tile_size - 1) { // rechter rand
-							currentColor = fugenColor;
-						} else if (x == 0) { // linker rand
-							currentColor = fugenColor;
-						}
-
-						if (y == tile_size - 1) { // unterer rand
-							currentColor = fugenColor;
-						} else if (y == 0) { // oberer rand
-							currentColor = fugenColor;
-						}
-
-						result.setPixel((t * tile_size) + x, (r * tile_size) + y, currentColor);
-					}
-				}
-			}
-
-		}
-
-		return result;
-
-	}
-
+	
 	public static ImageRaster generateDiscoTileTexture(int w, int h, int tilesize) {
 
 		ImageRaster result = new ImageRaster(w, h);
@@ -480,8 +365,6 @@ public class TextureGenerator {
 
 		int numberOfRows = h / tile_size;
 		int tilesPerRow = w / tile_size;
-
-		// Color fugenColor = new Color(0, 0, 255);
 
 		for (int r = 0; r < numberOfRows; r++) {
 
@@ -515,19 +398,6 @@ public class TextureGenerator {
 
 				for (int y = 0; y < tile_size; y++) {
 					for (int x = 0; x < tile_size; x++) {
-
-						// if(x==tile_size-1){ // rechter rand
-						// col = fugenColor.getRGB();
-						// }else if(x==0){ // linker rand
-						// col = fugenColor.getRGB();
-						// }
-						//
-						// if(y==tile_size-1){ // unterer rand
-						// col = fugenColor.getRGB();
-						// }else if(y==0){ // oberer rand
-						// col = fugenColor.getRGB();
-						// }
-
 						result.setPixel((t * tile_size) + x, (r * tile_size) + y, col);
 					}
 				}
@@ -566,21 +436,19 @@ public class TextureGenerator {
 																	// direction
 
 						boolean gap = false;
-
-						if (x == tile_size - 1 || x == tile_size - 2) { // rechter
-																		// rand
+						
+						if (x > tile_size - TILE_GAP_SIZE) {
 							normal = Toolbox.getYrotMatrix(-20).transform(normal);
 							gap = true;
-						} else if (x == 0 || x == 1) { // linker rand
+						}
+						else if(x < TILE_GAP_SIZE){
 							normal = Toolbox.getYrotMatrix(20).transform(normal);
 							gap = true;
 						}
-
-						if (y == tile_size - 1 || y == tile_size - 2) { // unterer
-																		// rand
+						if (y > tile_size - TILE_GAP_SIZE) { // unterer rand
 							normal = Toolbox.getXrotMatrix(-20).transform(normal);
 							gap = true;
-						} else if (y == 0 || y == 1) { // oberer rand
+						} else if (y < TILE_GAP_SIZE) { // oberer rand
 							normal = Toolbox.getXrotMatrix(20).transform(normal);
 							gap = true;
 						}
@@ -694,38 +562,8 @@ public class TextureGenerator {
 		}
 		return texture;
 	}
-
-	public static void copySpecularMapToAlphaChannel(ImageRaster specularMap, ImageRaster target) {
-		// specular map als alpha-channel in die normal map kopieren
-		for (int x = 0; x < specularMap.getWidth(); x++) {
-			for (int y = 0; y < specularMap.getHeight(); y++) {
-				int specRgb = specularMap.getPixel(x, y);
-				int grayValue = Toolbox.toGray(specRgb);
-				target.setAlpha(x, y, grayValue);
-			}
-		}
-	}
-
-	public static ImageRaster getRGBRaster(File imagefile, int w, int h) {
-
-		if (!imagefile.canRead()) {
-			throw new RuntimeException("Cannot read from file: " + imagefile.getAbsolutePath());
-		}
-
-		Toolkit tk = Toolkit.getDefaultToolkit();
-		Image img = null;
-		try {
-			img = tk.getImage(imagefile.toURI().toURL());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-
-		return Toolbox.getImageRaster(img, 0, 0, w, h);
-	}
-
-	public static int toColor(Vector3D normalVector, int alpha) {
+	
+	private static final int toColor(Vector3D normalVector, int alpha) {
 		int red = (int) (normalVector.x * 127) + 128;
 		int green = (int) (normalVector.y * 127) + 128;
 		int blue = (int) (normalVector.z * 127) + 128;
@@ -740,7 +578,7 @@ public class TextureGenerator {
 		
 		ImageRaster result = null;
 		
-		ImageRaster characterSet = TextureGenerator.getRGBRaster(new File("textures/courier_character_set_1024x1024.jpg"), 1024, 1024);
+		ImageRaster characterSet = TextureShader.getRGBRaster(new File("textures/courier_character_set_1024x1024.jpg"), 1024, 1024);
 		
 		int characterWidth  = 55;
 		int characterHeight = 60;
@@ -760,6 +598,7 @@ public class TextureGenerator {
 		case 'o': xoff = 832; yoff = 432; break;
 		case 'P': xoff = 890; yoff = 102; break;		
 		case ':': xoff = 658; yoff = 550; break;
+		// TODO ...
 		}
 		
 		result = new ImageRaster(characterWidth, characterHeight);
@@ -778,8 +617,12 @@ public class TextureGenerator {
 		
 		ImageRaster result = null;
 		
+		ImageRaster characterImage = getCharacterAsBitmap(' ');
+		int charImageWith = characterImage.getWidth();
+		int charImageHeight = characterImage.getHeight();
+		
 		char[] characters = text.toCharArray();
-		result = new ImageRaster(paddingLeft + (55*characters.length) + paddingRight, paddingTop + 60 + paddingBottom);
+		result = new ImageRaster(paddingLeft + (charImageWith*characters.length) + paddingRight, paddingTop + charImageHeight + paddingBottom);
 		
 		for(int x=0;x<result.getWidth();x++){
 			for(int y=0;y<result.getHeight();y++){
@@ -788,10 +631,10 @@ public class TextureGenerator {
 		}
 		
 		for(int i=0;i<characters.length;i++){
-			ImageRaster characterImage = getCharacterAsBitmap(text.charAt(i));
+			characterImage = getCharacterAsBitmap(text.charAt(i));
 			for(int x=0;x<characterImage.getWidth();x++){
 				for(int y=0;y<characterImage.getHeight();y++){
-					result.setPixel(paddingLeft + (i*55) + x, paddingBottom + y, characterImage.getPixel(x, y));
+					result.setPixel(paddingLeft + (i*charImageWith) + x, paddingBottom + y, characterImage.getPixel(x, y));
 				}
 			}
 		}			

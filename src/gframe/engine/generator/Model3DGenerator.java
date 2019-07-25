@@ -14,6 +14,7 @@ import gframe.engine.Face;
 import gframe.engine.ImageRaster;
 import gframe.engine.Model3D;
 import gframe.engine.Point3D;
+import gframe.engine.TextureShader;
 import gframe.engine.Toolbox;
 import gframe.engine.Vector3D;
 import graph.Graph;
@@ -56,7 +57,7 @@ public class Model3DGenerator {
 	
 	public static Model3D buildTerrainMeshFromHeightMap(File heightmapFile, int w, int h, Color color){
 		
-		ImageRaster heightMap = TextureGenerator.getRGBRaster(heightmapFile, w, h);
+		ImageRaster heightMap = TextureShader.getRGBRaster(heightmapFile, w, h);
 		
 		Model3D mesh = buildFlatMesh(w, h, color);
 			
@@ -1000,7 +1001,7 @@ public class Model3DGenerator {
 		Collection<Model3D> parts = Model3DGenerator.splitToParts(model);
 		model = new Model3D(model.getOrigin());
 		for (Model3D part : parts) {			
-			model.addChild(part);
+			model.addSubModel(part);
 		}
 		return model;
 	}
@@ -1025,7 +1026,7 @@ public class Model3DGenerator {
 		
 		List<Point3D> vertices = new ArrayList<Point3D>(model.getVertices());
 		// nur direkt kinder?!
-		for(Object child : model.getChildren()){
+		for(Object child : model.getSubModels()){
 			vertices.addAll( ((Model3D)child).getVertices() );
 		}
 		
@@ -1038,7 +1039,7 @@ public class Model3DGenerator {
 		
 		List<Face> faces = new ArrayList<Face>(model.getFaces());
 		// nur direkt kinder?!
-		for(Object child : model.getChildren()){
+		for(Object child : model.getSubModels()){
 			faces.addAll( ((Model3D)child).getFaces() );
 		}
 		
