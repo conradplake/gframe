@@ -4,13 +4,13 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import gframe.Space3D;
 import gframe.engine.AbstractShader;
 import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Particle;
 import gframe.engine.Point3D;
 import gframe.engine.RenderFace;
+import gframe.engine.Space3D;
 import gframe.engine.Toolbox;
 import gframe.engine.Vector3D;
 import gframe.engine.generator.NoiseGenerator;
@@ -85,9 +85,9 @@ public class FlowFieldShader extends AbstractShader {
 				int green = (pixel >> 8) & 0xff;
 				int blue = (pixel) & 0xff;
 
-				if (red + green + blue > 0) {
+				if (red + green + blue > 10) {
 					int nx = (int) Toolbox.map(x, 0, heightmap.getWidth(), 0, textureWidth);
-					int ny = textureHeight - (int) Toolbox.map(y, 0, heightmap.getHeight(), 0, textureHeight);
+					int ny = textureHeight - (int) Toolbox.map(y, 0, heightmap.getHeight(), 0, textureHeight);					
 					positions.add(new int[] { nx, ny });
 				}
 			}

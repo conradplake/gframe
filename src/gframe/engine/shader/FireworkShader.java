@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import gframe.Space3D;
 import gframe.engine.AbstractShader;
 import gframe.engine.ImageRaster;
 import gframe.engine.Lightsource;
 import gframe.engine.Particle;
 import gframe.engine.Point3D;
 import gframe.engine.RenderFace;
+import gframe.engine.Space3D;
 import gframe.engine.Toolbox;
 import gframe.engine.Vector3D;
 
