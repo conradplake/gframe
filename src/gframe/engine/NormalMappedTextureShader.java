@@ -251,22 +251,26 @@ public class NormalMappedTextureShader extends TextureShader {
 			float x_fract = x - x_int;
 			float y_fract = y - y_int;
 
+			int c0_a = (normal >> 24) & 0xff;
 			int c0_x = (normal >> 16) & 0xff;
 			int c0_y = (normal >> 8) & 0xff;
 			int c0_z = (normal >> 0) & 0xff;
 
 			int c1_normal = x_int + 1 < textureWidth ? normalMap.getPixel(x_int + 1, y_int) : normal;
+			int c1_a =  (c1_normal >> 24) & 0xff;
 			int c1_x = (c1_normal >> 16) & 0xff;
 			int c1_y = (c1_normal >> 8) & 0xff;
 			int c1_z = (c1_normal >> 0) & 0xff;
 
 			int c2_normal = y_int + 1 < textureHeight ? normalMap.getPixel(x_int, y_int + 1) : normal;
+			int c2_a = (c2_normal >> 24) & 0xff;
 			int c2_x = (c2_normal >> 16) & 0xff;
 			int c2_y = (c2_normal >> 8) & 0xff;
 			int c2_z = (c2_normal >> 0) & 0xff;
 
 			int c3_normal = x_int + 1 < textureWidth && y_int + 1 < textureHeight
 					? normalMap.getPixel(x_int + 1, y_int + 1) : normal;
+			int c3_a = (c3_normal >> 24) & 0xff;
 			int c3_x = (c3_normal >> 16) & 0xff;
 			int c3_y = (c3_normal >> 8) & 0xff;
 			int c3_z = (c3_normal >> 0) & 0xff;
@@ -276,13 +280,15 @@ public class NormalMappedTextureShader extends TextureShader {
 			float c2_weight = (1 - x_fract) * y_fract;
 			float c3_weight = x_fract * y_fract;
 
+			int newAlpha = (int) (c0_a * c0_weight + c1_a * c1_weight + c2_a * c2_weight + c3_a * c3_weight);
+			
 			int newX = (int) (c0_x * c0_weight + c1_x * c1_weight + c2_x * c2_weight + c3_x * c3_weight);
 
 			int newY = (int) (c0_y * c0_weight + c1_y * c1_weight + c2_y * c2_weight + c3_y * c3_weight);
 
 			int newZ = (int) (c0_z * c0_weight + c1_z * c1_weight + c2_z * c2_weight + c3_z * c3_weight);
 
-			normal = ((newX & 0xFF) << 16) | ((newY & 0xFF) << 8) | ((newZ & 0xFF) << 0);
+			normal = ((newAlpha & 0xFF) << 24) | ((newX & 0xFF) << 16) | ((newY & 0xFF) << 8) | ((newZ & 0xFF) << 0);
 		}
 
 		return normal;
