@@ -128,7 +128,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		showLoadingScreen();
 		
 		// test sequence 
-		startPart0();		
+//		startPart0();		
 		
 		// tiled wall
 		startPart1();
@@ -201,13 +201,14 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		int textureWidth = 160;
 		int textureHeight = 160;
 		int tilesize = 20;
+		int tileGapSize = 2;
 
 		Color floorTileColor = new Color(118, 206, 235);
 //		Color floorTileColor = Color.BLUE;
 		TextureShader wallShader = new NormalMappedTextureShader(lightsource,
-				TextureGenerator.generateTileTexture(textureWidth, textureHeight, tilesize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
-				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize), true);
-		wallShader.setIsBilinearFiltering(false);
+				TextureGenerator.generateTileTexture(textureWidth, textureHeight, tilesize, tileGapSize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()),
+				TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize, tileGapSize), true);
+//		wallShader.setIsBilinearFiltering(false);
 		
 //		Shader wallShader = new MaterialShader(lightsource, TextureGenerator.generateTileTextureNormalMap(textureWidth, textureHeight, tilesize));
 		
@@ -338,9 +339,10 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		
 		// floor
 		int tileSize = 160;
+		int tileGapSize = 2;
 		Color floorTileColor = new Color(118, 206, 235);
 		TextureShader floorShader = new NormalMappedTextureShader(lightsource,				
-				TextureGenerator.generateTileTexture(320, 320, tileSize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(320, 320, tileSize));
+				TextureGenerator.generateTileTexture(320, 320, tileSize, tileGapSize*2, floorTileColor.getRGB(), floorTileColor.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(320, 320, tileSize, tileGapSize*2));
 		
 		Model3D floor = Model3DGenerator.buildTiledFloor(10, 40, 50, Color.CYAN);	
 		engine.register(floor, floorShader);
@@ -355,7 +357,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		
 		// right wall		
 		TextureShader wallShader = new NormalMappedTextureShader(lightsource,				
-				TextureGenerator.generateTileTexture(700, 700, 70, floorTileColor.getRGB(), Color.LIGHT_GRAY.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(700, 700, 70));
+				TextureGenerator.generateTileTexture(700, 700, 70, tileGapSize, floorTileColor.getRGB(), Color.LIGHT_GRAY.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(700, 700, 70, tileGapSize));
 				
 		wallShader.setIsBilinearFiltering(true);
 		for (int i = 0; i < 10; i++) {
@@ -379,7 +381,7 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		// columns
 		Color columnTileColor = new Color(118, 206, 235);
 		TextureShader columnShader = new NormalMappedTextureShader(lightsource,
-				TextureGenerator.generateTileTexture(40, 500, 10, columnTileColor.darker().getRGB(), columnTileColor.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(40, 500, 10));		
+				TextureGenerator.generateTileTexture(40, 500, 10, 2, columnTileColor.darker().getRGB(), columnTileColor.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(40, 500, 10, 2));		
 		
 		Model3D column1a = Model3DGenerator.buildBlock(40, 250, 40, Color.GRAY);
 		column1a = Model3DGenerator.facify(column1a);
@@ -536,10 +538,10 @@ public class Demo01 extends DoubleBufferedFrame implements MouseMotionListener {
 		engine.setLightsource(lightsource);												
 		
 		int tileSize = 40;
+		int tileGapSize = 4;
 		Color floorTileColor = new Color(118, 206, 235);
-		TextureShader floorShader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateTileTexture(320, 320, tileSize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(320, 320, tileSize));
-		floorShader.setIsBilinearFiltering(false);
-		//TextureShader floorShader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateTileTexture(320, 320, tileSize*2, floorTileColor.getRGB(), floorTileColor.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(320, 320, tileSize*2));
+		TextureShader floorShader = new NormalMappedTextureShader(lightsource, TextureGenerator.generateTileTexture(320, 320, tileSize, tileGapSize, floorTileColor.getRGB(), floorTileColor.darker().getRGB()), TextureGenerator.generateTileTextureNormalMap(320, 320, tileSize, tileGapSize));
+//		floorShader.setIsBilinearFiltering(false);
 		
 		Model3D floor = Model3DGenerator.buildTiledFloor(4, 4, tileSize, Color.BLUE);
 		engine.register(floor, floorShader);			
