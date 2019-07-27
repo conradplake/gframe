@@ -14,7 +14,7 @@ import graph.Node;
 public class TextureGenerator {
 
 	
-	private static final int TILE_GAP_SIZE = 2;
+	private static final int DEFAULT_TILE_GAP_SIZE = 4;
 
 
 	public static ImageRaster generateMengerSpongeTexture(ImageRaster raster, int pos_x, int pos_y, int width,
@@ -122,7 +122,7 @@ public class TextureGenerator {
 									alpha = 250;
 									if (blocksize < 10) {
 										normal = Toolbox.getYrotMatrix(-60).transform(normal); // vector
-																								// "Ã¼berdrehen"
+																								// "überdrehen"
 																								// um
 																								// die
 																								// helligkeit
@@ -169,8 +169,137 @@ public class TextureGenerator {
 		return raster;
 	}
 
+	/*
+	 * see also:
+	 * https://fgiesen.wordpress.com/2010/03/28/how-to-generate-cellular-
+	 * textures/
+	 * 
+	 * 
+	 */
+	public static ImageRaster generateVoronoiTexture(int w, int h, int numberOfCells, Color[] colorPalette) {
+		ImageRaster result = new ImageRaster(w, h);
 
+		if (colorPalette == null) {
+			colorPalette = new Color[numberOfCells];
+			for (int i = 0; i < numberOfCells; i++) {
+				int random_r = (int) (Math.random() * 256);
+				int random_g = (int) (Math.random() * 256);
+				int random_b = (int) (Math.random() * 256);
+				colorPalette[i] = new Color(random_r, random_g, random_b);
+			}
+		}
+
+		// build mesh graph
+		Graph graph = new Graph(w * h);
+
+		long distToDirectNeighbor = 1000;
+		long distToDiagonalNeighbor = 1414;
+		// long distToDiagonalNeighbor = manhattanDistance? 2000 : 1414; // do
+		// euclidian else
+
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+
+				// long noise = (long)(100 *
+				// NoiseGenerator.improvedPerlinNoise((float)w/x, (float)h/y,
+				// 0));
+				// System.out.println("noise = "+noise);
+				long noise = 0L;
+
+				int nodeId = 1 + y * w + x; // graph node ids start counting at
+											// with 1, hence: 1 + ...
+
+				// oben
+				if (y > 0) {
+					int nodeIdNeighbor = 1 + (y - 1) * w + x;
+					graph.addEdge(nodeId, nodeIdNeighbor, distToDirectNeighbor + noise);
+				}
+
+				// unten
+				if (y < h - 1) {
+					int nodeIdNeighbor = 1 + (y + 1) * w + x;
+					graph.addEdge(nodeId, nodeIdNeighbor, distToDirectNeighbor + noise);
+				}
+
+				// links
+				if (x > 0) {
+					int nodeIdNeighbor = 1 + (y) * w + x - 1;
+					graph.addEdge(nodeId, nodeIdNeighbor, distToDirectNeighbor + noise);
+				}
+
+				// rechts
+				if (x < w - 1) {
+					int nodeIdNeighbor = 1 + (y) * w + x + 1;
+					graph.addEdge(nodeId, nodeIdNeighbor, distToDirectNeighbor + noise);
+				}
+
+				// oben links
+				if (y > 0 && x > 0) {
+					int nodeIdNeighbor = 1 + (y - 1) * w + x - 1;
+					graph.addEdge(nodeId, nodeIdNeighbor, distToDiagonalNeighbor + noise);
+				}
+
+				// oben rechts
+				if (y > 0 && x < w - 1) {
+					int nodeIdNeighbor = 1 + (y - 1) * w + x + 1;
+					graph.addEdge(nodeId, nodeIdNeighbor, distToDiagonalNeighbor + noise);
+				}
+
+				// unten links
+				if (y < h - 1 && x > 0) {
+					int nodeIdNeighbor = 1 + (y + 1) * w + x - 1;
+					graph.addEdge(nodeId, nodeIdNeighbor, distToDiagonalNeighbor + noise);
+				}
+
+				// unten rechts
+				if (y < h - 1 && x < w - 1) {
+					int nodeIdNeighbor = 1 + (y + 1) * w + x + 1;
+					graph.addEdge(nodeId, nodeIdNeighbor, distToDiagonalNeighbor + noise);
+				}
+			}
+		}
+
+		// randomly select terminal nodes (cells)
+		int[] terminalNodeIds = new int[numberOfCells];
+		for (int i = 0; i < numberOfCells; i++) {
+			int random_x = (int) (Math.random() * w);
+			int random_y = (int) (Math.random() * h);
+			int nodeId = 1 + random_y * w + random_x;
+			graph.setTerminal(nodeId, true);
+			terminalNodeIds[i] = nodeId;
+		}
+
+		// color each node/pixel with nearest terminal's color
+		// System.out.println(">> TextureGeneraor: computing voronoi areas");
+		graph.markVoronoiAreas();
+		// System.out.println("<< TextureGeneraor: computing voronoi areas");
+
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				int nodeId = 1 + y * w + x;
+				Node node = graph.getNode(nodeId);
+				int cellNodeId = node.getColor();
+
+				int colorIndex = -1;
+				for (int i = 0; i < terminalNodeIds.length; i++) {
+					if (terminalNodeIds[i] == cellNodeId) {
+						colorIndex = i;
+					}
+				}
+				Color color = colorPalette[colorIndex];
+				result.setPixel(x, y, color.getRGB());
+			}
+		}
+
+		return result;
+	}
+
+	
 	public static ImageRaster generateTileTexture(int w, int h, int tilesize, int tileColor, int fugenColor) {
+		return generateTileTexture(w, h, tilesize, DEFAULT_TILE_GAP_SIZE, tileColor, fugenColor);
+	}
+	
+	public static ImageRaster generateTileTexture(int w, int h, int tilesize, int tileGapSize, int tileColor, int fugenColor) {
 
 		ImageRaster result = new ImageRaster(w, h);
 
@@ -192,21 +321,21 @@ public class TextureGenerator {
 						// col = fugenColor.getRGB();
 						// }
 								
-						if (x > tile_size - TILE_GAP_SIZE) {
+						if (x > tile_size - tileGapSize) {
 							col = fugenColor;
 						}
-						else if(x < TILE_GAP_SIZE){
+						else if(x < tileGapSize){
 							col = fugenColor;
 						}
-						if (y > tile_size - TILE_GAP_SIZE) { // unterer rand
+						if (y > tile_size - tileGapSize) { // unterer rand
 							col = fugenColor;							
-						} else if (y < TILE_GAP_SIZE) { // oberer rand
+						} else if (y < tileGapSize) { // oberer rand
 							col = fugenColor;
 						}
 						
 						// if(x%tile_size==0 || y%tile_size==0 || x==tile_size-1
-						// || y==tile_size-1){ // fugen weiÃŸ
-						// if(x%tile_size==0 || y%tile_size==0){ // fugen weiÃŸ
+						// || y==tile_size-1){ // fugen weiß
+						// if(x%tile_size==0 || y%tile_size==0){ // fugen weiß
 						//
 						// col = ((255 & 0xFF) << 24) |
 						// ((255 & 0xFF) << 16) |
@@ -285,7 +414,12 @@ public class TextureGenerator {
 
 	}
 
+	
 	public static ImageRaster generateTileTextureNormalMap(int w, int h, int tilesize) {
+		return generateTileTextureNormalMap(w, h, tilesize, DEFAULT_TILE_GAP_SIZE);
+	}
+	
+	public static ImageRaster generateTileTextureNormalMap(int w, int h, int tilesize, int tileGapSize) {
 
 		ImageRaster result = generateDefaultNormalMap(w, h);
 
@@ -313,18 +447,18 @@ public class TextureGenerator {
 
 						boolean gap = false;
 						
-						if (x > tile_size - TILE_GAP_SIZE) {
+						if (x > tile_size - tileGapSize) {
 							normal = Toolbox.getYrotMatrix(-20).transform(normal);
 							gap = true;
 						}
-						else if(x < TILE_GAP_SIZE){
+						else if(x < tileGapSize){
 							normal = Toolbox.getYrotMatrix(20).transform(normal);
 							gap = true;
 						}
-						if (y > tile_size - TILE_GAP_SIZE) { // unterer rand
+						if (y > tile_size - tileGapSize) { // unterer rand
 							normal = Toolbox.getXrotMatrix(-20).transform(normal);
 							gap = true;
-						} else if (y < TILE_GAP_SIZE) { // oberer rand
+						} else if (y < tileGapSize) { // oberer rand
 							normal = Toolbox.getXrotMatrix(20).transform(normal);
 							gap = true;
 						}
@@ -337,6 +471,7 @@ public class TextureGenerator {
 						}
 
 						int col = toColor(normal, gap ? 155 : 255);
+//						int col = toColor(normal, 255);
 
 						result.setPixel((t * tile_size) + x, (r * tile_size) + y, col);
 					}
@@ -350,7 +485,7 @@ public class TextureGenerator {
 
 	public static ImageRaster generateWoodTexture(int width, int height, int alpha) {
 
-		float dimension_x = 4; // x=0 -> nur lÃ¤ngsstreifen
+		float dimension_x = 4; // x=0 -> nur längsstreifen
 		float dimension_y = 4; // regelt die streifenbreite
 
 		ImageRaster result = new ImageRaster(width, height);
