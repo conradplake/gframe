@@ -15,6 +15,8 @@ Features include:
  <tr>
   <td><img src="https://github.com/conradplake/gframe/blob/4e45b64d5367d3d2d6d852e0bb83b3cef1456479/gallery/star_wars_tunnel_chase.png" alt="Tunnel chase" width="300"></td>
   <td><img src="https://github.com/conradplake/gframe/blob/4e45b64d5367d3d2d6d852e0bb83b3cef1456479/gallery/space_station.png" alt="Space station" width="300"></td>
+ </tr>
+ <tr>  
   <td><img src="https://github.com/conradplake/gframe/blob/4e45b64d5367d3d2d6d852e0bb83b3cef1456479/gallery/normal_mapped_tiles.png" alt="Normal mapped tiles" width="300"></td>
   <td><img src="https://github.com/conradplake/gframe/blob/4e45b64d5367d3d2d6d852e0bb83b3cef1456479/gallery/dungeon.png" alt="Dungeon" width="300"></td>  
  </tr>
